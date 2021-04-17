@@ -26,93 +26,22 @@
 #define VOXELLOADER_HPP
 
 #include <array>
-#include <voxeloptimizer/Color.hpp>
+#include <VoxelOptimizer/Color.hpp>
 #include <memory>
 #include <stdlib.h>
 #include <string>
 #include <vector>
-#include <voxeloptimizer/Vector.hpp>
+#include <VoxelOptimizer/Vector.hpp>
+#include <VoxelOptimizer/Loaders/VoxelMesh.hpp>
 
 namespace VoxelOptimizer
 {
-    class CVoxelLoader
+    class CMagicaVoxelLoader
     {
         public:  
             using ColorPalette = std::array<CColor, 256>;
 
-            class CVoxel
-            {
-                public:
-                    enum Direction
-                    {
-                        UP,
-                        DOWN,
-                        LEFT,
-                        RIGHT,
-                        FORWARD,
-                        BACKWARD
-                    };
-
-                    CVoxel();
-
-                    CVector Pos;
-                    int Material;
-
-                    // A normal of (0, 0, 0) means invisible face.
-                    std::array<CVector, 6> Normals;
-
-                    inline bool IsVisible() const
-                    {
-                        for (auto &&n : Normals)
-                        {
-                            if(!n.IsZero())
-                                return true;
-                        }
-                        
-                        return false;
-                    }
-
-                    ~CVoxel() = default;
-            };
-
-            using Voxel = std::shared_ptr<CVoxel>;
-
-            class CModel
-            {
-                public:
-                    CModel() = default;
-
-                    inline void SetSize(CVector Size)
-                    {
-                        m_Size = Size;
-
-                        m_Voxels.clear();
-                        m_Voxels.resize(m_Size.x * m_Size.y * m_Size.z);
-                    }
-
-                    inline CVector GetSize() const
-                    {
-                        return m_Size;
-                    }
-
-                    inline std::vector<Voxel> GetVoxels() const
-                    {
-                        return m_Voxels;
-                    }
-
-                    void SetVoxel(CVector Pos, int Material);
-
-                    ~CModel() = default;
-                private:
-                    void SetNormal(Voxel Cur, Voxel Neighbor, CVoxel::Direction CurDir, CVoxel::Direction NeighborDir, CVector Val);
-
-                    CVector m_Size;
-                    std::vector<Voxel> m_Voxels;
-            };
-
-            using Model = std::shared_ptr<CModel>;
-
-            CVoxelLoader() = default;
+            CMagicaVoxelLoader() = default;
 
             /**
              * @brief Loads a .vox file from disk.
@@ -129,7 +58,10 @@ namespace VoxelOptimizer
              */
             void Load(const char *Data, size_t Length);
 
-            inline std::vector<Model> GetModels() const
+            /**
+             * @return Gets a list with all models inside the voxel file.
+             */
+            inline std::vector<VoxelModel> GetModels() const
             {
                 return m_Models;
             }
@@ -139,7 +71,7 @@ namespace VoxelOptimizer
                 return m_ColorPalette;
             }
 
-            ~CVoxelLoader() = default;
+            ~CMagicaVoxelLoader() = default;
         private:
             struct SChunkHeader
             {
@@ -152,10 +84,10 @@ namespace VoxelOptimizer
 
             SChunkHeader LoadChunk(const char *Data, size_t &Pos);
             void ProcessPack(const SChunkHeader &Chunk, const char *Data, size_t &Pos);
-            Model ProcessSize(const char *Data, size_t &Pos);
-            void ProcessXYZI(Model m, const char *Data, size_t &Pos, size_t Size);
+            VoxelModel ProcessSize(const char *Data, size_t &Pos);
+            void ProcessXYZI(VoxelModel m, const char *Data, size_t &Pos, size_t Size);
 
-            std::vector<Model> m_Models;
+            std::vector<VoxelModel> m_Models;
             ColorPalette m_ColorPalette;
 
             size_t m_Index;

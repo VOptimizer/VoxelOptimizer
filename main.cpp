@@ -1,18 +1,18 @@
 #include <iostream>
-#include <voxeloptimizer/VoxelLoader.hpp>
-#include <voxeloptimizer/SimpleMesher.hpp>
-#include <voxeloptimizer/OptimizeMesher.hpp>
-#include <voxeloptimizer/WavefrontObjExporter.hpp>
+#include <VoxelOptimizer/VoxelLoader.hpp>
+#include <VoxelOptimizer/SimpleMesher.hpp>
+#include <VoxelOptimizer/OptimizeMesher.hpp>
+#include <VoxelOptimizer/WavefrontObjExporter.hpp>
 #include <fstream>
 
 using namespace std;
 
 int main(int argc, char const *argv[])
 {
-    VoxelOptimizer::CVoxelLoader loader;
+    VoxelOptimizer::CMagicaVoxelLoader loader;
     loader.Load("windmill.vox");
 
-    VoxelOptimizer::COptimizeMesher Mesher;
+    VoxelOptimizer::CGreedyMesher Mesher;
 
     auto VoxelMesh = loader.GetModels().back();
 

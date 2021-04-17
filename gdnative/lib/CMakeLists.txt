@@ -5,10 +5,11 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-set(SRCS "${PROJECT_SOURCE_DIR}/src/VoxelLoader.cpp"
-         "${PROJECT_SOURCE_DIR}/src/SimpleMesher.cpp"
-         "${PROJECT_SOURCE_DIR}/src/OptimizeMesher.cpp"
-         "${PROJECT_SOURCE_DIR}/src/WavefrontObjExporter.cpp")
+set(SRCS "${PROJECT_SOURCE_DIR}/src/Loaders/MagicaVoxelLoader.cpp"
+         "${PROJECT_SOURCE_DIR}/src/Loaders/VoxelMesh.cpp"
+         "${PROJECT_SOURCE_DIR}/src/Meshers/SimpleMesher.cpp"
+        # "${PROJECT_SOURCE_DIR}/src/OptimizeMesher.cpp"
+         "${PROJECT_SOURCE_DIR}/src/Exporters/WavefrontObjExporter.cpp")
 #set(LIBS "")
 
 include_directories("${PROJECT_SOURCE_DIR}/include")

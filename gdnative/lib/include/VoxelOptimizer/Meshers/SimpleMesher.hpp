@@ -22,30 +22,36 @@
  * SOFTWARE.
  */
 
-#ifndef MESH_HPP
-#define MESH_HPP
+#ifndef SIMPLEMESHER_HPP
+#define SIMPLEMESHER_HPP
 
-#include <voxeloptimizer/Material.hpp>
-#include <memory>
-#include <vector>
-#include <voxeloptimizer/Vector.hpp>
+#include <map>
+#include <VoxelOptimizer/Material.hpp>
+#include <VoxelOptimizer/Loaders/VoxelMesh.hpp>
+#include <VoxelOptimizer/Loaders/MagicaVoxelLoader.hpp>
+
+#include <VoxelOptimizer/Mesh.hpp>
 
 namespace VoxelOptimizer
 {
-    struct SGroupedFaces
+    class CSimpleMesher
     {
-        CMaterial Material;
-        std::vector<int> Indices;
-    };
-    using GroupedFaces = std::shared_ptr<SGroupedFaces>;
+        public:
+            CSimpleMesher() = default;
 
-    struct SSimpleMesh
-    {
-        std::vector<CVector> Vertices;
-        std::vector<GroupedFaces> Faces;
+            Mesh GenerateMesh(VoxelModel m, CMagicaVoxelLoader::ColorPalette Palette);
+
+            ~CSimpleMesher() = default;
+
+        private:
+            int AddVertex(Mesh Mesh, CVector Vertex);
+            int AddNormal(Mesh Mesh, CVector Normal);
+
+            std::map<size_t, int> m_Index;
+            std::map<size_t, int> m_NormalIndex;
+            std::map<int, GroupedFaces> m_FacesIndex;
     };
-    using SimpleMesh = std::shared_ptr<SSimpleMesh>;
 } // namespace VoxelOptimizer
 
 
-#endif //MESH_HPP
+#endif //SIMPLEMESHER_HPP

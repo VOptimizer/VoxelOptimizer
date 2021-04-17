@@ -25,7 +25,7 @@
 #ifndef WAVEFRONTOBJEXPORTER_HPP
 #define WAVEFRONTOBJEXPORTER_HPP
 
-#include <voxeloptimizer/Mesh.hpp>
+#include <VoxelOptimizer/Mesh.hpp>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -43,7 +43,7 @@ namespace VoxelOptimizer
              * @param Path: Path of the generated obj.
              * @param Mesh: Mesh to save.
              */
-            void SaveObj(const std::string &Path, SimpleMesh Mesh);
+            void SaveObj(const std::string &Path, Mesh Mesh);
 
             /**
              * @brief Generates the obj.
@@ -52,11 +52,19 @@ namespace VoxelOptimizer
              * 
              * @return Returns a tuple where value one is the obj file, two the mtl and the third one the texture file.
              */
-            std::tuple<std::string, std::string, std::vector<char>> GenerateObj(SimpleMesh Mesh);
+            std::tuple<std::string, std::string, std::vector<char>> GenerateObj(Mesh Mesh);
+
+            /**
+             * @brief Sets the name for the MTL file. Only needed for Generate Obj.
+             */
+            inline void SetMTLFileName(std::string MTLFileName)
+            {
+                m_MTLFileName = MTLFileName;
+            }
 
             ~CWavefrontObjExporter() = default;
         private:
-        
+            std::string m_MTLFileName;
     };
 } // namespace VoxelOptimizer
 

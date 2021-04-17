@@ -22,28 +22,30 @@
  * SOFTWARE.
  */
 
-#ifndef OPTIMIZEMESHER_HPP
-#define OPTIMIZEMESHER_HPP
+#ifndef MATERIAL_HPP
+#define MATERIAL_HPP
 
-#include <map>
-#include <voxeloptimizer/Mesh.hpp>
-#include <voxeloptimizer/VoxelLoader.hpp>
+#include <VoxelOptimizer/Color.hpp>
 
 namespace VoxelOptimizer
 {
-    class COptimizeMesher
+    class CMaterial
     {
         public:
-            COptimizeMesher(/* args */) {}
+            enum ColorIndex
+            {
+                RED,
+                GREEN,
+                BLUE,
+                ALPHA
+            };
 
-            SimpleMesh GenerateMesh(CVoxelLoader::Model m, CVoxelLoader::ColorPalette Palette);
+            CMaterial() {}
 
-            ~COptimizeMesher() {}
-        private:
-            int AddVertex(SimpleMesh Mesh, CVector Vertex);
-            std::map<size_t, int> m_Index;
-            std::map<int, GroupedFaces> m_FacesIndex;
+            CColor Diffuse;
+
+            ~CMaterial() {}
     };
 } // namespace VoxelOptimizer
 
-#endif //OPTIMIZEMESHER_HPP
+#endif //MATERIAL_HPP

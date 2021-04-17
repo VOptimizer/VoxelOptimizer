@@ -22,30 +22,19 @@
  * SOFTWARE.
  */
 
-#ifndef MATERIAL_HPP
-#define MATERIAL_HPP
+#ifndef VOXELOPTIMIZER_HPP
+#define VOXELOPTIMIZER_HPP
 
-#include <voxeloptimizer/Color.hpp>
+#include <VoxelOptimizer/Color.hpp>
+#include <VoxelOptimizer/Exceptions.hpp>
+#include <VoxelOptimizer/Material.hpp>
+#include <VoxelOptimizer/Mesh.hpp>
+#include <VoxelOptimizer/Vector.hpp>
 
-namespace VoxelOptimizer
-{
-    class CMaterial
-    {
-        public:
-            enum ColorIndex
-            {
-                RED,
-                GREEN,
-                BLUE,
-                ALPHA
-            };
+#include <VoxelOptimizer/Exporters/WavefrontObjExporter.hpp>
+#include <VoxelOptimizer/Loaders/MagicaVoxelLoader.hpp>
+#include <VoxelOptimizer/Loaders/VoxelMesh.hpp>
+#include <VoxelOptimizer/Meshers/GreedyMesher.hpp>
+#include <VoxelOptimizer/Meshers/SimpleMesher.hpp>
 
-            CMaterial() {}
-
-            CColor Diffuse;
-
-            ~CMaterial() {}
-    };
-} // namespace VoxelOptimizer
-
-#endif //MATERIAL_HPP
+#endif //VOXELOPTIMIZER_HPP

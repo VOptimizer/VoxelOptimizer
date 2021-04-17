@@ -24,19 +24,11 @@
 
 #include <fstream>
 #include <string.h>
-#include <voxeloptimizer/VoxelLoader.hpp>
-#include <voxeloptimizer/Exceptions.hpp>
+#include <VoxelOptimizer/Loaders/MagicaVoxelLoader.hpp>
+#include <VoxelOptimizer/Exceptions.hpp>
 
 namespace VoxelOptimizer
 {
-    const static CVector FACE_UP = CVector(0, 0, 1);
-    const static CVector FACE_DOWN = CVector(0, 0, -1);
-    const static CVector FACE_LEFT = CVector(-1, 0, 0);
-    const static CVector FACE_RIGHT = CVector(1, 0, 0);
-    const static CVector FACE_FORWARD = CVector(0, 1, 0);
-    const static CVector FACE_BACKWARD = CVector(0, -1, 0);
-    const static CVector FACE_ZERO = CVector(0, 0, 0);
-
     // Copied from the official documentation. https://github.com/ephtracy/voxel-model/blob/master/MagicaVoxel-file-format-vox.txt
     const static unsigned int default_palette[256] = {
         0x00000000, 0xffffffff, 0xffccffff, 0xff99ffff, 0xff66ffff, 0xff33ffff, 0xff00ffff, 0xffffccff, 0xffccccff, 0xff99ccff, 0xff66ccff, 0xff33ccff, 0xff00ccff, 0xffff99ff, 0xffcc99ff, 0xff9999ff,
@@ -57,66 +49,7 @@ namespace VoxelOptimizer
         0xff880000, 0xff770000, 0xff550000, 0xff440000, 0xff220000, 0xff110000, 0xffeeeeee, 0xffdddddd, 0xffbbbbbb, 0xffaaaaaa, 0xff888888, 0xff777777, 0xff555555, 0xff444444, 0xff222222, 0xff111111
     };
 
-    CVoxelLoader::CVoxel::CVoxel()
-    {
-        Normals[Direction::UP] = FACE_UP;
-        Normals[Direction::DOWN] = FACE_DOWN;
-        Normals[Direction::LEFT] = FACE_LEFT;
-        Normals[Direction::RIGHT] = FACE_RIGHT;
-        Normals[Direction::FORWARD] = FACE_FORWARD;
-        Normals[Direction::BACKWARD] = FACE_BACKWARD;
-    }
-
-    void CVoxelLoader::CModel::SetVoxel(CVector Pos, int Material)
-    {
-        Voxel Tmp = Voxel(new CVoxel());
-        Tmp->Pos = Pos;
-        Tmp->Material = Material;
-
-        Voxel Up, Down, Left, Right, Forward, Backward;
-
-        if(Pos.z + 1 != m_Size.z)
-            Up = m_Voxels[Pos.x + m_Size.x * Pos.y + m_Size.x * m_Size.y * (Pos.z + 1)];
-
-        if(Pos.z != 0)
-            Down = m_Voxels[Pos.x + m_Size.x * Pos.y + m_Size.x * m_Size.y * (Pos.z - 1)];
-
-        if(Pos.x != 0)
-            Left = m_Voxels[(Pos.x - 1) + m_Size.x * Pos.y + m_Size.x * m_Size.y * Pos.z];
-
-        if(Pos.x + 1 != m_Size.x)
-            Right = m_Voxels[(Pos.x + 1) + m_Size.x * Pos.y + m_Size.x * m_Size.y * Pos.z];
-
-        if(Pos.y + 1 != m_Size.y)
-            Forward = m_Voxels[Pos.x + m_Size.x * (Pos.y + 1) + m_Size.x * m_Size.y * Pos.z];
-
-        if(Pos.y != 0)
-            Backward = m_Voxels[Pos.x + m_Size.x * (Pos.y - 1) + m_Size.x * m_Size.y * Pos.z];
-
-        SetNormal(Tmp, Up, CVoxel::Direction::UP, CVoxel::Direction::DOWN, FACE_UP);
-        SetNormal(Tmp, Down, CVoxel::Direction::DOWN, CVoxel::Direction::UP, FACE_DOWN);
-
-        SetNormal(Tmp, Left, CVoxel::Direction::LEFT, CVoxel::Direction::RIGHT, FACE_LEFT);
-        SetNormal(Tmp, Right, CVoxel::Direction::RIGHT, CVoxel::Direction::LEFT, FACE_RIGHT);
-
-        SetNormal(Tmp, Forward, CVoxel::Direction::FORWARD, CVoxel::Direction::BACKWARD, FACE_FORWARD);
-        SetNormal(Tmp, Backward, CVoxel::Direction::BACKWARD, CVoxel::Direction::FORWARD, FACE_BACKWARD);
-
-        m_Voxels[Pos.x + m_Size.x * Pos.y + m_Size.x * m_Size.y * Pos.z] = Tmp;
-    }
-
-    void CVoxelLoader::CModel::SetNormal(Voxel Cur, Voxel Neighbor, CVoxel::Direction CurDir, CVoxel::Direction NeighborDir, CVector Val)
-    {
-        if(Neighbor)
-        {
-            Neighbor->Normals[NeighborDir] = FACE_ZERO;
-            Cur->Normals[CurDir] = FACE_ZERO;
-        }
-        else
-            Cur->Normals[CurDir] = Val;
-    }
-
-    void CVoxelLoader::Load(const std::string &File)
+    void CMagicaVoxelLoader::Load(const std::string &File)
     {
         std::ifstream in(File, std::ios::binary);
         if(in.is_open())
@@ -136,7 +69,7 @@ namespace VoxelOptimizer
             throw CVoxelLoaderException("Failed to open '" + File + "'");
     }
 
-    void CVoxelLoader::Load(const char *Data, size_t Length)
+    void CMagicaVoxelLoader::Load(const char *Data, size_t Length)
     {
         m_Models.clear();
         LoadDefaultPalette();
@@ -181,7 +114,7 @@ namespace VoxelOptimizer
                         if(Pos + sizeof(int) * 4 >= Length)
                             throw CVoxelLoaderException("Corrupted file. Chunk 'SIZE' is not complete.");
 
-                        Model m = ProcessSize(Data, Pos);
+                        VoxelModel m = ProcessSize(Data, Pos);
                         Tmp = LoadChunk(Data, Pos);
                         if(strncmp(Tmp.ID, "XYZI", sizeof(Tmp.ID)) != 0)
                             throw CVoxelLoaderException("Can't understand the format.");
@@ -219,7 +152,7 @@ namespace VoxelOptimizer
         }
     }
 
-    void CVoxelLoader::LoadDefaultPalette()
+    void CMagicaVoxelLoader::LoadDefaultPalette()
     {
         for (size_t i = 0; i < m_ColorPalette.size(); i++)
         {
@@ -227,7 +160,7 @@ namespace VoxelOptimizer
         }
     }
 
-    CVoxelLoader::SChunkHeader CVoxelLoader::LoadChunk(const char *Data, size_t &Pos)
+    CMagicaVoxelLoader::SChunkHeader CMagicaVoxelLoader::LoadChunk(const char *Data, size_t &Pos)
     {
         SChunkHeader Tmp;
         memcpy(&Tmp, Data + Pos, sizeof(SChunkHeader));
@@ -236,15 +169,15 @@ namespace VoxelOptimizer
         return Tmp;
     }
 
-    void CVoxelLoader::ProcessPack(const CVoxelLoader::SChunkHeader &Chunk, const char *Data, size_t &Pos)
+    void CMagicaVoxelLoader::ProcessPack(const CMagicaVoxelLoader::SChunkHeader &Chunk, const char *Data, size_t &Pos)
     {
         m_Models.resize(*((int*)(Data + Pos)));
         Pos += sizeof(int);
     }
 
-    CVoxelLoader::Model CVoxelLoader::ProcessSize(const char *Data, size_t &Pos)
+    VoxelModel CMagicaVoxelLoader::ProcessSize(const char *Data, size_t &Pos)
     {
-        Model Ret = Model(new CModel());
+        VoxelModel Ret = VoxelModel(new CVoxelModel());
 
         CVector Size;
 
@@ -262,7 +195,7 @@ namespace VoxelOptimizer
         return Ret;
     }
 
-    void CVoxelLoader::ProcessXYZI(CVoxelLoader::Model m, const char *Data, size_t &Pos, size_t Size)
+    void CMagicaVoxelLoader::ProcessXYZI(VoxelModel m, const char *Data, size_t &Pos, size_t Size)
     {
         int VoxelCount = *((int*)(Data + Pos)); 
         Pos += sizeof(int);

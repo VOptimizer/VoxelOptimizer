@@ -22,33 +22,33 @@
  * SOFTWARE.
  */
 
-#ifndef GODOTVOXELOPTIMIZER_HPP
-#define GODOTVOXELOPTIMIZER_HPP
+#ifndef MESH_HPP
+#define MESH_HPP
 
-#include <ArrayMesh.hpp>
-#include <Godot.hpp>
-#include <Reference.hpp>
-#include <VoxelOptimizer/VoxelOptimizer.hpp>
+#include <VoxelOptimizer/Material.hpp>
+#include <memory>
+#include <vector>
+#include <VoxelOptimizer/Vector.hpp>
 
-using namespace godot;
-
-class CGodotVoxelOptimizer : public Reference
+namespace VoxelOptimizer
 {
-    GODOT_CLASS(CGodotVoxelOptimizer, Reference);
-    public:
-        CGodotVoxelOptimizer() = default;
+    struct SGroupedFaces
+    {
+        CMaterial Material;             //!< Material which are applied to this faces.
+        std::vector<CVector> Indices;   //!< Indices of the faces. 3 indices are alway 1 triangle. One index is a tripple of x = vertex, y = normal, z = uv.
+    };
+    using GroupedFaces = std::shared_ptr<SGroupedFaces>;
 
-        void _init() { }
+    struct SMesh
+    {
+        std::vector<CVector> Vertices;      //!< All vertices of this mesh.
+        std::vector<CVector> Normals;       //!< All normals of this mesh.
+        std::vector<CVector> UVs;           //!< All uvs of this mesh.
 
-        static void _register_methods();
-        godot_error Load(String Path);
-        godot_error Save(String Path);
-        Ref<ArrayMesh> GetMesh(bool Optimized);
+        std::vector<GroupedFaces> Faces;    //!< All faces of this mesh.
+    };
+    using Mesh = std::shared_ptr<SMesh>;
+} // namespace VoxelOptimizer
 
-        virtual ~CGodotVoxelOptimizer() = default;
-    private:
-        VoxelOptimizer::CMagicaVoxelLoader m_Loader;
-        VoxelOptimizer::Mesh m_Mesh;
-};
 
-#endif //GODOTVOXELOPTIMIZER_HPP
+#endif //MESH_HPP

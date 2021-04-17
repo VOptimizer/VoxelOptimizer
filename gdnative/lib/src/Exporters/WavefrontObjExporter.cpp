@@ -22,15 +22,27 @@
  * SOFTWARE.
  */
 
+#include <algorithm>
 #include <fstream>
 #include <sstream>
-#include <voxeloptimizer/WavefrontObjExporter.hpp>
+#include <VoxelOptimizer/Exporters/WavefrontObjExporter.hpp>
 
 namespace VoxelOptimizer
 {   
-    void CWavefrontObjExporter::SaveObj(const std::string &Path, SimpleMesh Mesh)
+    void CWavefrontObjExporter::SaveObj(const std::string &Path, Mesh Mesh)
     {
         auto Tuple = GenerateObj(Mesh);
+
+        // Names the MTL the same as the obj file.
+        m_MTLFileName = Path;
+        std::replace(m_MTLFileName.begin(), m_MTLFileName.end(), '\\', '/');
+        size_t Pos = m_MTLFileName.find_last_of("/");
+        if(Pos != std::string::npos)
+            m_MTLFileName = m_MTLFileName.substr(Pos);
+        
+        Pos = m_MTLFileName.find_last_of(".");
+        if(Pos != std::string::npos)
+            m_MTLFileName = m_MTLFileName.erase(Pos);
 
         std::ofstream out(Path, std::ios::out);
         if(out.is_open())
@@ -40,7 +52,7 @@ namespace VoxelOptimizer
             out.write(Val.data(), Val.size());
             out.close();
 
-            std::ofstream out("materials.mtl", std::ios::out);
+            std::ofstream out(m_MTLFileName + ".mtl", std::ios::out);
             if(out.is_open())
             {
                 Val = std::get<1>(Tuple);
@@ -51,13 +63,16 @@ namespace VoxelOptimizer
         }
     }
 
-    std::tuple<std::string, std::string, std::vector<char>> CWavefrontObjExporter::GenerateObj(SimpleMesh Mesh)
+    std::tuple<std::string, std::string, std::vector<char>> CWavefrontObjExporter::GenerateObj(Mesh Mesh)
     {
         std::stringstream ObjFile, MTLFile;
+        if(m_MTLFileName.empty())
+            m_MTLFileName = "materials";
 
-        ObjFile << "# Generated with Voxeloptimizer" << std::endl;
+
+        ObjFile << "# Generated with VoxelOptimizer" << std::endl;
         ObjFile << "# These comments can be removed" << std::endl;
-        ObjFile << "mtllib materials.mtl" << std::endl;
+        ObjFile << "mtllib " << m_MTLFileName << ".mtl" << std::endl;
 
         for (auto &&v : Mesh->Vertices)
             ObjFile << "v " << v.x << " " << v.y << " " << v.z << std::endl;
@@ -71,7 +86,15 @@ namespace VoxelOptimizer
             ObjFile << "usemtl Mat" << MatCounter << std::endl;
 
             for (size_t i = 0; i < f->Indices.size(); i += 3)
-                ObjFile << "f " << f->Indices[i] << " " << f->Indices[i + 1] << " " << f->Indices[i + 2] << std::endl;
+            {
+                ObjFile << "f";
+                for (char j = 0; j < 3; j++)
+                {
+                    ObjFile << " ";
+                    ObjFile << f->Indices[i + j].x << "//" << f->Indices[i + j].y;
+                }
+                ObjFile << std::endl;
+            }
 
             MatCounter++;         
         }

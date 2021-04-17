@@ -59,10 +59,7 @@ namespace VoxelOptimizer
                 return x == vr.x && y == vr.y && z == vr.z;
             }
 
-            inline bool operator!=(const CVector &vr) const
-            {
-                return x != vr.x && y != vr.y && z != vr.z;
-            }
+            // Upon here just math. Math is magic :D
 
             inline CVector operator*(const CVector &vr) const
             {
@@ -72,6 +69,11 @@ namespace VoxelOptimizer
             inline CVector operator-(const CVector &vr) const
             {
                 return CVector(x - vr.x, y - vr.y, z - vr.z);
+            }
+
+            inline CVector operator/(float scalar) const
+            {
+                return CVector(x / scalar, y / scalar, z / scalar);
             }
 
             inline CVector operator-() const

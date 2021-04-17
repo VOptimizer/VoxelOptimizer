@@ -22,13 +22,13 @@
  * SOFTWARE.
  */
 
-#include <voxeloptimizer/OptimizeMesher.hpp>
+#include <VoxelOptimizer/Meshers/GreedyMesher.hpp>
 
 namespace VoxelOptimizer
 {
-    SimpleMesh COptimizeMesher::GenerateMesh(CVoxelLoader::Model m, CVoxelLoader::ColorPalette Palette)
+    Mesh CGreedyMesher::GenerateMesh(VoxelModel m, CMagicaVoxelLoader::ColorPalette Palette)
     {
-        SimpleMesh Ret = SimpleMesh(new SSimpleMesh());
+        Mesh Ret = Mesh(new SMesh());
 
         auto Voxels = m->GetVoxels();
         auto Size = m->GetSize();
@@ -59,16 +59,14 @@ namespace VoxelOptimizer
                 {
                     for (x[Axis1] = 0; x[Axis1] < Size.v[Axis1]; ++x[Axis1])
                     {       
-                        CVoxelLoader::Voxel V1, V2;
+                        Voxel V1, V2;
 
                         if(x[Axis] >= 0)
-                        {
                             V1 = Voxels[x[0] + (int)Size.x * x[1] + (int)Size.x * (int)Size.y * x[2]];
 
-                            if(x[Axis] < Size.v[Axis] - 1)
-                                V2 = Voxels[x[0] + q[0] + (int)Size.x * (x[1] + q[1]) + (int)Size.x * (int)Size.y * (x[2] + q[2])];
-                        }
-
+                        if(x[Axis] < Size.v[Axis] - 1)
+                            V2 = Voxels[x[0] + q[0] + (int)Size.x * (x[1] + q[1]) + (int)Size.x * (int)Size.y * (x[2] + q[2])];
+                        
                         bool blockCurrent = 0 <= x[Axis] ? (V1 && V1->IsVisible()) : false;
                         bool blockCompare = x[Axis] < Size.v[Axis] - 1 ? (V2 && V2->IsVisible()) : false;
 
@@ -169,7 +167,7 @@ namespace VoxelOptimizer
         return Ret;
     }
 
-    int COptimizeMesher::AddVertex(SimpleMesh Mesh, CVector Vertex)
+    int CGreedyMesher::AddVertex(Mesh Mesh, CVector Vertex)
     {
         int Ret = 0;
         // auto End = Mesh->Vertices.data() + Mesh->Vertices.size();
