@@ -8,7 +8,8 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(SRCS "${PROJECT_SOURCE_DIR}/src/Loaders/MagicaVoxelLoader.cpp"
          "${PROJECT_SOURCE_DIR}/src/Loaders/VoxelMesh.cpp"
          "${PROJECT_SOURCE_DIR}/src/Meshers/SimpleMesher.cpp"
-        # "${PROJECT_SOURCE_DIR}/src/OptimizeMesher.cpp"
+         "${PROJECT_SOURCE_DIR}/src/Meshers/GreedyMesher.cpp"
+         "${PROJECT_SOURCE_DIR}/src/Meshers/IMesher.cpp"
          "${PROJECT_SOURCE_DIR}/src/Exporters/WavefrontObjExporter.cpp")
 #set(LIBS "")
 

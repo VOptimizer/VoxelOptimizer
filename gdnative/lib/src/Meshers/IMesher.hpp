@@ -22,23 +22,47 @@
  * SOFTWARE.
  */
 
-#ifndef SIMPLEMESHER_HPP
-#define SIMPLEMESHER_HPP
-
 #include <VoxelOptimizer/Meshers/IMesher.hpp>
 
 namespace VoxelOptimizer
 {
-    class CSimpleMesher : public IMesher
+    int IMesher::AddVertex(Mesh Mesh, CVector Vertex)
     {
-        public:
-            CSimpleMesher() = default;
+        int Ret = 0;
+        // auto End = Mesh->Vertices.data() + Mesh->Vertices.size();
+        auto IT = m_Index.find(Vertex.hash()); //std::find(Mesh->Vertices.data(), End, Vertex);
 
-            Mesh GenerateMesh(VoxelModel m, CMagicaVoxelLoader::ColorPalette Palette) override;
+        if(IT != m_Index.end())
+            Ret = IT->second;
+        else
+        {
+            Mesh->Vertices.push_back(Vertex);
+            Ret = Mesh->Vertices.size();
 
-            ~CSimpleMesher() = default;
-    };
+            m_Index.insert({Vertex.hash(), Ret});
+        }
+
+        return Ret;
+    }
+
+    int IMesher::AddNormal(Mesh Mesh, CVector Normal)
+    {
+        int Ret = 0;
+        // Normal = CVector(Normal.x, Normal.z, Normal.y);
+
+        // auto End = Mesh->Vertices.data() + Mesh->Vertices.size();
+        auto IT = m_NormalIndex.find(Normal.hash()); //std::find(Mesh->Vertices.data(), End, Vertex);
+
+        if(IT != m_NormalIndex.end())
+            Ret = IT->second;
+        else
+        {
+            Mesh->Normals.push_back(Normal);
+            Ret = Mesh->Normals.size();
+
+            m_NormalIndex.insert({Normal.hash(), Ret});
+        }
+
+        return Ret;
+    }
 } // namespace VoxelOptimizer
-
-
-#endif //SIMPLEMESHER_HPP

@@ -22,23 +22,41 @@
  * SOFTWARE.
  */
 
-#ifndef SIMPLEMESHER_HPP
-#define SIMPLEMESHER_HPP
+#ifndef IMESHER_HPP
+#define IMESHER_HPP
 
-#include <VoxelOptimizer/Meshers/IMesher.hpp>
+#include <map>
+
+#include <VoxelOptimizer/Material.hpp>
+#include <VoxelOptimizer/Loaders/VoxelMesh.hpp>
+#include <VoxelOptimizer/Loaders/MagicaVoxelLoader.hpp>
+
+#include <VoxelOptimizer/Mesh.hpp>
 
 namespace VoxelOptimizer
 {
-    class CSimpleMesher : public IMesher
+    class IMesher
     {
         public:
-            CSimpleMesher() = default;
+            IMesher() = default;
 
-            Mesh GenerateMesh(VoxelModel m, CMagicaVoxelLoader::ColorPalette Palette) override;
+            /**
+             * @brief Generates a mesh from given voxel model data.
+             * 
+             * @param m: Voxel mesh to meshify.
+             */
+            virtual Mesh GenerateMesh(VoxelModel m, CMagicaVoxelLoader::ColorPalette Palette) = 0;
 
-            ~CSimpleMesher() = default;
+            virtual ~IMesher() = default;
+        protected:
+            int AddVertex(Mesh Mesh, CVector Vertex);
+            int AddNormal(Mesh Mesh, CVector Normal);
+
+            std::map<size_t, int> m_Index;
+            std::map<size_t, int> m_NormalIndex;
+            std::map<int, GroupedFaces> m_FacesIndex;
     };
 } // namespace VoxelOptimizer
 
 
-#endif //SIMPLEMESHER_HPP
+#endif //IMESHER_HPP

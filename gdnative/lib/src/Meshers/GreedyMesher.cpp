@@ -30,7 +30,6 @@ namespace VoxelOptimizer
     {
         Mesh Ret = Mesh(new SMesh());
 
-        auto Voxels = m->GetVoxels();
         auto Size = m->GetSize();
 
         // For all 3 axis (x, y, z)
@@ -61,11 +60,14 @@ namespace VoxelOptimizer
                     {       
                         Voxel V1, V2;
 
-                        if(x[Axis] >= 0)
-                            V1 = Voxels[x[0] + (int)Size.x * x[1] + (int)Size.x * (int)Size.y * x[2]];
+                        V1 = m->GetVoxel(CVector(x[0], x[1], x[2]));
+                        V2 = m->GetVoxel(CVector(x[0] + q[0], x[1] + q[1], x[2] + q[2]));
 
-                        if(x[Axis] < Size.v[Axis] - 1)
-                            V2 = Voxels[x[0] + q[0] + (int)Size.x * (x[1] + q[1]) + (int)Size.x * (int)Size.y * (x[2] + q[2])];
+                        // if(x[Axis] >= 0)
+                        //     V1 = Voxels[x[0] + (int)Size.x * x[1] + (int)Size.x * (int)Size.y * x[2]];
+
+                        // if(x[Axis] < Size.v[Axis] - 1)
+                        //     V2 = Voxels[x[0] + q[0] + (int)Size.x * (x[1] + q[1]) + (int)Size.x * (int)Size.y * (x[2] + q[2])];
                         
                         bool blockCurrent = 0 <= x[Axis] ? (V1 && V1->IsVisible()) : false;
                         bool blockCompare = x[Axis] < Size.v[Axis] - 1 ? (V2 && V2->IsVisible()) : false;
@@ -136,13 +138,13 @@ namespace VoxelOptimizer
                             else
                                 Faces = ITFaces->second;
 
-                            Faces->Indices.push_back(I1);
-                            Faces->Indices.push_back(I2);
-                            Faces->Indices.push_back(I3);
+                            Faces->Indices.push_back(CVector(I1, 0, 0));
+                            Faces->Indices.push_back(CVector(I2, 0, 0));
+                            Faces->Indices.push_back(CVector(I3, 0, 0));
 
-                            Faces->Indices.push_back(I1);
-                            Faces->Indices.push_back(I3);
-                            Faces->Indices.push_back(I4);
+                            Faces->Indices.push_back(CVector(I1, 0, 0));
+                            Faces->Indices.push_back(CVector(I3, 0, 0));
+                            Faces->Indices.push_back(CVector(I4, 0, 0));
 
                             for (int l = 0; l < h; ++l)
                                 for (int k = 0; k < w; ++k)
@@ -162,25 +164,6 @@ namespace VoxelOptimizer
             }
 
             delete[] mask;
-        }
-
-        return Ret;
-    }
-
-    int CGreedyMesher::AddVertex(Mesh Mesh, CVector Vertex)
-    {
-        int Ret = 0;
-        // auto End = Mesh->Vertices.data() + Mesh->Vertices.size();
-        auto IT = m_Index.find(Vertex.hash()); //std::find(Mesh->Vertices.data(), End, Vertex);
-
-        if(IT != m_Index.end())
-            Ret = IT->second;
-        else
-        {
-            Mesh->Vertices.push_back(Vertex);
-            Ret = Mesh->Vertices.size();
-
-            m_Index.insert({Vertex.hash(), Ret});
         }
 
         return Ret;

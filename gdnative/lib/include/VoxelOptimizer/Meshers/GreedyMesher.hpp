@@ -25,25 +25,18 @@
 #ifndef OPTIMIZEMESHER_HPP
 #define OPTIMIZEMESHER_HPP
 
-#include <map>
-#include <VoxelOptimizer/Mesh.hpp>
-#include <VoxelOptimizer/Loaders/VoxelMesh.hpp>
-#include <VoxelOptimizer/Loaders/MagicaVoxelLoader.hpp>
+#include <VoxelOptimizer/Meshers/IMesher.hpp>
 
 namespace VoxelOptimizer
 {
-    class CGreedyMesher
+    class CGreedyMesher : public IMesher
     {
         public:
             CGreedyMesher() = default;
 
-            Mesh GenerateMesh(VoxelModel m, CMagicaVoxelLoader::ColorPalette Palette);
+            Mesh GenerateMesh(VoxelModel m, CMagicaVoxelLoader::ColorPalette Palette) override;
 
             ~CGreedyMesher() = default;
-        private:
-            int AddVertex(Mesh Mesh, CVector Vertex);
-            std::map<size_t, int> m_Index;
-            std::map<int, GroupedFaces> m_FacesIndex;
     };
 } // namespace VoxelOptimizer
 
