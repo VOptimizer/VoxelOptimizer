@@ -81,10 +81,10 @@ namespace VoxelOptimizer
 
     using Voxel = std::shared_ptr<CVoxel>;
 
-    class CVoxelModel
+    class CVoxelMesh
     {
         public:
-            CVoxelModel() = default;
+            CVoxelMesh() = default;
 
             /**
              * @brief Sets the size of the voxel space.
@@ -132,7 +132,7 @@ namespace VoxelOptimizer
              */
             Voxel GetVoxel(CVector Pos);
 
-            ~CVoxelModel() = default;
+            ~CVoxelMesh() = default;
         private:
             void SetNormal(Voxel Cur, Voxel Neighbor, CVoxel::Direction CurDir, CVoxel::Direction NeighborDir, CVector Val);
 
@@ -140,7 +140,7 @@ namespace VoxelOptimizer
             std::vector<Voxel> m_Voxels;
     };
 
-    using VoxelModel = std::shared_ptr<CVoxelModel>;
+    using VoxelMesh = std::shared_ptr<CVoxelMesh>;
 } // namespace VoxelOptimizer
 
 

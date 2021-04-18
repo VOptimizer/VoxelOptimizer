@@ -10,6 +10,7 @@ set(SRCS "${PROJECT_SOURCE_DIR}/src/Loaders/MagicaVoxelLoader.cpp"
          "${PROJECT_SOURCE_DIR}/src/Meshers/SimpleMesher.cpp"
          "${PROJECT_SOURCE_DIR}/src/Meshers/GreedyMesher.cpp"
          "${PROJECT_SOURCE_DIR}/src/Meshers/IMesher.cpp"
+         "${PROJECT_SOURCE_DIR}/src/Meshers/Slicer/Slicer.cpp"
          "${PROJECT_SOURCE_DIR}/src/Exporters/WavefrontObjExporter.cpp")
 #set(LIBS "")
 

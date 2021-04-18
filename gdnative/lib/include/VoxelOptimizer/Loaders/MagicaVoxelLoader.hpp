@@ -61,7 +61,7 @@ namespace VoxelOptimizer
             /**
              * @return Gets a list with all models inside the voxel file.
              */
-            inline std::vector<VoxelModel> GetModels() const
+            inline std::vector<VoxelMesh> GetModels() const
             {
                 return m_Models;
             }
@@ -84,10 +84,10 @@ namespace VoxelOptimizer
 
             SChunkHeader LoadChunk(const char *Data, size_t &Pos);
             void ProcessPack(const SChunkHeader &Chunk, const char *Data, size_t &Pos);
-            VoxelModel ProcessSize(const char *Data, size_t &Pos);
-            void ProcessXYZI(VoxelModel m, const char *Data, size_t &Pos, size_t Size);
+            VoxelMesh ProcessSize(const char *Data, size_t &Pos);
+            void ProcessXYZI(VoxelMesh m, const char *Data, size_t &Pos, size_t Size);
 
-            std::vector<VoxelModel> m_Models;
+            std::vector<VoxelMesh> m_Models;
             ColorPalette m_ColorPalette;
 
             size_t m_Index;

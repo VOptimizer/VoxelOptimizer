@@ -22,80 +22,66 @@
  * SOFTWARE.
  */
 
+#include "Slicer/Slicer.hpp"
 #include <VoxelOptimizer/Meshers/GreedyMesher.hpp>
 
 namespace VoxelOptimizer
 {
-    Mesh CGreedyMesher::GenerateMesh(VoxelModel m, CMagicaVoxelLoader::ColorPalette Palette)
+    Mesh CGreedyMesher::GenerateMesh(VoxelMesh m, CMagicaVoxelLoader::ColorPalette Palette)
     {
         Mesh Ret = Mesh(new SMesh());
 
         auto Size = m->GetSize();
         CVector BoxCenter = m->GetSize() / 2;
 
+        CSlicer Slicer(m);
+
         // For all 3 axis (x, y, z)
         for (size_t Axis = 0; Axis < 3; Axis++)
         {
+            Slicer.SetActiveAxis(Axis);
+
             int Axis1 = (Axis + 1) % 3; // 1 = 1 = y, 2 = 2 = z, 3 = 0 = x
             int Axis2 = (Axis + 2) % 3; // 2 = 2 = z, 3 = 0 = x, 4 = 1 = y
             int x[3] = {0};
-            int q[3] = {0};
 
-            /**
-             * x000
-             * 0xx0
-             * 0xx0
-             * 0000
-             */
-
-            // 2d plane to project a slice to.
-            bool *mask = new bool[(size_t)Size.v[Axis1] * (size_t)Size.v[Axis2]];
-            q[Axis] = 1;
-
-            CVector Normal;
-
-
+            // Iterate over each slice of the 3d model.
             for (x[Axis] = -1; x[Axis] < Size.v[Axis];)
             {
-                size_t n = 0;
-                Normal.v[Axis] = 0;
-
-                for (x[Axis2] = 0; x[Axis2] < Size.v[Axis2]; ++x[Axis2])
-                {
-                    for (x[Axis1] = 0; x[Axis1] < Size.v[Axis1]; ++x[Axis1])
-                    {       
-                        Voxel V1, V2;
-
-                        V1 = m->GetVoxel(CVector(x[0], x[1], x[2]));
-                        V2 = m->GetVoxel(CVector(x[0] + q[0], x[1] + q[1], x[2] + q[2]));
-                        
-                        bool blockCurrent = 0 <= x[Axis] ? ((bool)V1) : false;
-                        bool blockCompare = x[Axis] < Size.v[Axis] - 1 ? ((bool)V2) : false;
-
-                        mask[n++] = blockCurrent != blockCompare;
-
-                        if(Normal.v[Axis] == 0)
-                        {
-                            Normal.v[Axis] = blockCurrent ? 1 : 0;
-                            if(Normal.v[Axis] == 0)
-                                Normal.v[Axis] = blockCompare ? -1 : 0;
-                        }
-                    }
-                }
-
                 ++x[Axis];
-                n = 0;
 
+                // Foreach slice go over a 2d plane. 
                 for (int HeightAxis = 0; HeightAxis < Size.v[Axis2]; ++HeightAxis)
                 {
                     for (int WidthAxis = 0; WidthAxis < Size.v[Axis1];)
                     {
-                        if(mask[n])
+                        CVector Pos;
+                        Pos.v[Axis] = x[Axis] - 1;
+                        Pos.v[Axis1] = WidthAxis;
+                        Pos.v[Axis2] = HeightAxis;
+
+                        if(Slicer.IsFace(Pos))
                         {
                             int w, h;
+                            CVector Normal = Slicer.Normal();
+                            int Material = Slicer.Material();
 
                             //Claculates the width of the rect.
-                            for (w = 1; WidthAxis + w < Size.v[Axis1] && mask[n + w]; w++) { }
+                            for (w = 1; WidthAxis + w < Size.v[Axis1]; w++) 
+                            {
+                                CVector WPos;
+                                WPos.v[Axis1] = w;
+
+                                bool IsFace = Slicer.IsFace(Pos + WPos);
+                                if(IsFace)
+                                {
+                                    CVector FaceNormal = Slicer.Normal();
+                                    IsFace = Normal == FaceNormal && Material == Slicer.Material();
+                                }
+
+                                if(!IsFace)
+                                    break;
+                            }
 
                             bool done = false;
                             for (h = 1; HeightAxis + h < Size.v[Axis2]; h++)
@@ -103,8 +89,19 @@ namespace VoxelOptimizer
                                 // Check each block next to this quad
                                 for (int k = 0; k < w; ++k)
                                 {
+                                    CVector QuadPos = Pos;
+                                    QuadPos.v[Axis1] += k;
+                                    QuadPos.v[Axis2] += h;
+
+                                    bool IsFace = Slicer.IsFace(QuadPos);
+                                    if(IsFace)
+                                    {
+                                        CVector FaceNormal = Slicer.Normal();
+                                        IsFace = Normal == FaceNormal && Material == Slicer.Material();
+                                    }
+
                                     // If there's a hole in the mask, exit
-                                    if (!mask[n + k + h * (size_t)Size.v[Axis1]])
+                                    if (!IsFace)
                                     {
                                         done = true;
                                         break;
@@ -138,19 +135,22 @@ namespace VoxelOptimizer
 
                             GroupedFaces Faces;
 
-                            auto ITFaces = m_FacesIndex.find(1);
+                            Material -= 1;
+                            auto ITFaces = m_FacesIndex.find(Material);
                             if(ITFaces == m_FacesIndex.end())
                             {
                                 Faces = GroupedFaces(new SGroupedFaces());
                                 Ret->Faces.push_back(Faces);
 
-                                Faces->Material.Diffuse = Palette[1];
-                                m_FacesIndex.insert({1, Faces});
+                                Faces->Material.Diffuse = Palette[Material];
+                                m_FacesIndex.insert({Material, Faces});
                             }
                             else
                                 Faces = ITFaces->second;
 
-                            CVector FaceNormal = (v2 - v1).Cross(v3 - v1).Normalize(); 
+                            CVector FaceNormal = (v2 - v1).Cross(v3 - v1).Normalize();
+                            
+                            std::swap(Normal.y, Normal.z);
                             int NormalIdx = AddNormal(Ret, Normal);
 
                             if(FaceNormal == Normal)
@@ -174,24 +174,20 @@ namespace VoxelOptimizer
                                 Faces->Indices.push_back(CVector(I1, NormalIdx, 0));
                             }
 
-                            for (int l = 0; l < h; ++l)
-                                for (int k = 0; k < w; ++k)
-                                    mask[n + k + l * (size_t)Size.v[Axis1]] = false;
+                            Slicer.AddProcessedQuad(CVector(x[0], x[1], x[2]), CVector(du[0] + dv[0], du[1] + dv[1], du[2] + dv[2]));
 
                             // Increment counters and continue
                             WidthAxis += w;
-                            n += w;
                         }
                         else
-                        {
                             WidthAxis++;
-                            n++;
-                        }
                     }
                 }
+
+                Slicer.ClearQuads();
             }
 
-            delete[] mask;
+            // break;
         }
 
         return Ret;

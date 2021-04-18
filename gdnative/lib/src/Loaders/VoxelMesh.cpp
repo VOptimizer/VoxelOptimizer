@@ -44,7 +44,7 @@ namespace VoxelOptimizer
         Normals[Direction::BACKWARD] = FACE_BACKWARD;
     }
 
-    void CVoxelModel::SetVoxel(CVector Pos, int Material)
+    void CVoxelMesh::SetVoxel(CVector Pos, int Material)
     {
         Voxel Tmp = Voxel(new CVoxel());
         Tmp->Pos = Pos;
@@ -82,7 +82,7 @@ namespace VoxelOptimizer
         m_Voxels[Pos.x + m_Size.x * Pos.y + m_Size.x * m_Size.y * Pos.z] = Tmp;
     }
 
-    Voxel CVoxelModel::GetVoxel(CVector Pos)
+    Voxel CVoxelMesh::GetVoxel(CVector Pos)
     {
         size_t ArrPos = (size_t)Pos.x + (size_t)m_Size.x * (size_t)Pos.y + (size_t)m_Size.x * (size_t)m_Size.y * (size_t)Pos.z;
 
@@ -92,7 +92,7 @@ namespace VoxelOptimizer
         return m_Voxels[ArrPos];
     }
     
-    void CVoxelModel::SetNormal(Voxel Cur, Voxel Neighbor, CVoxel::Direction CurDir, CVoxel::Direction NeighborDir, CVector Val)
+    void CVoxelMesh::SetNormal(Voxel Cur, Voxel Neighbor, CVoxel::Direction CurDir, CVoxel::Direction NeighborDir, CVector Val)
     {
         if(Neighbor)
         {

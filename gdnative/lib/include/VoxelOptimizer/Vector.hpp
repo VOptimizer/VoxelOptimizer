@@ -71,6 +71,11 @@ namespace VoxelOptimizer
                 return CVector(x - vr.x, y - vr.y, z - vr.z);
             }
 
+            inline CVector operator+(const CVector &vr) const
+            {
+                return CVector(x + vr.x, y + vr.y, z + vr.z);
+            }
+
             inline CVector operator/(float scalar) const
             {
                 return CVector(x / scalar, y / scalar, z / scalar);

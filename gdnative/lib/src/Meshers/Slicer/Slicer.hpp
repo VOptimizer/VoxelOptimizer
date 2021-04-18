@@ -22,43 +22,62 @@
  * SOFTWARE.
  */
 
-#ifndef IMESHER_HPP
-#define IMESHER_HPP
+#ifndef SLICER_HPP
+#define SLICER_HPP
 
-#include <map>
+#include <vector>
+#include <utility>
 
-#include <VoxelOptimizer/Material.hpp>
 #include <VoxelOptimizer/Loaders/VoxelMesh.hpp>
-#include <VoxelOptimizer/Loaders/MagicaVoxelLoader.hpp>
-
-#include <VoxelOptimizer/Mesh.hpp>
+#include <VoxelOptimizer/Vector.hpp>
 
 namespace VoxelOptimizer
 {
-    class IMesher
+    class CSlicer
     {
         public:
-            IMesher() = default;
+            CSlicer(VoxelMesh Mesh) : m_Mesh(Mesh) {}
 
             /**
-             * @brief Generates a mesh from given voxel model data.
-             * 
-             * @param m: Voxel mesh to meshify.
+             * @brief Sets the axis which is currently the main axis.
              */
-            virtual Mesh GenerateMesh(VoxelMesh m, CMagicaVoxelLoader::ColorPalette Palette) = 0;
+            void SetActiveAxis(int Axis);
 
-            virtual ~IMesher() = default;
-        protected:
-            int AddVertex(Mesh Mesh, CVector Vertex);
-            int AddNormal(Mesh Mesh, CVector Normal);
+            /**
+             * @return Returns true if there is a face on the given position.
+             */
+            bool IsFace(CVector Pos);
 
-            std::map<size_t, int> m_Index;
-            std::map<size_t, int> m_NormalIndex;
-            std::map<int, GroupedFaces> m_FacesIndex;
+            /**
+             * @brief Adds a quad to the list of already processed ones.
+             */
+            void AddProcessedQuad(CVector Pos, CVector Size);
+
+            void ClearQuads();
+
+            inline CVector Normal()
+            {
+                return m_Normal;
+            }
+
+            inline int Material()
+            {
+                return m_Material;
+            }
+
+            ~CSlicer() = default;
+        private:
+            void SetFaceNormal(Voxel v, bool IsCurrent);
+
+            VoxelMesh m_Mesh;
+            CVector m_Neighbour;
+            int m_Axis;
+            CVector m_Normal;
+            int m_Material;
+
+            std::vector<std::pair<CVector, CVector>> m_ProcessedQuads;
     };
-
-    using Mesher = std::shared_ptr<IMesher>;
 } // namespace VoxelOptimizer
 
 
-#endif //IMESHER_HPP
+#endif //SLICER_HPP

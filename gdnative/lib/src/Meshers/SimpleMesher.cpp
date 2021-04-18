@@ -27,7 +27,7 @@
 
 namespace VoxelOptimizer
 {
-    Mesh CSimpleMesher::GenerateMesh(VoxelModel m, CMagicaVoxelLoader::ColorPalette Palette)
+    Mesh CSimpleMesher::GenerateMesh(VoxelMesh m, CMagicaVoxelLoader::ColorPalette Palette)
     {
         Mesh Ret = Mesh(new SMesh());
 

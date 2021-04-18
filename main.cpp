@@ -7,7 +7,7 @@ using namespace std;
 int main(int argc, char const *argv[])
 {
     VoxelOptimizer::CMagicaVoxelLoader loader;
-    loader.Load("minicube.vox");
+    loader.Load("windmill.vox");
 
     VoxelOptimizer::CGreedyMesher Mesher;
 

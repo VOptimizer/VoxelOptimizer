@@ -114,7 +114,7 @@ namespace VoxelOptimizer
                         if(Pos + sizeof(int) * 4 >= Length)
                             throw CVoxelLoaderException("Corrupted file. Chunk 'SIZE' is not complete.");
 
-                        VoxelModel m = ProcessSize(Data, Pos);
+                        VoxelMesh m = ProcessSize(Data, Pos);
                         Tmp = LoadChunk(Data, Pos);
                         if(strncmp(Tmp.ID, "XYZI", sizeof(Tmp.ID)) != 0)
                             throw CVoxelLoaderException("Can't understand the format.");
@@ -175,9 +175,9 @@ namespace VoxelOptimizer
         Pos += sizeof(int);
     }
 
-    VoxelModel CMagicaVoxelLoader::ProcessSize(const char *Data, size_t &Pos)
+    VoxelMesh CMagicaVoxelLoader::ProcessSize(const char *Data, size_t &Pos)
     {
-        VoxelModel Ret = VoxelModel(new CVoxelModel());
+        VoxelMesh Ret = VoxelMesh(new CVoxelMesh());
 
         CVector Size;
 
@@ -195,7 +195,7 @@ namespace VoxelOptimizer
         return Ret;
     }
 
-    void CMagicaVoxelLoader::ProcessXYZI(VoxelModel m, const char *Data, size_t &Pos, size_t Size)
+    void CMagicaVoxelLoader::ProcessXYZI(VoxelMesh m, const char *Data, size_t &Pos, size_t Size)
     {
         int VoxelCount = *((int*)(Data + Pos)); 
         Pos += sizeof(int);
