@@ -129,8 +129,14 @@ Ref<ArrayMesh> CGodotVoxelOptimizer::GetMesh(bool Optimized)
         return nullptr;
     }
 
-    VoxelOptimizer::CSimpleMesher Mesher;
-    m_Mesh = Mesher.GenerateMesh(m_Loader.GetModels().front(), m_Loader.GetColorPalette());
+    VoxelOptimizer::Mesher Mesher;
+
+    if(Optimized)
+        Mesher = VoxelOptimizer::Mesher(new VoxelOptimizer::CGreedyMesher());
+    else
+        Mesher = VoxelOptimizer::Mesher(new VoxelOptimizer::CSimpleMesher());
+
+    m_Mesh = Mesher->GenerateMesh(m_Loader.GetModels().front(), m_Loader.GetColorPalette());
 
     Ref<ArrayMesh> Ret = ArrayMesh::_new();
     Array arr;

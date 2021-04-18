@@ -77,6 +77,9 @@ namespace VoxelOptimizer
         for (auto &&v : Mesh->Vertices)
             ObjFile << "v " << v.x << " " << v.y << " " << v.z << std::endl;
 
+        for (auto &&vn : Mesh->Normals)
+            ObjFile << "vn " << vn.x << " " << vn.y << " " << vn.z << std::endl;
+
         size_t MatCounter = 0;
         for (auto &&f : Mesh->Faces)
         {

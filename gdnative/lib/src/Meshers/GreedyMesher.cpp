@@ -31,6 +31,7 @@ namespace VoxelOptimizer
         Mesh Ret = Mesh(new SMesh());
 
         auto Size = m->GetSize();
+        CVector BoxCenter = m->GetSize() / 2;
 
         // For all 3 axis (x, y, z)
         for (size_t Axis = 0; Axis < 3; Axis++)
@@ -51,9 +52,14 @@ namespace VoxelOptimizer
             bool *mask = new bool[(size_t)Size.v[Axis1] * (size_t)Size.v[Axis2]];
             q[Axis] = 1;
 
+            CVector Normal;
+
+
             for (x[Axis] = -1; x[Axis] < Size.v[Axis];)
             {
                 size_t n = 0;
+                Normal.v[Axis] = 0;
+
                 for (x[Axis2] = 0; x[Axis2] < Size.v[Axis2]; ++x[Axis2])
                 {
                     for (x[Axis1] = 0; x[Axis1] < Size.v[Axis1]; ++x[Axis1])
@@ -62,17 +68,18 @@ namespace VoxelOptimizer
 
                         V1 = m->GetVoxel(CVector(x[0], x[1], x[2]));
                         V2 = m->GetVoxel(CVector(x[0] + q[0], x[1] + q[1], x[2] + q[2]));
-
-                        // if(x[Axis] >= 0)
-                        //     V1 = Voxels[x[0] + (int)Size.x * x[1] + (int)Size.x * (int)Size.y * x[2]];
-
-                        // if(x[Axis] < Size.v[Axis] - 1)
-                        //     V2 = Voxels[x[0] + q[0] + (int)Size.x * (x[1] + q[1]) + (int)Size.x * (int)Size.y * (x[2] + q[2])];
                         
-                        bool blockCurrent = 0 <= x[Axis] ? (V1 && V1->IsVisible()) : false;
-                        bool blockCompare = x[Axis] < Size.v[Axis] - 1 ? (V2 && V2->IsVisible()) : false;
+                        bool blockCurrent = 0 <= x[Axis] ? ((bool)V1) : false;
+                        bool blockCompare = x[Axis] < Size.v[Axis] - 1 ? ((bool)V2) : false;
 
                         mask[n++] = blockCurrent != blockCompare;
+
+                        if(Normal.v[Axis] == 0)
+                        {
+                            Normal.v[Axis] = blockCurrent ? 1 : 0;
+                            if(Normal.v[Axis] == 0)
+                                Normal.v[Axis] = blockCompare ? -1 : 0;
+                        }
                     }
                 }
 
@@ -119,10 +126,15 @@ namespace VoxelOptimizer
 
                             int I1, I2, I3, I4;
 
-                            I1 = AddVertex(Ret, CVector(x[0], x[1], x[2]));
-                            I2 = AddVertex(Ret, CVector(x[0] + du[0], x[1] + du[1], x[2] + du[2]));
-                            I3 = AddVertex(Ret, CVector(x[0] + du[0] + dv[0], x[1] + du[1] + dv[1], x[2] + du[2] + dv[2]));
-                            I4 = AddVertex(Ret, CVector(x[0] + dv[0], x[1] + dv[1], x[2] + dv[2]));
+                            CVector v1 = CVector(x[0], x[2], x[1]) - BoxCenter;
+                            CVector v2 = CVector(x[0] + du[0], x[2] + du[2], x[1] + du[1]) - BoxCenter;
+                            CVector v3 = CVector(x[0] + du[0] + dv[0], x[2] + du[2] + dv[2], x[1] + du[1] + dv[1]) - BoxCenter;
+                            CVector v4 = CVector(x[0] + dv[0], x[2] + dv[2], x[1] + dv[1]) - BoxCenter;
+
+                            I1 = AddVertex(Ret, v1);
+                            I2 = AddVertex(Ret, v2);
+                            I3 = AddVertex(Ret, v3);
+                            I4 = AddVertex(Ret, v4);
 
                             GroupedFaces Faces;
 
@@ -138,13 +150,29 @@ namespace VoxelOptimizer
                             else
                                 Faces = ITFaces->second;
 
-                            Faces->Indices.push_back(CVector(I1, 0, 0));
-                            Faces->Indices.push_back(CVector(I2, 0, 0));
-                            Faces->Indices.push_back(CVector(I3, 0, 0));
+                            CVector FaceNormal = (v2 - v1).Cross(v3 - v1).Normalize(); 
+                            int NormalIdx = AddNormal(Ret, Normal);
 
-                            Faces->Indices.push_back(CVector(I1, 0, 0));
-                            Faces->Indices.push_back(CVector(I3, 0, 0));
-                            Faces->Indices.push_back(CVector(I4, 0, 0));
+                            if(FaceNormal == Normal)
+                            {
+                                Faces->Indices.push_back(CVector(I1, NormalIdx, 0));
+                                Faces->Indices.push_back(CVector(I2, NormalIdx, 0));
+                                Faces->Indices.push_back(CVector(I3, NormalIdx, 0));
+
+                                Faces->Indices.push_back(CVector(I1, NormalIdx, 0));
+                                Faces->Indices.push_back(CVector(I3, NormalIdx, 0));
+                                Faces->Indices.push_back(CVector(I4, NormalIdx, 0));
+                            }
+                            else
+                            {
+                                Faces->Indices.push_back(CVector(I3, NormalIdx, 0));
+                                Faces->Indices.push_back(CVector(I2, NormalIdx, 0));
+                                Faces->Indices.push_back(CVector(I1, NormalIdx, 0));
+
+                                Faces->Indices.push_back(CVector(I4, NormalIdx, 0));
+                                Faces->Indices.push_back(CVector(I3, NormalIdx, 0));
+                                Faces->Indices.push_back(CVector(I1, NormalIdx, 0));
+                            }
 
                             for (int l = 0; l < h; ++l)
                                 for (int k = 0; k < w; ++k)

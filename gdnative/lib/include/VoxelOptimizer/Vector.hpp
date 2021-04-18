@@ -46,7 +46,7 @@ namespace VoxelOptimizer
                 float v[3];
             };
 
-            CVector() = default;
+            CVector() : x(0), y(0), z(0) {}
             CVector(float x, float y, float z) : x(x), y(y), z(z) {}
 
             inline bool IsZero() const

@@ -1,8 +1,5 @@
 #include <iostream>
-#include <VoxelOptimizer/VoxelLoader.hpp>
-#include <VoxelOptimizer/SimpleMesher.hpp>
-#include <VoxelOptimizer/OptimizeMesher.hpp>
-#include <VoxelOptimizer/WavefrontObjExporter.hpp>
+#include <VoxelOptimizer/VoxelOptimizer.hpp>
 #include <fstream>
 
 using namespace std;
@@ -10,7 +7,7 @@ using namespace std;
 int main(int argc, char const *argv[])
 {
     VoxelOptimizer::CMagicaVoxelLoader loader;
-    loader.Load("windmill.vox");
+    loader.Load("minicube.vox");
 
     VoxelOptimizer::CGreedyMesher Mesher;
 

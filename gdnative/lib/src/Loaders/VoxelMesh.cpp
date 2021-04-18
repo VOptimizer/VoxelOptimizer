@@ -84,7 +84,7 @@ namespace VoxelOptimizer
 
     Voxel CVoxelModel::GetVoxel(CVector Pos)
     {
-        size_t ArrPos = (size_t)Pos.x + m_Size.x * (size_t)Pos.y + m_Size.x * m_Size.y + (size_t)Pos.z;
+        size_t ArrPos = (size_t)Pos.x + (size_t)m_Size.x * (size_t)Pos.y + (size_t)m_Size.x * (size_t)m_Size.y * (size_t)Pos.z;
 
         if(ArrPos > m_Voxels.size() - 1)
             return nullptr;

@@ -56,6 +56,8 @@ namespace VoxelOptimizer
             std::map<size_t, int> m_NormalIndex;
             std::map<int, GroupedFaces> m_FacesIndex;
     };
+
+    using Mesher = std::shared_ptr<IMesher>;
 } // namespace VoxelOptimizer
 
 
