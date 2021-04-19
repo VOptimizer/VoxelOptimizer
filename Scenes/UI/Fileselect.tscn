@@ -1,0 +1,35 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Scripts/UI/Fileselect.gd" type="Script" id=1]
+
+[node name="Fileselect" type="VBoxContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Caption" type="Label" parent="."]
+margin_right = 1024.0
+margin_bottom = 14.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+margin_top = 18.0
+margin_right = 1024.0
+margin_bottom = 42.0
+
+[node name="Path" type="LineEdit" parent="HBoxContainer"]
+margin_right = 990.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 5.0
+
+[node name="Button" type="Button" parent="HBoxContainer"]
+margin_left = 994.0
+margin_right = 1024.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.15
+text = "..."
+[connection signal="pressed" from="HBoxContainer/Button" to="." method="_on_select_pressed"]

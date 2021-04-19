@@ -1,0 +1,30 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Scripts/UI/PopupFileDialog.gd" type="Script" id=1]
+
+[node name="PopupFileDialog" type="PopupPanel"]
+self_modulate = Color( 1, 1, 1, 0.501961 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+popup_exclusive = true
+script = ExtResource( 1 )
+
+[node name="FileDialog" type="FileDialog" parent="."]
+visible = true
+margin_left = 4.0
+margin_top = 4.0
+margin_right = 1020.0
+margin_bottom = 596.0
+rect_min_size = Vector2( 300, 100 )
+popup_exclusive = true
+window_title = "Open a File"
+resizable = true
+mode = 0
+access = 2
+current_dir = "/home/christian/godot_proj/VoxelOptimizer"
+current_path = "/home/christian/godot_proj/VoxelOptimizer/"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="file_selected" from="FileDialog" to="." method="_on_FileDialog_file_selected"]
+[connection signal="popup_hide" from="FileDialog" to="." method="_on_FileDialog_popup_hide"]
