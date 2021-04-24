@@ -57,7 +57,8 @@ namespace VoxelOptimizer
             CVoxel();
 
             CVector Pos;
-            int Material;
+            int Material;   //!< Index of the material.
+            int Color;      //!< Index of the color.
 
             // A normal of (0, 0, 0) means invisible face.
             std::array<CVector, 6> Normals;
@@ -84,7 +85,7 @@ namespace VoxelOptimizer
     class CVoxelMesh
     {
         public:
-            CVoxelMesh() = default;
+            CVoxelMesh() : m_BlockCount(0) { }
 
             /**
              * @brief Sets the size of the voxel space.
@@ -124,20 +125,30 @@ namespace VoxelOptimizer
              * 
              * @param Pos: The position of the voxel inside the voxel space.
              * @param Material: Material index of the voxels material.
+             * @param Color: Color index.
              */
-            void SetVoxel(CVector Pos, int Material);
+            void SetVoxel(CVector Pos, int Material, int Color);
 
             /**
              * @return Gets a voxel on a given position.
              */
             Voxel GetVoxel(CVector Pos);
 
+            /**
+             * @brief Gets the count of all setted blocks.
+             */
+            inline size_t GetBlockCount() const
+            {
+                return m_BlockCount;
+            }
+            
             ~CVoxelMesh() = default;
         private:
             void SetNormal(Voxel Cur, Voxel Neighbor, CVoxel::Direction CurDir, CVoxel::Direction NeighborDir, CVector Val);
 
             CVector m_Size;
             std::vector<Voxel> m_Voxels;
+            size_t m_BlockCount;
     };
 
     using VoxelMesh = std::shared_ptr<CVoxelMesh>;

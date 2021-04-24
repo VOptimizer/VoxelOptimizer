@@ -34,7 +34,7 @@ namespace VoxelOptimizer
 {
     struct SGroupedFaces
     {
-        CMaterial Material;             //!< Material which are applied to this faces.
+        Material FaceMaterial;              //!< Material which are applied to this faces.
         std::vector<CVector> Indices;   //!< Indices of the faces. 3 indices are alway 1 triangle. One index is a tripple of x = vertex, y = normal, z = uv.
     };
     using GroupedFaces = std::shared_ptr<SGroupedFaces>;
@@ -46,6 +46,7 @@ namespace VoxelOptimizer
         std::vector<CVector> UVs;           //!< All uvs of this mesh.
 
         std::vector<GroupedFaces> Faces;    //!< All faces of this mesh.
+        std::vector<CColor> Texture;        //!< Texture used by this mesh.
     };
     using Mesh = std::shared_ptr<SMesh>;
 } // namespace VoxelOptimizer

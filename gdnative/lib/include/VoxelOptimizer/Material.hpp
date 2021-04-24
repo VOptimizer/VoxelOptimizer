@@ -25,6 +25,7 @@
 #ifndef MATERIAL_HPP
 #define MATERIAL_HPP
 
+#include <memory>
 #include <VoxelOptimizer/Color.hpp>
 
 namespace VoxelOptimizer
@@ -40,12 +41,20 @@ namespace VoxelOptimizer
                 ALPHA
             };
 
-            CMaterial() {}
+            CMaterial() : Metallic(0), Specular(0), Roughness(0), IOR(0), Power(0), Transparency(0) {}
 
             CColor Diffuse;
+            float Metallic;
+            float Specular;
+            float Roughness;
+            float IOR;
+            float Power;    //!< For emissive.
+            float Transparency;
 
             ~CMaterial() {}
     };
+
+    using Material = std::shared_ptr<CMaterial>;
 } // namespace VoxelOptimizer
 
 #endif //MATERIAL_HPP

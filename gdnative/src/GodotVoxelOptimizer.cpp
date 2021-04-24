@@ -26,6 +26,8 @@
 #include <File.hpp>
 #include <SpatialMaterial.hpp>
 #include <GodotVoxelOptimizer.hpp>
+#include <ImageTexture.hpp>
+#include <Image.hpp>
 
 void CGodotVoxelOptimizer::_register_methods()
 {
@@ -82,6 +84,7 @@ godot_error CGodotVoxelOptimizer::Save(String Path)
 
     Ref<File> VFile = File::_new();
     VoxelOptimizer::CWavefrontObjExporter Exporter;
+    Exporter.SetMTLFileName(std::string(Path.get_basename().get_file().utf8().get_data()));
     auto Res = Exporter.GenerateObj(m_Mesh);
 
     VFile->open(Path, File::WRITE);
@@ -136,7 +139,7 @@ Ref<ArrayMesh> CGodotVoxelOptimizer::GetMesh(bool Optimized)
     else
         Mesher = VoxelOptimizer::Mesher(new VoxelOptimizer::CSimpleMesher());
 
-    m_Mesh = Mesher->GenerateMesh(m_Loader.GetModels().front(), m_Loader.GetColorPalette());
+    m_Mesh = Mesher->GenerateMesh(m_Loader.GetModels().front(), m_Loader);
 
     Ref<ArrayMesh> Ret = ArrayMesh::_new();
     Array arr;
@@ -145,6 +148,7 @@ Ref<ArrayMesh> CGodotVoxelOptimizer::GetMesh(bool Optimized)
     std::map<size_t, int> m_Index;
 
     PoolVector3Array Vertices, Normals;
+    PoolVector2Array UVs;
 
     // for (auto &&m : Mesh->Vertices)
     //     Vec3Arr.append(Vector3(m.x, m.y, m.z));
@@ -157,6 +161,22 @@ Ref<ArrayMesh> CGodotVoxelOptimizer::GetMesh(bool Optimized)
     int TmpIndices[3];
     int VertexCounter = 0;
 
+    Ref<Image> Img = Image::_new();
+    Img->create(m_Mesh->Texture.size(), 1, false, Image::Format::FORMAT_RGBA8);
+    Img->lock();
+
+    int x = 0;
+    for (auto &&c : m_Mesh->Texture)
+    {
+        Img->set_pixel(x, 0, Color(c.R / 255.f, c.G / 255.f, c.B / 255.f, c.A / 255.f));
+        x++;
+    }
+
+    Img->unlock();
+
+    Ref<ImageTexture> Tex = ImageTexture::_new();
+    Tex->create_from_image(Img);
+
     for (auto &&f : m_Mesh->Faces)
     {
         for (auto &&v : f->Indices)
@@ -168,16 +188,17 @@ Ref<ArrayMesh> CGodotVoxelOptimizer::GetMesh(bool Optimized)
                 // Indices.append(IT->second);
             else
             {
-                VoxelOptimizer::CVector Vertex, Normal;
+                VoxelOptimizer::CVector Vertex, Normal, UV;
                 Vertex = m_Mesh->Vertices[(size_t)v.x - 1];
                 Normal = m_Mesh->Normals[(size_t)v.y - 1];
+                UV = m_Mesh->Normals[(size_t)v.z - 1];
 
                 Vertices.append(Vector3(Vertex.x, Vertex.y, Vertex.z));
                 Normals.append(Vector3(Normal.x, Normal.y, Normal.z));
+                UVs.append(Vector2(UV.x, UV.y));
 
                 int Idx = Vertices.size() - 1;
                 m_Index.insert({Hash, Idx});
-                // Indices.append(Idx);
                 TmpIndices[VertexCounter] = Idx;
             }
 
@@ -193,11 +214,18 @@ Ref<ArrayMesh> CGodotVoxelOptimizer::GetMesh(bool Optimized)
 
         arr[ArrayMesh::ARRAY_VERTEX] = Vertices;
         arr[ArrayMesh::ARRAY_NORMAL] = Normals;
+        arr[ArrayMesh::ARRAY_TEX_UV] = UVs;
         arr[ArrayMesh::ARRAY_INDEX] = Indices;
         Ret->add_surface_from_arrays(ArrayMesh::PRIMITIVE_TRIANGLES, arr);
 
         Ref<SpatialMaterial> Mat = SpatialMaterial::_new();
-        Mat->set_albedo(Color(f->Material.Diffuse.R / 255.f, f->Material.Diffuse.G / 255.f, f->Material.Diffuse.B / 255.f));
+
+        Mat->set_metallic(f->FaceMaterial->Metallic);
+        Mat->set_roughness(f->FaceMaterial->Roughness);
+        Mat->set_emission_energy(f->FaceMaterial->Power);
+        Mat->set_specular(f->FaceMaterial->Specular);
+        Mat->set_refraction(f->FaceMaterial->IOR);
+        Mat->set_texture(SpatialMaterial::TextureParam::TEXTURE_ALBEDO, Tex);
 
         Ret->surface_set_material(Surface, Mat);
         Surface++;

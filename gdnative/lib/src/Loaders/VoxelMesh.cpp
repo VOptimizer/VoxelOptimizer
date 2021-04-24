@@ -44,11 +44,12 @@ namespace VoxelOptimizer
         Normals[Direction::BACKWARD] = FACE_BACKWARD;
     }
 
-    void CVoxelMesh::SetVoxel(CVector Pos, int Material)
+    void CVoxelMesh::SetVoxel(CVector Pos, int Material, int Color)
     {
         Voxel Tmp = Voxel(new CVoxel());
         Tmp->Pos = Pos;
         Tmp->Material = Material;
+        Tmp->Color = Color;
 
         Voxel Up, Down, Left, Right, Forward, Backward;
 
@@ -80,6 +81,7 @@ namespace VoxelOptimizer
         SetNormal(Tmp, Backward, CVoxel::Direction::BACKWARD, CVoxel::Direction::FORWARD, CVoxel::FACE_BACKWARD);
 
         m_Voxels[Pos.x + m_Size.x * Pos.y + m_Size.x * m_Size.y * Pos.z] = Tmp;
+        m_BlockCount++;
     }
 
     Voxel CVoxelMesh::GetVoxel(CVector Pos)

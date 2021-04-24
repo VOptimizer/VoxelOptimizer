@@ -27,9 +27,11 @@
 
 namespace VoxelOptimizer
 {
-    Mesh CSimpleMesher::GenerateMesh(VoxelMesh m, CMagicaVoxelLoader::ColorPalette Palette)
+    Mesh CSimpleMesher::GenerateMesh(VoxelMesh m, CMagicaVoxelLoader Loader)
     {
         Mesh Ret = Mesh(new SMesh());
+        Ret->Texture = Loader.GetColorPalette();
+        m_Loader = Loader;
 
         auto Voxels = m->GetVoxels();
         CVector BoxCenter = m->GetSize() / 2;
@@ -44,7 +46,6 @@ namespace VoxelOptimizer
                     if(v->Normals[i] == CVector(0, 0, 0))
                         continue;
 
-                    int I1, I2, I3, I4;
                     CVector v1, v2, v3, v4, Normal = v->Normals[i];
                     std::swap(Normal.y, Normal.z);
                     
@@ -57,11 +58,6 @@ namespace VoxelOptimizer
                             v2 = CVector(v->Pos.x - 0.5, v->Pos.z + v->Normals[i].z / 2.0, v->Pos.y - 0.5) - BoxCenter;
                             v3 = CVector(v->Pos.x + 0.5, v->Pos.z + v->Normals[i].z / 2.0, v->Pos.y - 0.5) - BoxCenter;
                             v4 = CVector(v->Pos.x + 0.5, v->Pos.z + v->Normals[i].z / 2.0, v->Pos.y + 0.5) - BoxCenter;
-
-                            I1 = AddVertex(Ret, v1);
-                            I2 = AddVertex(Ret, v2);
-                            I3 = AddVertex(Ret, v3);
-                            I4 = AddVertex(Ret, v4);
                         }break;
 
                         case CVoxel::Direction::LEFT:
@@ -71,11 +67,6 @@ namespace VoxelOptimizer
                             v2 = CVector(v->Pos.x + v->Normals[i].x / 2.0, v->Pos.z - 0.5, v->Pos.y + 0.5) - BoxCenter;
                             v3 = CVector(v->Pos.x + v->Normals[i].x / 2.0, v->Pos.z + 0.5, v->Pos.y + 0.5) - BoxCenter;
                             v4 = CVector(v->Pos.x + v->Normals[i].x / 2.0, v->Pos.z + 0.5, v->Pos.y - 0.5) - BoxCenter;
-
-                            I1 = AddVertex(Ret, v1);
-                            I2 = AddVertex(Ret, v2);
-                            I3 = AddVertex(Ret, v3);
-                            I4 = AddVertex(Ret, v4);
                         }break;
 
                         case CVoxel::Direction::FORWARD:
@@ -85,62 +76,15 @@ namespace VoxelOptimizer
                             v2 = CVector(v->Pos.x - 0.5, v->Pos.z - 0.5, v->Pos.y + v->Normals[i].y / 2.0) - BoxCenter;
                             v3 = CVector(v->Pos.x + 0.5, v->Pos.z - 0.5, v->Pos.y + v->Normals[i].y / 2.0) - BoxCenter;
                             v4 = CVector(v->Pos.x + 0.5, v->Pos.z + 0.5, v->Pos.y + v->Normals[i].y / 2.0) - BoxCenter;
-
-                            I1 = AddVertex(Ret, v1);
-                            I2 = AddVertex(Ret, v2);
-                            I3 = AddVertex(Ret, v3);
-                            I4 = AddVertex(Ret, v4);
                         }break;
                     }
 
-                    GroupedFaces Faces;
-
-                    auto ITFaces = m_FacesIndex.find(v->Material);
-                    if(ITFaces == m_FacesIndex.end())
-                    {
-                        Faces = GroupedFaces(new SGroupedFaces());
-                        Ret->Faces.push_back(Faces);
-
-                        Faces->Material.Diffuse = Palette[v->Material - 1];
-                        m_FacesIndex.insert({v->Material, Faces});
-                    }
-                    else
-                        Faces = ITFaces->second;
-                        
-
-                    CVector FaceNormal = (v2 - v1).Cross(v3 - v1).Normalize(); 
-                    int NormalIdx = AddNormal(Ret, Normal);
-                    
-                    //(v1 * v2).Cross(v1 * v3).Normalize();
-                    // CVector Centroid((v1.x + v2.x + v3.x) / 3.f, (v1.y + v2.y + v3.y) / 3.f, (v1.z + v2.z + v3.z) / 3.f);
-                    // float FaceDir = FaceNormal.Dot((v2 - Centroid).Normalize());
-
-                    if(FaceNormal == Normal)
-                    {
-                        Faces->Indices.push_back(CVector(I1, NormalIdx, 0));
-                        Faces->Indices.push_back(CVector(I2, NormalIdx, 0));
-                        Faces->Indices.push_back(CVector(I3, NormalIdx, 0));
-
-                        Faces->Indices.push_back(CVector(I1, NormalIdx, 0));
-                        Faces->Indices.push_back(CVector(I3, NormalIdx, 0));
-                        Faces->Indices.push_back(CVector(I4, NormalIdx, 0));
-                    }
-                    else
-                    {
-                        Faces->Indices.push_back(CVector(I3, NormalIdx, 0));
-                        Faces->Indices.push_back(CVector(I2, NormalIdx, 0));
-                        Faces->Indices.push_back(CVector(I1, NormalIdx, 0));
-
-                        Faces->Indices.push_back(CVector(I4, NormalIdx, 0));
-                        Faces->Indices.push_back(CVector(I3, NormalIdx, 0));
-                        Faces->Indices.push_back(CVector(I1, NormalIdx, 0));
-                    }
+                    AddFace(Ret, v1, v2, v3, v4, Normal, v->Color, v->Material);
                 }
             }
         }
 
-        m_Index.clear();
-        m_FacesIndex.clear();
+        ClearCache();
         return Ret;
     }
 } // namespace VoxelOptimizer

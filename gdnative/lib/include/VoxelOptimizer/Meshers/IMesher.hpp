@@ -45,16 +45,24 @@ namespace VoxelOptimizer
              * 
              * @param m: Voxel mesh to meshify.
              */
-            virtual Mesh GenerateMesh(VoxelMesh m, CMagicaVoxelLoader::ColorPalette Palette) = 0;
+            virtual Mesh GenerateMesh(VoxelMesh m, CMagicaVoxelLoader Loader) = 0;
 
             virtual ~IMesher() = default;
         protected:
+            void ClearCache();
+
+            void AddFace(Mesh Mesh, CVector v1, CVector v2, CVector v3, CVector v4, CVector Normal, int Color, int Material);
+
             int AddVertex(Mesh Mesh, CVector Vertex);
             int AddNormal(Mesh Mesh, CVector Normal);
+            int AddUV(Mesh Mesh, CVector UV);
 
             std::map<size_t, int> m_Index;
             std::map<size_t, int> m_NormalIndex;
+            std::map<size_t, int> m_UVIndex;
             std::map<int, GroupedFaces> m_FacesIndex;
+
+            CMagicaVoxelLoader m_Loader;
     };
 
     using Mesher = std::shared_ptr<IMesher>;

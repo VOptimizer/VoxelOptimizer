@@ -27,9 +27,11 @@
 
 namespace VoxelOptimizer
 {
-    Mesh CGreedyMesher::GenerateMesh(VoxelMesh m, CMagicaVoxelLoader::ColorPalette Palette)
+    Mesh CGreedyMesher::GenerateMesh(VoxelMesh m, CMagicaVoxelLoader Loader)
     {
         Mesh Ret = Mesh(new SMesh());
+        Ret->Texture = Loader.GetColorPalette();
+        m_Loader = Loader;
 
         auto Size = m->GetSize();
         CVector BoxCenter = m->GetSize() / 2;
@@ -65,6 +67,7 @@ namespace VoxelOptimizer
                             int w, h;
                             CVector Normal = Slicer.Normal();
                             int Material = Slicer.Material();
+                            int Color = Slicer.Color();
 
                             //Claculates the width of the rect.
                             for (w = 1; WidthAxis + w < Size.v[Axis1]; w++) 
@@ -76,7 +79,7 @@ namespace VoxelOptimizer
                                 if(IsFace)
                                 {
                                     CVector FaceNormal = Slicer.Normal();
-                                    IsFace = Normal == FaceNormal && Material == Slicer.Material();
+                                    IsFace = Normal == FaceNormal && Material == Slicer.Material() && Color == Slicer.Color();
                                 }
 
                                 if(!IsFace)
@@ -97,7 +100,7 @@ namespace VoxelOptimizer
                                     if(IsFace)
                                     {
                                         CVector FaceNormal = Slicer.Normal();
-                                        IsFace = Normal == FaceNormal && Material == Slicer.Material();
+                                        IsFace = Normal == FaceNormal && Material == Slicer.Material() && Color == Slicer.Color();
                                     }
 
                                     // If there's a hole in the mask, exit
@@ -128,51 +131,8 @@ namespace VoxelOptimizer
                             CVector v3 = CVector(x[0] + du[0] + dv[0], x[2] + du[2] + dv[2], x[1] + du[1] + dv[1]) - BoxCenter;
                             CVector v4 = CVector(x[0] + dv[0], x[2] + dv[2], x[1] + dv[1]) - BoxCenter;
 
-                            I1 = AddVertex(Ret, v1);
-                            I2 = AddVertex(Ret, v2);
-                            I3 = AddVertex(Ret, v3);
-                            I4 = AddVertex(Ret, v4);
-
-                            GroupedFaces Faces;
-
-                            Material -= 1;
-                            auto ITFaces = m_FacesIndex.find(Material);
-                            if(ITFaces == m_FacesIndex.end())
-                            {
-                                Faces = GroupedFaces(new SGroupedFaces());
-                                Ret->Faces.push_back(Faces);
-
-                                Faces->Material.Diffuse = Palette[Material];
-                                m_FacesIndex.insert({Material, Faces});
-                            }
-                            else
-                                Faces = ITFaces->second;
-
-                            CVector FaceNormal = (v2 - v1).Cross(v3 - v1).Normalize();
-                            
                             std::swap(Normal.y, Normal.z);
-                            int NormalIdx = AddNormal(Ret, Normal);
-
-                            if(FaceNormal == Normal)
-                            {
-                                Faces->Indices.push_back(CVector(I1, NormalIdx, 0));
-                                Faces->Indices.push_back(CVector(I2, NormalIdx, 0));
-                                Faces->Indices.push_back(CVector(I3, NormalIdx, 0));
-
-                                Faces->Indices.push_back(CVector(I1, NormalIdx, 0));
-                                Faces->Indices.push_back(CVector(I3, NormalIdx, 0));
-                                Faces->Indices.push_back(CVector(I4, NormalIdx, 0));
-                            }
-                            else
-                            {
-                                Faces->Indices.push_back(CVector(I3, NormalIdx, 0));
-                                Faces->Indices.push_back(CVector(I2, NormalIdx, 0));
-                                Faces->Indices.push_back(CVector(I1, NormalIdx, 0));
-
-                                Faces->Indices.push_back(CVector(I4, NormalIdx, 0));
-                                Faces->Indices.push_back(CVector(I3, NormalIdx, 0));
-                                Faces->Indices.push_back(CVector(I1, NormalIdx, 0));
-                            }
+                            AddFace(Ret, v1, v2, v3, v4, Normal, Color, Material);
 
                             Slicer.AddProcessedQuad(CVector(x[0], x[1], x[2]), CVector(du[0] + dv[0], du[1] + dv[1], du[2] + dv[2]));
 
@@ -190,6 +150,7 @@ namespace VoxelOptimizer
             // break;
         }
 
+        ClearCache();
         return Ret;
     }
 } // namespace VoxelOptimizer

@@ -34,7 +34,7 @@ namespace VoxelOptimizer
         public:
             CSimpleMesher() = default;
 
-            Mesh GenerateMesh(VoxelMesh m, CMagicaVoxelLoader::ColorPalette Palette) override;
+            Mesh GenerateMesh(VoxelMesh m, CMagicaVoxelLoader Loader) override;
 
             ~CSimpleMesher() = default;
     };

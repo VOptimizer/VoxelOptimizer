@@ -66,11 +66,13 @@ namespace VoxelOptimizer
 
         if(!BlockCurrent && BlockCompare)
         {
+            m_Color = V2->Color;
             m_Material = V2->Material;
             SetFaceNormal(V2, false);
         }
         else if(BlockCurrent && !BlockCompare)
         {
+            m_Color = V1->Color;
             m_Material = V1->Material;
             SetFaceNormal(V1, true);
         }

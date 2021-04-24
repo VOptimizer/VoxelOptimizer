@@ -27,6 +27,8 @@
 
 #include <array>
 #include <VoxelOptimizer/Color.hpp>
+#include <map>
+#include <VoxelOptimizer/Material.hpp>
 #include <memory>
 #include <stdlib.h>
 #include <string>
@@ -39,7 +41,7 @@ namespace VoxelOptimizer
     class CMagicaVoxelLoader
     {
         public:  
-            using ColorPalette = std::array<CColor, 256>;
+            using ColorPalette = std::vector<CColor>;
 
             CMagicaVoxelLoader() = default;
 
@@ -68,8 +70,13 @@ namespace VoxelOptimizer
 
             inline ColorPalette GetColorPalette() const
             {
-                return m_ColorPalette;
+                return m_UsedColorPalette;
             }
+
+            inline std::vector<Material> GetMaterials() const
+            {
+                return m_Materials;
+            } 
 
             ~CMagicaVoxelLoader() = default;
         private:
@@ -86,11 +93,19 @@ namespace VoxelOptimizer
             void ProcessPack(const SChunkHeader &Chunk, const char *Data, size_t &Pos);
             VoxelMesh ProcessSize(const char *Data, size_t &Pos);
             void ProcessXYZI(VoxelMesh m, const char *Data, size_t &Pos, size_t Size);
+            void ProcessMaterial(const char *Data, size_t Pos, size_t Length);
 
             std::vector<VoxelMesh> m_Models;
+            std::vector<Material> m_Materials;
+
+            std::map<int, int> m_ColorMapping;
+            std::map<int, int> m_MaterialMapping;
+
             ColorPalette m_ColorPalette;
+            ColorPalette m_UsedColorPalette;
 
             size_t m_Index;
+            size_t m_UsedColorsPos;
     };
 } // namespace VoxelOptimizer
 

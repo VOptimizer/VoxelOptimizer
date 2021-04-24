@@ -74,6 +74,12 @@ namespace VoxelOptimizer
         m_Models.clear();
         LoadDefaultPalette();
         m_Index = 0;
+        m_UsedColorsPos = 0;
+        m_Materials.clear();
+        m_ColorMapping.clear();
+        m_MaterialMapping.clear();
+        m_Materials.clear();
+        m_UsedColorPalette.clear();
 
         size_t Pos = 0;
         if(Length < 8)
@@ -92,6 +98,10 @@ namespace VoxelOptimizer
             throw CVoxelLoaderException("Version: " + std::to_string(Version) + " is not supported");
 
         Pos += 8;
+
+        // Processes first the Material which is at the end of the file.
+        ProcessMaterial(Data, Pos, Length);
+
         if(Pos < Length && Pos + sizeof(SChunkHeader) < Length)
         {
             SChunkHeader Tmp = LoadChunk(Data, Pos);
@@ -150,10 +160,16 @@ namespace VoxelOptimizer
                 }
             }
         }
+
+        // Creates the used color palette.
+        m_UsedColorPalette.resize(m_ColorMapping.size());
+        for (auto &&c : m_ColorMapping)
+            m_UsedColorPalette[c.second] = m_ColorPalette[c.first - 1];
     }
 
     void CMagicaVoxelLoader::LoadDefaultPalette()
     {
+        m_ColorPalette.resize(256);
         for (size_t i = 0; i < m_ColorPalette.size(); i++)
         {
             memcpy(m_ColorPalette[i].c, &default_palette[i], 4);
@@ -216,8 +232,102 @@ namespace VoxelOptimizer
             vec.z = *((char*)(Data + Pos));
             Pos += sizeof(char);
 
-            m->SetVoxel(vec, *((char*)(Data + Pos)));
+            int MatIdx = *((unsigned char*)(Data + Pos));
+            int Color = 0;
+
+            // Remaps the indices.
+            auto IT = m_ColorMapping.find(MatIdx);
+            if(IT == m_ColorMapping.end())
+            {
+                m_ColorMapping.insert({MatIdx, m_UsedColorsPos});
+                Color = m_UsedColorsPos;
+                m_UsedColorsPos++;
+            }
+            else
+                Color = IT->second;
+
+            IT = m_MaterialMapping.find(MatIdx);
+            if(IT == m_MaterialMapping.end())
+                MatIdx = 0;
+            else
+                MatIdx = IT->second;
+
+            m->SetVoxel(vec, MatIdx, Color);
             Pos += sizeof(char);
         } 
+    }
+
+    void CMagicaVoxelLoader::ProcessMaterial(const char *Data, size_t Pos, size_t Length)
+    {
+        m_Materials.push_back(Material(new CMaterial()));
+
+        if(Pos < Length && Pos + sizeof(SChunkHeader) < Length)
+        {
+            SChunkHeader Tmp = LoadChunk(Data, Pos);
+            if(strncmp(Tmp.ID, "MAIN", sizeof(Tmp.ID)) == 0)
+            {
+                while (Pos < Length && Pos + sizeof(SChunkHeader) < Length)
+                {
+                    Tmp = LoadChunk(Data, Pos);
+
+                    if(strncmp(Tmp.ID, "MATL", sizeof(Tmp.ID)) == 0)
+                    {
+                        Material Mat = Material(new CMaterial());
+                        int ID = *((int*)(Data + Pos));
+                        Pos += sizeof(int);
+
+                        int KeyValueCount = *((int*)(Data + Pos));
+                        Pos += sizeof(int);
+
+                        std::string MaterialType;
+
+                        for (int i = 0; i < KeyValueCount; i++)
+                        {
+                            int StrLen = *((int*)(Data + Pos));
+                            Pos += sizeof(int);
+
+                            std::string Key(StrLen, '\0'); 
+                            memcpy(&Key[0], Data + Pos, StrLen);
+                            Pos += StrLen;
+
+                            if(Key == "_plastic")
+                                continue;
+
+                            StrLen = *((int*)(Data + Pos));
+                            Pos += sizeof(int);
+
+                            std::string Value(StrLen, '\0'); 
+                            memcpy(&Value[0], Data + Pos, StrLen);
+                            Pos += StrLen;
+
+                            if(Key == "_type")
+                                MaterialType = Value;
+                            else if(Key == "_metal")
+                                Mat->Metallic = std::stof(Value);
+                            else if(Key == "_alpha")
+                                Mat->Transparency = std::stof(Value);     
+                            else if(Key == "_rough")
+                                Mat->Roughness = std::stof(Value);
+                            else if(Key == "_spec")
+                                Mat->Specular = std::stof(Value);
+                            else if(Key == "_ior")
+                                Mat->IOR = std::stof(Value);
+                            else if(Key == "_flux")
+                                Mat->Power = std::stof(Value);   
+                        }
+
+                        if(MaterialType == "_diffuse" || MaterialType.empty())
+                            continue;
+                        
+                        m_Materials.push_back(Mat);
+                        m_MaterialMapping.insert({ID, m_Materials.size() - 1});
+                    }
+                    else
+                    {
+                        Pos += Tmp.ChunkContentSize + Tmp.ChildChunkSize;
+                    }
+                }
+            }
+        }
     }
 } // namespace VoxelOptimizer

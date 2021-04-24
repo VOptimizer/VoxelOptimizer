@@ -43,7 +43,7 @@ namespace VoxelOptimizer
                 unsigned char c[4];
             };
 
-            CColor() = default;
+            CColor() : R(255), G(255), B(255), A(255) {}
             ~CColor() = default;
     };
 } // namespace VoxelOptimizer

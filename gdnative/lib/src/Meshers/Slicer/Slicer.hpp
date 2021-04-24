@@ -65,6 +65,11 @@ namespace VoxelOptimizer
                 return m_Material;
             }
 
+            inline int Color()
+            {
+                return m_Color;
+            }
+
             ~CSlicer() = default;
         private:
             void SetFaceNormal(Voxel v, bool IsCurrent);
@@ -74,6 +79,7 @@ namespace VoxelOptimizer
             int m_Axis;
             CVector m_Normal;
             int m_Material;
+            int m_Color;
 
             std::vector<std::pair<CVector, CVector>> m_ProcessedQuads;
     };
