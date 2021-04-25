@@ -216,6 +216,8 @@ namespace VoxelOptimizer
         int VoxelCount = *((int*)(Data + Pos)); 
         Pos += sizeof(int);
 
+        CVector Beg(1000, 1000, 1000), End;
+
         if(Pos + VoxelCount * sizeof(int) >= Size)
             throw CVoxelLoaderException("Corrupted file. Chunk 'XYZI' is not complete."); 
 
@@ -232,8 +234,17 @@ namespace VoxelOptimizer
             vec.z = *((char*)(Data + Pos));
             Pos += sizeof(char);
 
+            Beg.x = std::min(Beg.x, vec.x);
+            Beg.y = std::min(Beg.y, vec.y);
+            Beg.z = std::min(Beg.z, vec.z);
+
+            End.x = std::max(End.x, vec.x);
+            End.y = std::max(End.y, vec.y);
+            End.z = std::max(End.z, vec.z);
+
             int MatIdx = *((unsigned char*)(Data + Pos));
             int Color = 0;
+            bool Transparent = false;
 
             // Remaps the indices.
             auto IT = m_ColorMapping.find(MatIdx);
@@ -250,11 +261,21 @@ namespace VoxelOptimizer
             if(IT == m_MaterialMapping.end())
                 MatIdx = 0;
             else
+            {
                 MatIdx = IT->second;
+                Transparent = m_Materials[MatIdx]->Transparency != 0.0;
+                if(Transparent)
+                {
+                    int k= 0;
+                    k++;
+                }
+            }
 
-            m->SetVoxel(vec, MatIdx, Color);
+            m->SetVoxel(vec, MatIdx, Color, Transparent);
             Pos += sizeof(char);
         } 
+
+        m->SetMeshSize(End - Beg);
     }
 
     void CMagicaVoxelLoader::ProcessMaterial(const char *Data, size_t Pos, size_t Length)

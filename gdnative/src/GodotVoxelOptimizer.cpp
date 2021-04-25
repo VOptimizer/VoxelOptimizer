@@ -34,6 +34,7 @@ void CGodotVoxelOptimizer::_register_methods()
     register_method("load", &CGodotVoxelOptimizer::Load);
     register_method("save", &CGodotVoxelOptimizer::Save);
     register_method("get_mesh", &CGodotVoxelOptimizer::GetMesh);
+    register_method("get_statistics", &CGodotVoxelOptimizer::GetStatistics);
 }
 
 godot_error CGodotVoxelOptimizer::Load(String Path)
@@ -140,6 +141,7 @@ Ref<ArrayMesh> CGodotVoxelOptimizer::GetMesh(bool Optimized)
         Mesher = VoxelOptimizer::Mesher(new VoxelOptimizer::CSimpleMesher());
 
     m_Mesh = Mesher->GenerateMesh(m_Loader.GetModels().front(), m_Loader);
+    m_BlockCount = m_Loader.GetModels().front()->GetBlockCount();
 
     Ref<ArrayMesh> Ret = ArrayMesh::_new();
     Array arr;
@@ -191,7 +193,7 @@ Ref<ArrayMesh> CGodotVoxelOptimizer::GetMesh(bool Optimized)
                 VoxelOptimizer::CVector Vertex, Normal, UV;
                 Vertex = m_Mesh->Vertices[(size_t)v.x - 1];
                 Normal = m_Mesh->Normals[(size_t)v.y - 1];
-                UV = m_Mesh->Normals[(size_t)v.z - 1];
+                UV = m_Mesh->UVs[(size_t)v.z - 1];
 
                 Vertices.append(Vector3(Vertex.x, Vertex.y, Vertex.z));
                 Normals.append(Vector3(Normal.x, Normal.y, Normal.z));
@@ -215,6 +217,7 @@ Ref<ArrayMesh> CGodotVoxelOptimizer::GetMesh(bool Optimized)
         arr[ArrayMesh::ARRAY_VERTEX] = Vertices;
         arr[ArrayMesh::ARRAY_NORMAL] = Normals;
         arr[ArrayMesh::ARRAY_TEX_UV] = UVs;
+        // arr[ArrayMesh::ARRAY_TEX_UV2] = UVs2;
         arr[ArrayMesh::ARRAY_INDEX] = Indices;
         Ret->add_surface_from_arrays(ArrayMesh::PRIMITIVE_TRIANGLES, arr);
 
@@ -227,12 +230,25 @@ Ref<ArrayMesh> CGodotVoxelOptimizer::GetMesh(bool Optimized)
         Mat->set_refraction(f->FaceMaterial->IOR);
         Mat->set_texture(SpatialMaterial::TextureParam::TEXTURE_ALBEDO, Tex);
 
+        if(f->FaceMaterial->Transparency != 0.0)
+        {
+            Mat->set_feature(SpatialMaterial::Feature::FEATURE_TRANSPARENT, true);
+            Mat->set_albedo(Color(1, 1, 1, 1 - f->FaceMaterial->Transparency));
+        }
+
+        if(f->FaceMaterial->Power != 0.0)
+        {
+            Mat->set_feature(SpatialMaterial::Feature::FEATURE_EMISSION, true);
+        }
+
         Ret->surface_set_material(Surface, Mat);
         Surface++;
 
         m_Index.clear();
         Vertices = PoolVector3Array();
         Normals = PoolVector3Array();
+        UVs = PoolVector2Array();
+        // UVs2 = PoolVector2Array();
         Indices = PoolIntArray();
     }
 
@@ -243,6 +259,31 @@ Ref<ArrayMesh> CGodotVoxelOptimizer::GetMesh(bool Optimized)
     // Ret->add_surface_from_arrays(ArrayMesh::PRIMITIVE_TRIANGLES, arr);
     // VoxelOptimizer::CWavefrontObjExporter obj;
     // obj.SaveObj("test.obj", Mesh);
+
+    return Ret;
+}
+
+Dictionary CGodotVoxelOptimizer::GetStatistics()
+{
+    Dictionary Ret;
+
+    Ret["blocks"] = m_BlockCount;
+
+    if(m_Mesh)
+    {
+        Ret["vertices"] = m_Mesh->Vertices.size();
+        int FaceCount = 0;
+
+        for (auto &&f : m_Mesh->Faces)
+            FaceCount += f->Indices.size() / 3;        
+
+        Ret["faces"] = FaceCount;
+    }
+    else
+    {
+        Ret["vertices"] = 0;
+        Ret["faces"] = 0;
+    }
 
     return Ret;
 }

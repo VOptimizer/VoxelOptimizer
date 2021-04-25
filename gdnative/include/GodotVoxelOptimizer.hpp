@@ -36,7 +36,7 @@ class CGodotVoxelOptimizer : public Reference
 {
     GODOT_CLASS(CGodotVoxelOptimizer, Reference);
     public:
-        CGodotVoxelOptimizer() = default;
+        CGodotVoxelOptimizer() : m_BlockCount(0) {}
 
         void _init() { }
 
@@ -44,11 +44,13 @@ class CGodotVoxelOptimizer : public Reference
         godot_error Load(String Path);
         godot_error Save(String Path);
         Ref<ArrayMesh> GetMesh(bool Optimized);
+        Dictionary GetStatistics();
 
         virtual ~CGodotVoxelOptimizer() = default;
     private:
         VoxelOptimizer::CMagicaVoxelLoader m_Loader;
         VoxelOptimizer::Mesh m_Mesh;
+        int m_BlockCount;
 };
 
 #endif //GODOTVOXELOPTIMIZER_HPP

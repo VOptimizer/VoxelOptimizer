@@ -59,6 +59,7 @@ namespace VoxelOptimizer
             CVector Pos;
             int Material;   //!< Index of the material.
             int Color;      //!< Index of the color.
+            bool Transparent;
 
             // A normal of (0, 0, 0) means invisible face.
             std::array<CVector, 6> Normals;
@@ -110,6 +111,27 @@ namespace VoxelOptimizer
             }
 
             /**
+             * @brief Gets the size of the mesh itself rather than the complete voxel space size.
+             */
+            inline CVector GetMeshSize() const
+            {
+                return m_MeshSize;
+            }
+            
+            /**
+             * @brief Sets the mesh size.
+             */
+            inline void SetMeshSize(CVector MeshSize)
+            {
+                // Prevents a size of 0.
+                MeshSize.x = std::max(MeshSize.x, 1.f);
+                MeshSize.y = std::max(MeshSize.y, 1.f);
+                MeshSize.z = std::max(MeshSize.z, 1.f);
+
+                m_MeshSize = MeshSize;
+            }
+
+            /**
              * List of voxels. The size of the list is always the size of the voxel space.
              * Voxels which are null are empty space.
              * 
@@ -126,8 +148,9 @@ namespace VoxelOptimizer
              * @param Pos: The position of the voxel inside the voxel space.
              * @param Material: Material index of the voxels material.
              * @param Color: Color index.
+             * @param Transparent: Is the block transparent?
              */
-            void SetVoxel(CVector Pos, int Material, int Color);
+            void SetVoxel(CVector Pos, int Material, int Color, bool Transparent);
 
             /**
              * @return Gets a voxel on a given position.
@@ -147,6 +170,7 @@ namespace VoxelOptimizer
             void SetNormal(Voxel Cur, Voxel Neighbor, CVoxel::Direction CurDir, CVoxel::Direction NeighborDir, CVector Val);
 
             CVector m_Size;
+            CVector m_MeshSize;
             std::vector<Voxel> m_Voxels;
             size_t m_BlockCount;
     };

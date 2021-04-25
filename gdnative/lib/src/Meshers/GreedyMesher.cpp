@@ -34,7 +34,8 @@ namespace VoxelOptimizer
         m_Loader = Loader;
 
         auto Size = m->GetSize();
-        CVector BoxCenter = m->GetSize() / 2;
+        CVector BoxCenter = Size / 2;
+        std::swap(BoxCenter.y, BoxCenter.z);
 
         CSlicer Slicer(m);
 

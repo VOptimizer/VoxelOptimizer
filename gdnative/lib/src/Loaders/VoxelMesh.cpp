@@ -44,32 +44,36 @@ namespace VoxelOptimizer
         Normals[Direction::BACKWARD] = FACE_BACKWARD;
     }
 
-    void CVoxelMesh::SetVoxel(CVector Pos, int Material, int Color)
+    void CVoxelMesh::SetVoxel(CVector Pos, int Material, int Color, bool Transparent)
     {
         Voxel Tmp = Voxel(new CVoxel());
         Tmp->Pos = Pos;
         Tmp->Material = Material;
         Tmp->Color = Color;
+        Tmp->Transparent = Transparent;
 
         Voxel Up, Down, Left, Right, Forward, Backward;
 
-        if(Pos.z + 1 != m_Size.z)
-            Up = m_Voxels[Pos.x + m_Size.x * Pos.y + m_Size.x * m_Size.y * (Pos.z + 1)];
+        if(!Transparent)
+        {
+            if(Pos.z + 1 != m_Size.z)
+                Up = m_Voxels[Pos.x + m_Size.x * Pos.y + m_Size.x * m_Size.y * (Pos.z + 1)];
 
-        if(Pos.z != 0)
-            Down = m_Voxels[Pos.x + m_Size.x * Pos.y + m_Size.x * m_Size.y * (Pos.z - 1)];
+            if(Pos.z != 0)
+                Down = m_Voxels[Pos.x + m_Size.x * Pos.y + m_Size.x * m_Size.y * (Pos.z - 1)];
 
-        if(Pos.x != 0)
-            Left = m_Voxels[(Pos.x - 1) + m_Size.x * Pos.y + m_Size.x * m_Size.y * Pos.z];
+            if(Pos.x != 0)
+                Left = m_Voxels[(Pos.x - 1) + m_Size.x * Pos.y + m_Size.x * m_Size.y * Pos.z];
 
-        if(Pos.x + 1 != m_Size.x)
-            Right = m_Voxels[(Pos.x + 1) + m_Size.x * Pos.y + m_Size.x * m_Size.y * Pos.z];
+            if(Pos.x + 1 != m_Size.x)
+                Right = m_Voxels[(Pos.x + 1) + m_Size.x * Pos.y + m_Size.x * m_Size.y * Pos.z];
 
-        if(Pos.y + 1 != m_Size.y)
-            Forward = m_Voxels[Pos.x + m_Size.x * (Pos.y + 1) + m_Size.x * m_Size.y * Pos.z];
+            if(Pos.y + 1 != m_Size.y)
+                Forward = m_Voxels[Pos.x + m_Size.x * (Pos.y + 1) + m_Size.x * m_Size.y * Pos.z];
 
-        if(Pos.y != 0)
-            Backward = m_Voxels[Pos.x + m_Size.x * (Pos.y - 1) + m_Size.x * m_Size.y * Pos.z];
+            if(Pos.y != 0)
+                Backward = m_Voxels[Pos.x + m_Size.x * (Pos.y - 1) + m_Size.x * m_Size.y * Pos.z];
+        }
 
         SetNormal(Tmp, Up, CVoxel::Direction::UP, CVoxel::Direction::DOWN, CVoxel::FACE_UP);
         SetNormal(Tmp, Down, CVoxel::Direction::DOWN, CVoxel::Direction::UP, CVoxel::FACE_DOWN);
@@ -96,7 +100,7 @@ namespace VoxelOptimizer
     
     void CVoxelMesh::SetNormal(Voxel Cur, Voxel Neighbor, CVoxel::Direction CurDir, CVoxel::Direction NeighborDir, CVector Val)
     {
-        if(Neighbor)
+        if(Neighbor && !Neighbor->Transparent && !Cur->Transparent)
         {
             Neighbor->Normals[NeighborDir] = CVoxel::FACE_ZERO;
             Cur->Normals[CurDir] = CVoxel::FACE_ZERO;
