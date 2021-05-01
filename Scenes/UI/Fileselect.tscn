@@ -32,4 +32,6 @@ margin_bottom = 24.0
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.15
 text = "..."
+
+[connection signal="text_changed" from="HBoxContainer/Path" to="." method="_on_Path_text_changed"]
 [connection signal="pressed" from="HBoxContainer/Button" to="." method="_on_select_pressed"]

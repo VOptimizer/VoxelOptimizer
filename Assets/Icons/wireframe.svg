@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   width="32"
+   height="32"
+   viewBox="0 0 8.4666665 8.4666669"
+   version="1.1"
+   id="svg8">
+  <defs
+     id="defs2" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1">
+    <g
+       id="g951"
+       transform="rotate(30,4.2333336,4.2333331)">
+      <ellipse
+         style="fill:none;stroke:#f9f9f9;stroke-width:0.264583;stroke-miterlimit:4;stroke-dasharray:none"
+         id="path847"
+         cx="4.2333336"
+         cy="4.2333331"
+         rx="4.1050506"
+         ry="4.105051" />
+      <ellipse
+         style="fill:none;stroke:#f9f9f9;stroke-width:0.264583;stroke-miterlimit:4;stroke-dasharray:none"
+         id="ellipse860"
+         cx="4.2333336"
+         cy="7.0114579"
+         rx="2.9144258"
+         ry="0.79375017" />
+      <ellipse
+         style="fill:none;stroke:#f9f9f9;stroke-width:0.264583;stroke-miterlimit:4;stroke-dasharray:none"
+         id="ellipse862"
+         cx="4.2333336"
+         cy="1.4552084"
+         rx="2.9144258"
+         ry="0.79375017" />
+      <ellipse
+         style="fill:none;stroke:#f9f9f9;stroke-width:0.265;stroke-miterlimit:4;stroke-dasharray:none"
+         id="ellipse882"
+         cx="4.2333336"
+         cy="4.2337503"
+         rx="4.0445528"
+         ry="1.1373031" />
+      <ellipse
+         style="fill:none;stroke:#f9f9f9;stroke-width:0.264583;stroke-miterlimit:4;stroke-dasharray:none"
+         id="ellipse884"
+         cx="4.2333336"
+         cy="4.2333331"
+         rx="2.6458335"
+         ry="4.105051" />
+      <ellipse
+         style="fill:none;stroke:#f9f9f9;stroke-width:0.264582;stroke-miterlimit:4;stroke-dasharray:none"
+         id="ellipse886"
+         cx="4.2333336"
+         cy="4.2333331"
+         rx="0.018754601"
+         ry="4.105051" />
+    </g>
+  </g>
+</svg>

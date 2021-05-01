@@ -26,5 +26,6 @@ current_path = "/home/christian/godot_proj/VoxelOptimizer/"
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
 [connection signal="file_selected" from="FileDialog" to="." method="_on_FileDialog_file_selected"]
 [connection signal="popup_hide" from="FileDialog" to="." method="_on_FileDialog_popup_hide"]

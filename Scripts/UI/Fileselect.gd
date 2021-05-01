@@ -55,3 +55,8 @@ func _on_select_pressed():
 	_CurrentFileDlg.SaveDialog = SaveDialog
 	_CurrentFileDlg.Path = _LastPath
 	_CurrentFileDlg.popup()
+
+
+func _on_Path_text_changed(new_text):
+	FilePath = new_text
+	_LastPath = new_text.replace(new_text.get_file(), "")

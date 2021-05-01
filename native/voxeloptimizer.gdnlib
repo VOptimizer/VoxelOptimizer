@@ -7,8 +7,10 @@ reloadable=true
 
 [entry]
 
+Windows.64="res://native/libgodotvoxeloptimizer.dll"
 X11.64="res://native/libgodotvoxeloptimizer.so"
 
 [dependencies]
 
+Windows.64=[  ]
 X11.64=[  ]

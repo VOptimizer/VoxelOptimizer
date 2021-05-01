@@ -9,6 +9,10 @@ export(String) var Path = "" setget set_path
 
 onready var _Dlg : = $FileDialog
 
+func _ready():	
+	_Dlg.current_dir = OS.get_system_dir(OS.SYSTEM_DIR_DOCUMENTS)
+	_Dlg.current_path = ""#OS.get_system_dir(OS.SYSTEM_DIR_DOCUMENTS)
+
 func popup(bounds: Rect2 = Rect2( 0, 0, 0, 0 )):
 	.popup(bounds)
 	

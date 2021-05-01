@@ -32,9 +32,11 @@ _global_script_class_icons={
 
 [application]
 
-config/name="VoxelOptimizer"
+config/name="V-Optimizer"
 run/main_scene="res://Scenes/Main.tscn"
+boot_splash/image="res://Assets/Icons/icon.png"
 config/icon="res://icon.png"
+config/windows_native_icon="res://Assets/Icons/icon.ico"
 config/version="0.0.1-Alpha"
 
 [rendering]

@@ -1,0 +1,73 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Scripts/UI/AboutDialog.gd" type="Script" id=1]
+
+[node name="AboutDialog" type="PopupPanel"]
+visible = true
+self_modulate = Color( 1, 1, 1, 0.501961 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="WindowDialog" type="WindowDialog" parent="."]
+visible = true
+margin_right = 488.0
+margin_bottom = 114.0
+popup_exclusive = true
+window_title = "About"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="WindowDialog"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MarginContainer" type="MarginContainer" parent="WindowDialog/VBoxContainer"]
+margin_right = 488.0
+margin_bottom = 80.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_constants/margin_right = 10
+custom_constants/margin_top = 10
+custom_constants/margin_left = 10
+custom_constants/margin_bottom = 10
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="RichTextLabel" type="RichTextLabel" parent="WindowDialog/VBoxContainer/MarginContainer"]
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 478.0
+margin_bottom = 70.0
+bbcode_enabled = true
+bbcode_text = "This tool is created with the [url=https://godotengine.org/]Godot Game Engine[/url]. The used font is part of the [url=https://kenney.nl/assets/kenney-fonts]Kenney fonts[/url], feel free and check them out."
+text = "This tool is created with the Godot Game Engine. The used font is part of the Kenney fonts, feel free and check them out."
+
+[node name="MarginContainer2" type="MarginContainer" parent="WindowDialog/VBoxContainer"]
+margin_top = 84.0
+margin_right = 488.0
+margin_bottom = 114.0
+custom_constants/margin_right = 10
+custom_constants/margin_left = 10
+custom_constants/margin_bottom = 10
+
+[node name="Button" type="Button" parent="WindowDialog/VBoxContainer/MarginContainer2"]
+margin_left = 10.0
+margin_right = 478.0
+margin_bottom = 20.0
+text = "Close"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[connection signal="popup_hide" from="WindowDialog" to="." method="_on_WindowDialog_popup_hide"]
+[connection signal="meta_clicked" from="WindowDialog/VBoxContainer/MarginContainer/RichTextLabel" to="." method="_on_RichTextLabel_meta_clicked"]
+[connection signal="pressed" from="WindowDialog/VBoxContainer/MarginContainer2/Button" to="." method="_on_Button_pressed"]
