@@ -10,8 +10,14 @@ add_subdirectory(lib)
 
 set(SRCS "${PROJECT_SOURCE_DIR}/main.cpp"
          "${PROJECT_SOURCE_DIR}/src/GodotVoxelOptimizer.cpp")
-set(LIBS "godot-cpp.windows.release.64"
-         "voxeloptimizer")
+set(LIBS "voxeloptimizer")
+
+if(WIN32)
+    set(LIBS ${LIBS} "godot-cpp.windows.release.64")
+else(WIND32)
+    set(LIBS ${LIBS} "godot-cpp.linux.release.64")
+endif(WIN32)
+
 
 include_directories("${PROJECT_SOURCE_DIR}/../godot-cpp/include"
                     "${PROJECT_SOURCE_DIR}/../godot-cpp/include/core"

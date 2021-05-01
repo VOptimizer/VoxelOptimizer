@@ -105,7 +105,7 @@ godot_error CGodotVoxelOptimizer::Save(String Path)
     VFile->store_buffer(Data);
     VFile->close();
 
-    VFile->open(Path.replace(Path.get_file(), "materials.mtl"), File::WRITE);
+    VFile->open(Path.replace(Path.get_extension(), "mtl"), File::WRITE);
     if(!VFile->is_open())
     {
         ERR_PRINT("Couldn't open file: " + Path);
@@ -120,6 +120,23 @@ godot_error CGodotVoxelOptimizer::Save(String Path)
     memcpy(Writer.ptr(), ObjData.data(), ObjData.size());
 
     VFile->store_buffer(Data1);
+    VFile->close();
+
+    VFile->open(Path.replace(Path.get_extension(), "png"), File::WRITE);
+    if(!VFile->is_open())
+    {
+        ERR_PRINT("Couldn't open file: " + Path);
+        return (godot_error)Error::ERR_FILE_CANT_WRITE;
+    }
+
+    auto Texture = std::get<2>(Res);
+
+    PoolByteArray Data2;
+    Data2.resize(Texture.size());
+    Writer = Data2.write();
+    memcpy(Writer.ptr(), Texture.data(), Texture.size());
+
+    VFile->store_buffer(Data2);
     VFile->close();
 
     return (godot_error)Error::OK;
