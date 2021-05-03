@@ -12,10 +12,12 @@ set(SRCS "${PROJECT_SOURCE_DIR}/src/Loaders/MagicaVoxelLoader.cpp"
          "${PROJECT_SOURCE_DIR}/src/Meshers/IMesher.cpp"
          "${PROJECT_SOURCE_DIR}/src/Meshers/Slicer/Slicer.cpp"
          "${PROJECT_SOURCE_DIR}/src/Exporters/WavefrontObjExporter.cpp"
+         "${PROJECT_SOURCE_DIR}/src/Exporters/glTF/GLTFExporter.cpp"
          "${PROJECT_SOURCE_DIR}/src/stb_image_write.c")
 #set(LIBS "")
 
-include_directories("${PROJECT_SOURCE_DIR}/include")
+include_directories("${PROJECT_SOURCE_DIR}/include"
+                    "${PROJECT_SOURCE_DIR}/third_party")
 
 add_library(${PROJECT_NAME} STATIC ${SRCS})
 #target_link_libraries(${PROJECT_NAME} ${LIBS})

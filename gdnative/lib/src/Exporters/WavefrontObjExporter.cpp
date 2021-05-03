@@ -26,7 +26,7 @@
 #include <fstream>
 #include <sstream>
 #include <string.h>
-#include "../stb_image_write.h"
+#include <stb_image_write.h>
 #include <VoxelOptimizer/Exporters/WavefrontObjExporter.hpp>
 
 namespace VoxelOptimizer

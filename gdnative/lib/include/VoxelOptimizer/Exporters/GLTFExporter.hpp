@@ -22,49 +22,51 @@
  * SOFTWARE.
  */
 
-#ifndef WAVEFRONTOBJEXPORTER_HPP
-#define WAVEFRONTOBJEXPORTER_HPP
+#ifndef GLTFEXPORTER_HPP
+#define GLTFEXPORTER_HPP
 
+#include <map>
 #include <VoxelOptimizer/Mesh.hpp>
 #include <string>
-#include <tuple>
 #include <vector>
+
 namespace VoxelOptimizer
 {
-    class CWavefrontObjExporter
+    class CGLTFExporter
     {
         public:
-            CWavefrontObjExporter() = default;
+            CGLTFExporter() = default;
 
             /**
-             * @brief Generates and saves the obj to disk.
+             * @brief Generates and saves the mesh.
              * 
-             * @param Path: Path of the generated obj.
+             * @param Path: Path of the file.
              * @param Mesh: Mesh to save.
              */
-            void SaveObj(const std::string &Path, Mesh Mesh);
+            void Save(const std::string &Path, Mesh Mesh);
 
             /**
-             * @brief Generates the obj.
+             * @brief Generates the file streams.
              * 
              * @param Mesh: Mesh to save.
              * 
-             * @return Returns a tuple where value one is the obj file, two the mtl and the third one the texture file.
+             * @return Returns a map where the key is the type and the std::vector<char> is the data.
              */
-            std::tuple<std::string, std::string, std::vector<char>> GenerateObj(Mesh Mesh);
+            std::map<std::string, std::vector<char>> Generate(Mesh Mesh);
 
             /**
-             * @brief Sets the name for the MTL file. Only needed for Generate Obj.
+             * @brief Sets the name for the all the external files. Only needed for memory generation.
              */
-            inline void SetMTLFileName(std::string MTLFileName)
+            inline void SetExternaFilenames(std::string ExternalFilenames)
             {
-                m_MTLFileName = MTLFileName;
+                m_ExternalFilenames = ExternalFilenames;
             }
 
-            ~CWavefrontObjExporter() = default;
+            ~CGLTFExporter() = default;
+
         private:
-            std::string m_MTLFileName;
+            std::string m_ExternalFilenames;
     };
 } // namespace VoxelOptimizer
 
-#endif //WAVEFRONTOBJEXPORTER_HPP
+#endif //GLTFEXPORTER_HPP

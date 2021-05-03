@@ -1,0 +1,158 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2021 Christian Tost
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+#ifndef NODES_HPP
+#define NODES_HPP
+
+#include <CJSON/JSON.hpp>
+#include <VoxelOptimizer/Vector.hpp>
+#include <cstdint>
+
+namespace VoxelOptimizer
+{
+    enum GLTFTypes
+    {
+        FLOAT = 5126,
+        INT = 5125
+    };
+
+    class CAsset
+    {
+        public:
+            void Serialize(CJSON &json) const
+            {
+                json.AddPair("version", std::string("2.0"));
+                json.AddPair("generator", std::string("Generated with VoxelOptimizer"));
+            }        
+    };
+
+    class CScene
+    {
+        public:
+            void Serialize(CJSON &json) const
+            {
+                json.AddPair("nodes", std::vector<int>(1));
+            }    
+    };
+
+    class CNode
+    {
+        public:
+            void Serialize(CJSON &json) const
+            {
+                json.AddPair("mesh", std::vector<int>(1));
+            }    
+    };
+
+    class CBuffer
+    {
+        public:
+            size_t Size;
+            std::string Uri;
+
+            void Serialize(CJSON &json) const
+            {
+                json.AddPair("byteLength", Size);
+                json.AddPair("uri", Uri);
+            }    
+    };
+
+    class CBufferView
+    {
+        public:
+            size_t Size;
+            size_t Offset;
+
+            void Serialize(CJSON &json) const
+            {
+                json.AddPair("buffer", 0);
+                json.AddPair("byteLength", Size);
+                json.AddPair("byteOffset", Offset);
+            }    
+    };
+
+    class CAccessor
+    {
+        public:
+            size_t BufferView;
+            GLTFTypes ComponentType;
+            std::string Type;
+            CVector Min;
+            CVector Max;
+
+            void Serialize(CJSON &json) const
+            {
+                json.AddPair("bufferView", BufferView);
+                json.AddPair("componentType", (int)ComponentType);
+
+                // json.AddPair("max", Max.v);
+                // json.AddPair("min", Min.v);
+
+                json.AddPair("type", Type);
+            }
+    };
+
+    class CPrimitive
+    {
+        public:
+            CPrimitive() : 
+                NormalAccessor(-1),
+                PositionAccessor(-1),
+                TextCoordAccessor(-1),
+                IndicesAccessor(-1),
+                Material(-1) {}
+
+            int64_t NormalAccessor;
+            int64_t PositionAccessor;
+            int64_t TextCoordAccessor;
+            int64_t IndicesAccessor;
+            int64_t Material;
+
+            void Serialize(CJSON &json) const
+            {
+                std::map<std::string, int64_t> Attributes;
+
+                Attributes["NORMAL"] = NormalAccessor;
+                Attributes["POSITION"] = PositionAccessor;
+                // Attributes["TEXCOORD_0"] = TextCoordAccessor;
+
+                json.AddPair("attributes", Attributes);
+                json.AddPair("indices", IndicesAccessor);
+                // json.AddPair("material", Material);
+            }
+    };
+
+    class CMesh
+    {
+        public:
+            std::vector<CPrimitive> Primitives;
+
+            void Serialize(CJSON &json) const
+            {
+                json.AddPair("primitives", Primitives);
+            }
+    };
+} // namespace VoxelOptimizer
+
+#endif //NODES_HPP
