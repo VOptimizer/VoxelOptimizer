@@ -59,6 +59,16 @@ namespace VoxelOptimizer
                 return x == vr.x && y == vr.y && z == vr.z;
             }
 
+            inline CVector Min(CVector &vec)
+            {
+                return CVector(std::min(x, vec.x), std::min(y, vec.y), std::min(z, vec.z));
+            }
+
+            inline CVector Max(CVector &vec)
+            {
+                return CVector(std::max(x, vec.x), std::max(y, vec.y), std::max(z, vec.z));
+            }
+
             // Upon here just math. Math is magic :D
 
             inline CVector operator*(const CVector &vr) const

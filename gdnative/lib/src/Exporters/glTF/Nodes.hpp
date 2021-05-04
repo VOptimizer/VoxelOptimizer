@@ -26,6 +26,7 @@
 #define NODES_HPP
 
 #include <CJSON/JSON.hpp>
+#include <string.h>
 #include <VoxelOptimizer/Vector.hpp>
 #include <cstdint>
 
@@ -61,7 +62,7 @@ namespace VoxelOptimizer
         public:
             void Serialize(CJSON &json) const
             {
-                json.AddPair("mesh", std::vector<int>(1));
+                json.AddPair("mesh", 0);
             }    
     };
 
@@ -98,19 +99,45 @@ namespace VoxelOptimizer
             size_t BufferView;
             GLTFTypes ComponentType;
             std::string Type;
-            CVector Min;
-            CVector Max;
+            size_t Count;
+
+            inline void SetMax(CVector Max)
+            {
+                if(Type == "VEC3")
+                    m_Max.insert(m_Max.end(), Max.v, Max.v + 3);
+                else if(Type == "VEC2")
+                    m_Max.insert(m_Max.end(), Max.v, Max.v + 2);
+                else
+                    m_Max.push_back(Max.x);
+            }
+
+            inline void SetMin(CVector Min)
+            {
+                if(Type == "VEC3")
+                    m_Min.insert(m_Min.end(), Min.v, Min.v + 3);
+                else if(Type == "VEC2")
+                    m_Min.insert(m_Min.end(), Min.v, Min.v + 2);
+                else
+                    m_Min.push_back(Min.x);
+            }
 
             void Serialize(CJSON &json) const
             {
                 json.AddPair("bufferView", BufferView);
                 json.AddPair("componentType", (int)ComponentType);
 
-                // json.AddPair("max", Max.v);
-                // json.AddPair("min", Min.v);
+                if(!m_Max.empty())
+                    json.AddPair("max", m_Max);
+
+                if(!m_Min.empty())
+                    json.AddPair("min", m_Min);
 
                 json.AddPair("type", Type);
+                json.AddPair("count", Count);
             }
+
+        private:
+            std::vector<float> m_Max, m_Min;
     };
 
     class CPrimitive
@@ -135,7 +162,7 @@ namespace VoxelOptimizer
 
                 Attributes["NORMAL"] = NormalAccessor;
                 Attributes["POSITION"] = PositionAccessor;
-                // Attributes["TEXCOORD_0"] = TextCoordAccessor;
+                Attributes["TEXCOORD_0"] = TextCoordAccessor;
 
                 json.AddPair("attributes", Attributes);
                 json.AddPair("indices", IndicesAccessor);

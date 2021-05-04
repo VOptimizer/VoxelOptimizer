@@ -41,6 +41,9 @@ int main(int argc, char const *argv[])
 
     auto Mesh = Mesher.GenerateMesh(VoxelMesh, loader);
 
+    // VoxelOptimizer::CWavefrontObjExporter exporter1;
+    // exporter1.SaveObj("minicube.obj", Mesh);
+
     VoxelOptimizer::CGLTFExporter exporter;
 
     exporter.Save("lantern.gltf", Mesh);

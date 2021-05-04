@@ -56,41 +56,13 @@ namespace VoxelOptimizer
         auto Files = Generate(Mesh);
         for (auto &&f : Files)
         {
-            std::ofstream out(Path + "." + f.first, std::ios::out);
+            std::ofstream out(PathWithoutExt + "." + f.first, std::ios::out);
             if(out.is_open())
             {
                 out.write(f.second.data(), f.second.size());
                 out.close();
             }
         }
-        
-
-        // std::ofstream out(Path, std::ios::out);
-        // if(out.is_open())
-        // {
-        //     std::string Val = std::get<0>(Tuple);
-
-        //     out.write(Val.data(), Val.size());
-        //     out.close();
-
-        //     out.open(m_ExternalFilenames + ".mtl", std::ios::out);
-        //     if(out.is_open())
-        //     {
-        //         Val = std::get<1>(Tuple);
-
-        //         out.write(Val.data(), Val.size());
-        //         out.close();
-
-        //         out.open(m_ExternalFilenames + ".png", std::ios::out);
-        //         if(out.is_open())
-        //         {
-        //             auto Texture = std::get<2>(Tuple);
-
-        //             out.write(Texture.data(), Texture.size());
-        //             out.close();
-        //         }
-        //     }
-        // }
     }
 
     std::map<std::string, std::vector<char>> CGLTFExporter::Generate(Mesh Mesh)
@@ -101,73 +73,86 @@ namespace VoxelOptimizer
         json.AddPair("scenes", std::vector<CScene>() = { CScene() });
         json.AddPair("nodes", std::vector<CNode>() = { CNode() });
 
-        std::vector<CVector> Vertices, Normals, UVs;
-        std::vector<int> Indices;
-        std::map<size_t, int> IndicesIndex;
-
         std::vector<CBufferView> BufferViews;
         std::vector<CAccessor> Accessors;
+
+        std::vector<char> Binary;
 
         CMesh GLTFMesh;
 
         for (auto &&f : Mesh->Faces)
         {
-            CBufferView Position, Normal, UV, IndexView;
-            Position.Offset = Vertices.size();
-            Normal.Offset = Normals.size();
-            UV.Offset = UVs.size();
-            IndexView.Offset = Indices.size();
+            std::vector<CVector> Vertices, Normals, UVs;
+            std::vector<int> Indices;
+            std::map<size_t, int> IndicesIndex;
 
-            for (auto &&i : f->Indices)
+            CVector Max, Min(10000, 10000, 10000);
+
+            for (size_t i = 0; i < f->Indices.size(); i += 3)
             {
-                int Index = 0;
-                size_t Hash = i.hash();
-
-                auto IT = IndicesIndex.find(Hash);
-                if(IT == IndicesIndex.end())
+                for (size_t j = 0; j < 3; j++)
                 {
-                    Vertices.push_back(Mesh->Vertices[(size_t)i.x]);
-                    Normals.push_back(Mesh->Normals[(size_t)i.y]);
-                    UVs.push_back(Mesh->UVs[(size_t)i.z]);
+                    CVector vec = f->Indices[i + j];
 
-                    Index = Vertices.size() - 1;
-                    IndicesIndex.insert({Hash, Index});
+                    int Index = 0;
+                    size_t Hash = vec.hash();
+
+                    auto IT = IndicesIndex.find(Hash);
+                    if(IT == IndicesIndex.end())
+                    {
+                        Vertices.push_back(Mesh->Vertices[(size_t)vec.x - 1]);
+                        Normals.push_back(Mesh->Normals[(size_t)vec.y - 1]);
+                        UVs.push_back(Mesh->UVs[(size_t)vec.z - 1]);
+
+                        Min = Min.Min(Mesh->Vertices[(size_t)vec.x - 1]);
+                        Max = Max.Max(Mesh->Vertices[(size_t)vec.x - 1]);
+
+                        Index = Vertices.size() - 1;
+                        IndicesIndex.insert({Hash, Index});
+                    }
+                    else
+                        Index = IT->second;
+
+                    Indices.push_back(Index);
                 }
-                else
-                    Index = IT->second;
-
-                Indices.push_back(Index);
             }
 
-            Position.Size = Vertices.size() - Position.Offset;
-            Normal.Size = Normals.size() - Normal.Offset;
-            UV.Size = UVs.size() - UV.Offset;
-            IndexView.Size = Indices.size() - IndexView.Offset;
+            CBufferView Position, Normal, UV, IndexView;
+
+            Position.Offset = Binary.size();
+            Position.Size = Vertices.size() * sizeof(CVector);
+
+            Normal.Offset = Position.Offset + Position.Size;
+            Normal.Size = Normals.size() * sizeof(CVector);
+
+            UV.Offset = Normal.Offset + Normal.Size;
+            UV.Size = UVs.size() * (sizeof(float) * 2);
+
+            IndexView.Offset = UV.Offset + UV.Size;
+            IndexView.Size = Indices.size() * sizeof(int);
 
             CAccessor PositionAccessor, NormalAccessor, UVAccessor, IndexAccessor;
             PositionAccessor.BufferView = BufferViews.size();
             PositionAccessor.ComponentType = GLTFTypes::FLOAT;
+            PositionAccessor.Count = Vertices.size();
             PositionAccessor.Type = "VEC3";
-            PositionAccessor.Min = CVector(-1, -1, -1);
-            PositionAccessor.Max = CVector(1, 1, 1);
+            PositionAccessor.SetMin(Min);
+            PositionAccessor.SetMax(Max);
 
             NormalAccessor.BufferView = BufferViews.size() + 1;
             NormalAccessor.ComponentType = GLTFTypes::FLOAT;
+            NormalAccessor.Count = Normals.size();
             NormalAccessor.Type = "VEC3";
-            NormalAccessor.Min = CVector(-1, -1, -1);
-            NormalAccessor.Max = CVector(1, 1, 1);
 
             UVAccessor.BufferView = BufferViews.size() + 2;
             UVAccessor.ComponentType = GLTFTypes::FLOAT;
+            UVAccessor.Count = UVs.size();
             UVAccessor.Type = "VEC2";
-            UVAccessor.Min = CVector(0, 0, 0);
-            UVAccessor.Max = CVector(1, 1, 0);
 
             IndexAccessor.BufferView = BufferViews.size() + 3;
             IndexAccessor.ComponentType = GLTFTypes::INT;
+            IndexAccessor.Count = Indices.size();
             IndexAccessor.Type = "SCALAR";
-            IndexAccessor.Min = CVector(INT32_MIN, 0, 0);
-            IndexAccessor.Max = CVector(INT32_MAX, 0, 0);
 
             CPrimitive Primitive;
             Primitive.PositionAccessor = Accessors.size();
@@ -186,24 +171,25 @@ namespace VoxelOptimizer
             Accessors.push_back(NormalAccessor);
             Accessors.push_back(UVAccessor);
             Accessors.push_back(IndexAccessor);
+
+            size_t Pos = Binary.size();
+
+            Binary.resize(Binary.size() + Position.Size + Normal.Size + UV.Size + IndexView.Size);
+
+            memcpy(Binary.data() + Pos, Vertices.data(), Position.Size);
+            Pos += Position.Size;
+
+            memcpy(Binary.data() + Pos, Normals.data(), Normal.Size);
+            Pos += Normal.Size;
+
+            for (auto &&uv : UVs)
+            {
+                memcpy(Binary.data() + Pos, &uv, sizeof(float) * 2);
+                Pos += sizeof(float) * 2;
+            }
+
+            memcpy(Binary.data() + Pos, Indices.data(), IndexView.Size);
         }
-
-        std::vector<char> Binary(Vertices.size() * (sizeof(float) * 3) + Normals.size() * (sizeof(float) * 3) + UVs.size() * (sizeof(float) * 2) + Indices.size() * sizeof(int));
-        
-        size_t Pos = 0;
-        memcpy(&Binary[Pos], Vertices.data(), Vertices.size() * (sizeof(float) * 3));
-
-        Pos += Vertices.size() * (sizeof(float) * 3);
-        memcpy(&Binary[Pos], Normals.data(), Normals.size() * (sizeof(float) * 3));
-
-        for (auto &&uv : UVs)
-        {
-            Binary.push_back(uv.x);
-            Binary.push_back(uv.y);
-        }
-
-        Pos += UVs.size() * (sizeof(float) * 2);
-        memcpy(&Binary[Pos], Indices.data(), Indices.size() * sizeof(int));
 
         json.AddPair("meshes", std::vector<CMesh>() = { GLTFMesh });
         json.AddPair("accessors", Accessors);
