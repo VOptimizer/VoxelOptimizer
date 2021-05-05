@@ -68,17 +68,24 @@ namespace VoxelOptimizer
     std::map<std::string, std::vector<char>> CGLTFExporter::Generate(Mesh Mesh)
     {
         CJSON json;
-        json.AddPair("asset", CAsset());
+        json.AddPair("asset", GLTF::CAsset());
         json.AddPair("scene", 0);
-        json.AddPair("scenes", std::vector<CScene>() = { CScene() });
-        json.AddPair("nodes", std::vector<CNode>() = { CNode() });
+        json.AddPair("scenes", std::vector<GLTF::CScene>() = { GLTF::CScene() });
+        json.AddPair("nodes", std::vector<GLTF::CNode>() = { GLTF::CNode() });
 
-        std::vector<CBufferView> BufferViews;
-        std::vector<CAccessor> Accessors;
+        GLTF::CImage Image;
+        Image.Uri = m_ExternalFilenames + ".png";
+
+        json.AddPair("images", std::vector<GLTF::CImage>() = { Image });
+        json.AddPair("textures", std::vector<GLTF::CTexture>() = { GLTF::CTexture() });
+
+        std::vector<GLTF::CBufferView> BufferViews;
+        std::vector<GLTF::CAccessor> Accessors;
+        std::vector<GLTF::CMaterial> Materials;
 
         std::vector<char> Binary;
 
-        CMesh GLTFMesh;
+        GLTF::CMesh GLTFMesh;
 
         for (auto &&f : Mesh->Faces)
         {
@@ -87,6 +94,14 @@ namespace VoxelOptimizer
             std::map<size_t, int> IndicesIndex;
 
             CVector Max, Min(10000, 10000, 10000);
+
+            GLTF::CMaterial Mat;
+            Mat.Name = "Mat" + std::to_string(GLTFMesh.Primitives.size());
+            Mat.Metallic = f->FaceMaterial->Metallic;
+            Mat.Roughness = f->FaceMaterial->Roughness;
+            Mat.Emissive = f->FaceMaterial->Power;
+            Mat.Transparency = f->FaceMaterial->Transparency;
+            Materials.push_back(Mat);
 
             for (size_t i = 0; i < f->Indices.size(); i += 3)
             {
@@ -117,7 +132,7 @@ namespace VoxelOptimizer
                 }
             }
 
-            CBufferView Position, Normal, UV, IndexView;
+            GLTF::CBufferView Position, Normal, UV, IndexView;
 
             Position.Offset = Binary.size();
             Position.Size = Vertices.size() * sizeof(CVector);
@@ -131,34 +146,35 @@ namespace VoxelOptimizer
             IndexView.Offset = UV.Offset + UV.Size;
             IndexView.Size = Indices.size() * sizeof(int);
 
-            CAccessor PositionAccessor, NormalAccessor, UVAccessor, IndexAccessor;
+            GLTF::CAccessor PositionAccessor, NormalAccessor, UVAccessor, IndexAccessor;
             PositionAccessor.BufferView = BufferViews.size();
-            PositionAccessor.ComponentType = GLTFTypes::FLOAT;
+            PositionAccessor.ComponentType = GLTF::GLTFTypes::FLOAT;
             PositionAccessor.Count = Vertices.size();
             PositionAccessor.Type = "VEC3";
             PositionAccessor.SetMin(Min);
             PositionAccessor.SetMax(Max);
 
             NormalAccessor.BufferView = BufferViews.size() + 1;
-            NormalAccessor.ComponentType = GLTFTypes::FLOAT;
+            NormalAccessor.ComponentType = GLTF::GLTFTypes::FLOAT;
             NormalAccessor.Count = Normals.size();
             NormalAccessor.Type = "VEC3";
 
             UVAccessor.BufferView = BufferViews.size() + 2;
-            UVAccessor.ComponentType = GLTFTypes::FLOAT;
+            UVAccessor.ComponentType = GLTF::GLTFTypes::FLOAT;
             UVAccessor.Count = UVs.size();
             UVAccessor.Type = "VEC2";
 
             IndexAccessor.BufferView = BufferViews.size() + 3;
-            IndexAccessor.ComponentType = GLTFTypes::INT;
+            IndexAccessor.ComponentType = GLTF::GLTFTypes::INT;
             IndexAccessor.Count = Indices.size();
             IndexAccessor.Type = "SCALAR";
 
-            CPrimitive Primitive;
+            GLTF::CPrimitive Primitive;
             Primitive.PositionAccessor = Accessors.size();
             Primitive.NormalAccessor = Accessors.size() + 1;
             Primitive.TextCoordAccessor = Accessors.size() + 2;
             Primitive.IndicesAccessor = Accessors.size() + 3;
+            Primitive.Material = GLTFMesh.Primitives.size();
 
             GLTFMesh.Primitives.push_back(Primitive);
 
@@ -191,22 +207,30 @@ namespace VoxelOptimizer
             memcpy(Binary.data() + Pos, Indices.data(), IndexView.Size);
         }
 
-        json.AddPair("meshes", std::vector<CMesh>() = { GLTFMesh });
+        json.AddPair("meshes", std::vector<GLTF::CMesh>() = { GLTFMesh });
         json.AddPair("accessors", Accessors);
         json.AddPair("bufferViews", BufferViews);
+        json.AddPair("materials", Materials);
 
-        CBuffer Buffer;
+        GLTF::CBuffer Buffer;
         Buffer.Size = Binary.size();
         Buffer.Uri = m_ExternalFilenames + ".bin";
 
-        json.AddPair("buffers", std::vector<CBuffer>() = { Buffer });
+        json.AddPair("buffers", std::vector<GLTF::CBuffer>() = { Buffer });
 
         std::string JS = json.Serialize();
         std::vector<char> GLTF(JS.begin(), JS.end());
 
+        std::vector<char> Texture;
+        stbi_write_png_to_func([](void *context, void *data, int size){
+            std::vector<char> *InnerTexture = (std::vector<char>*)context;
+            InnerTexture->insert(InnerTexture->end(), (char*)data, ((char*)data) + size);
+        }, &Texture, Mesh->Texture.size(), 1, 4, Mesh->Texture.data(), 4 * Mesh->Texture.size());
+
         return {
             {"gltf", GLTF},
-            {"bin", Binary}
+            {"bin", Binary},
+            {"png", Texture}
         };
     }
 } // namespace VoxelOptimizer

@@ -9,7 +9,7 @@ int main(int argc, char const *argv[])
     VoxelOptimizer::CMagicaVoxelLoader loader;
     loader.Load("lantern.vox");
 
-    VoxelOptimizer::CSimpleMesher Mesher;
+    VoxelOptimizer::CGreedyMesher Mesher;
 
     auto VoxelMesh = loader.GetModels().back();
 

@@ -115,7 +115,7 @@ namespace VoxelOptimizer
             }
 
             MTLFile << "newmtl Mat" << MatCounter << std::endl;
-            MTLFile << "Ns " << (1.0f - f->FaceMaterial->Roughness) * 1000.f << std::endl;
+            MTLFile << "Ns " << f->FaceMaterial->Roughness * 1000.f << std::endl;
             MTLFile << "Ka " << Ambient << " " << Ambient << " " << Ambient << std::endl;
             MTLFile << "Kd 1.0 1.0 1.0" << std::endl;
             MTLFile << "Ks " << f->FaceMaterial->Specular << " " << f->FaceMaterial->Specular << " " << f->FaceMaterial->Specular << std::endl;

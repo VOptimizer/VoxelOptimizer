@@ -33,15 +33,7 @@ namespace VoxelOptimizer
     class CMaterial
     {
         public:
-            enum ColorIndex
-            {
-                RED,
-                GREEN,
-                BLUE,
-                ALPHA
-            };
-
-            CMaterial() : Metallic(0), Specular(0), Roughness(0), IOR(0), Power(0), Transparency(0) {}
+            CMaterial() : Metallic(0), Specular(0), Roughness(1), IOR(0), Power(0), Transparency(0) {}
 
             CColor Diffuse;
             float Metallic;
