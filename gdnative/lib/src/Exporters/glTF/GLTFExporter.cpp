@@ -35,23 +35,8 @@ namespace VoxelOptimizer
     void CGLTFExporter::Save(const std::string &Path, Mesh Mesh)
     {
         // Names the MTL the same as the obj file.
-        m_ExternalFilenames = Path;
-        std::replace(m_ExternalFilenames.begin(), m_ExternalFilenames.end(), '\\', '/');
-        size_t Pos = m_ExternalFilenames.find_last_of("/");
-        if(Pos != std::string::npos)
-            m_ExternalFilenames = m_ExternalFilenames.substr(Pos);
-        
-        // Removes the file extension.
-        Pos = m_ExternalFilenames.find_last_of(".");
-        if(Pos != std::string::npos)
-            m_ExternalFilenames = m_ExternalFilenames.erase(Pos);
-
-        std::string PathWithoutExt = Path;
-
-        // Removes the file extension.
-        Pos = PathWithoutExt.find_last_of(".");
-        if(Pos != std::string::npos)
-            PathWithoutExt = PathWithoutExt.erase(Pos);
+        m_ExternalFilenames = GetFilenameWithoutExt(Path);
+        std::string PathWithoutExt = GetPathWithoutExt(Path);
 
         auto Files = Generate(Mesh);
         for (auto &&f : Files)

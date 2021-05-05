@@ -22,21 +22,42 @@
  * SOFTWARE.
  */
 
-#ifndef VOXELOPTIMIZER_HPP
-#define VOXELOPTIMIZER_HPP
+#ifndef SPRITESTACKINGEXPORTER_HPP
+#define SPRITESTACKINGEXPORTER_HPP
 
-#include <VoxelOptimizer/Color.hpp>
-#include <VoxelOptimizer/Exceptions.hpp>
-#include <VoxelOptimizer/Material.hpp>
-#include <VoxelOptimizer/Mesh.hpp>
-#include <VoxelOptimizer/Vector.hpp>
-
-#include <VoxelOptimizer/Exporters/IExporter.hpp>
-#include <VoxelOptimizer/Exporters/WavefrontObjExporter.hpp>
-#include <VoxelOptimizer/Exporters/GLTFExporter.hpp>
 #include <VoxelOptimizer/Loaders/MagicaVoxelLoader.hpp>
-#include <VoxelOptimizer/Loaders/VoxelMesh.hpp>
-#include <VoxelOptimizer/Meshers/GreedyMesher.hpp>
-#include <VoxelOptimizer/Meshers/SimpleMesher.hpp>
+#include <string>
+#include <vector>
 
-#endif //VOXELOPTIMIZER_HPP
+namespace VoxelOptimizer
+{
+    class CSpriteStackingExporter
+    {
+        public:
+            CSpriteStackingExporter() = default;
+
+            /**
+             * @brief Generates and saves the mesh as png slices.
+             * 
+             * @param Path: Path of the file.
+             * @param Mesh: Mesh to save.
+             */
+            void Save(const std::string &Path, VoxelMesh m, CMagicaVoxelLoader Loader);
+
+            /**
+             * @brief Generates the file stream.
+             * 
+             * @param Mesh: Mesh to save.
+             * 
+             * @return Returns a png image.
+             */
+            std::vector<char> Generate(VoxelMesh m, CMagicaVoxelLoader Loader); 
+
+            ~CSpriteStackingExporter() = default;
+        private:
+        /* data */
+    };
+} // namespace VoxelOptimizer
+
+
+#endif //SPRITESTACKINGEXPORTER_HPP

@@ -22,21 +22,33 @@
  * SOFTWARE.
  */
 
-#ifndef VOXELOPTIMIZER_HPP
-#define VOXELOPTIMIZER_HPP
-
-#include <VoxelOptimizer/Color.hpp>
-#include <VoxelOptimizer/Exceptions.hpp>
-#include <VoxelOptimizer/Material.hpp>
-#include <VoxelOptimizer/Mesh.hpp>
-#include <VoxelOptimizer/Vector.hpp>
-
+#include <algorithm>
 #include <VoxelOptimizer/Exporters/IExporter.hpp>
-#include <VoxelOptimizer/Exporters/WavefrontObjExporter.hpp>
-#include <VoxelOptimizer/Exporters/GLTFExporter.hpp>
-#include <VoxelOptimizer/Loaders/MagicaVoxelLoader.hpp>
-#include <VoxelOptimizer/Loaders/VoxelMesh.hpp>
-#include <VoxelOptimizer/Meshers/GreedyMesher.hpp>
-#include <VoxelOptimizer/Meshers/SimpleMesher.hpp>
 
-#endif //VOXELOPTIMIZER_HPP
+namespace VoxelOptimizer
+{
+    std::string IExporter::GetPathWithoutExt(std::string Path)
+    {
+        // Removes the file extension.
+        size_t Pos = Path.find_last_of(".");
+        if(Pos != std::string::npos)
+            Path = Path.erase(Pos);
+
+        return Path;
+    }
+
+    std::string IExporter::GetFilenameWithoutExt(std::string Path)
+    {
+        Path = GetPathWithoutExt(Path);
+
+        // Replaces all '\' to '/'
+        std::replace(Path.begin(), Path.end(), '\\', '/');
+
+        // Deletes the path.
+        size_t Pos = Path.find_last_of("/");
+        if(Pos != std::string::npos)
+            Path = Path.substr(Pos);
+
+        return Path;
+    }
+} // namespace VoxelOptimizer

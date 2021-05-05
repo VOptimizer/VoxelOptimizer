@@ -22,25 +22,27 @@
  * SOFTWARE.
  */
 
-#ifndef GLTFEXPORTER_HPP
-#define GLTFEXPORTER_HPP
+#ifndef IEXPORTER_HPP
+#define IEXPORTER_HPP
 
-#include <VoxelOptimizer/Exporters/IExporter.hpp>
+#include <map>
+#include <memory>
+#include <VoxelOptimizer/Mesh.hpp>
+#include <string>
+#include <vector>
 
 namespace VoxelOptimizer
 {
-    class CGLTFExporter : public IExporter
+    class IExporter
     {
         public:
-            CGLTFExporter() = default;
-
             /**
              * @brief Generates and saves the mesh.
              * 
              * @param Path: Path of the file.
              * @param Mesh: Mesh to save.
              */
-            void Save(const std::string &Path, Mesh Mesh) override;
+            virtual void Save(const std::string &Path, Mesh Mesh) = 0;
 
             /**
              * @brief Generates the file streams.
@@ -49,10 +51,25 @@ namespace VoxelOptimizer
              * 
              * @return Returns a map where the key is the type and the std::vector<char> is the data.
              */
-            std::map<std::string, std::vector<char>> Generate(Mesh Mesh) override;
+            virtual std::map<std::string, std::vector<char>> Generate(Mesh Mesh) = 0;
 
-            virtual ~CGLTFExporter() = default;
+            /**
+             * @brief Sets the name for the all the external files. Only needed for memory generation.
+             */
+            inline void SetExternaFilenames(std::string ExternalFilenames)
+            {
+                m_ExternalFilenames = ExternalFilenames;
+            }
+        
+        protected:
+            std::string GetPathWithoutExt(std::string Path);
+            std::string GetFilenameWithoutExt(std::string Path);
+
+            std::string m_ExternalFilenames;
     };
+
+    using Exporter = std::shared_ptr<IExporter>;
 } // namespace VoxelOptimizer
 
-#endif //GLTFEXPORTER_HPP
+
+#endif //IEXPORTER_HPP
