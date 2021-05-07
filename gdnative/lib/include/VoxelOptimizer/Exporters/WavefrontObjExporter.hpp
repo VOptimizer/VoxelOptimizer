@@ -25,45 +25,32 @@
 #ifndef WAVEFRONTOBJEXPORTER_HPP
 #define WAVEFRONTOBJEXPORTER_HPP
 
-#include <VoxelOptimizer/Mesh.hpp>
-#include <string>
-#include <tuple>
-#include <vector>
+#include <VoxelOptimizer/Exporters/IExporter.hpp>
 namespace VoxelOptimizer
 {
-    class CWavefrontObjExporter
+    class CWavefrontObjExporter : public IExporter
     {
         public:
             CWavefrontObjExporter() = default;
 
             /**
-             * @brief Generates and saves the obj to disk.
+             * @brief Generates and saves the mesh.
              * 
-             * @param Path: Path of the generated obj.
+             * @param Path: Path of the file.
              * @param Mesh: Mesh to save.
              */
-            void SaveObj(const std::string &Path, Mesh Mesh);
+            void Save(const std::string &Path, Mesh Mesh) override;
 
             /**
-             * @brief Generates the obj.
+             * @brief Generates the file streams.
              * 
              * @param Mesh: Mesh to save.
              * 
-             * @return Returns a tuple where value one is the obj file, two the mtl and the third one the texture file.
+             * @return Returns a map where the key is the type and the std::vector<char> is the data.
              */
-            std::tuple<std::string, std::string, std::vector<char>> GenerateObj(Mesh Mesh);
-
-            /**
-             * @brief Sets the name for the MTL file. Only needed for Generate Obj.
-             */
-            inline void SetMTLFileName(std::string MTLFileName)
-            {
-                m_MTLFileName = MTLFileName;
-            }
+            std::map<std::string, std::vector<char>> Generate(Mesh Mesh) override;
 
             ~CWavefrontObjExporter() = default;
-        private:
-            std::string m_MTLFileName;
     };
 } // namespace VoxelOptimizer
 

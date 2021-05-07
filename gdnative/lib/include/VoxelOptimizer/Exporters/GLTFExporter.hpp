@@ -26,7 +26,6 @@
 #define GLTFEXPORTER_HPP
 
 #include <VoxelOptimizer/Exporters/IExporter.hpp>
-
 namespace VoxelOptimizer
 {
     class CGLTFExporter : public IExporter

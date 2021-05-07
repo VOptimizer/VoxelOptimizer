@@ -36,7 +36,7 @@ namespace VoxelOptimizer
     {
         m_Binary = Path.find(".glb") != std::string::npos;
 
-        // Names the MTL the same as the obj file.
+        // Names all files like thhe output file.
         m_ExternalFilenames = GetFilenameWithoutExt(Path);
         std::string PathWithoutExt = GetPathWithoutExt(Path);
 

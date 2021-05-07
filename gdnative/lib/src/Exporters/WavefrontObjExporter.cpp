@@ -31,59 +31,33 @@
 
 namespace VoxelOptimizer
 {   
-    void CWavefrontObjExporter::SaveObj(const std::string &Path, Mesh Mesh)
+    void CWavefrontObjExporter::Save(const std::string &Path, Mesh Mesh)
     {
-        // Names the MTL the same as the obj file.
-        m_MTLFileName = Path;
-        std::replace(m_MTLFileName.begin(), m_MTLFileName.end(), '\\', '/');
-        size_t Pos = m_MTLFileName.find_last_of("/");
-        if(Pos != std::string::npos)
-            m_MTLFileName = m_MTLFileName.substr(Pos);
-        
-        // Removes the file extension.
-        Pos = m_MTLFileName.find_last_of(".");
-        if(Pos != std::string::npos)
-            m_MTLFileName = m_MTLFileName.erase(Pos);
+        // Names all files like thhe output file.
+        m_ExternalFilenames = GetFilenameWithoutExt(Path);
+        std::string PathWithoutExt = GetPathWithoutExt(Path);
 
-        auto Tuple = GenerateObj(Mesh);
-
-        std::ofstream out(Path, std::ios::out);
-        if(out.is_open())
+        auto Files = Generate(Mesh);
+        for (auto &&f : Files)
         {
-            std::string Val = std::get<0>(Tuple);
-
-            out.write(Val.data(), Val.size());
-            out.close();
-
-            out.open(m_MTLFileName + ".mtl", std::ios::out);
+            std::ofstream out(PathWithoutExt + std::string(".") + f.first, std::ios::binary);
             if(out.is_open())
             {
-                Val = std::get<1>(Tuple);
-
-                out.write(Val.data(), Val.size());
+                out.write(f.second.data(), f.second.size());
                 out.close();
-
-                out.open(m_MTLFileName + ".png", std::ios::out);
-                if(out.is_open())
-                {
-                    auto Texture = std::get<2>(Tuple);
-
-                    out.write(Texture.data(), Texture.size());
-                    out.close();
-                }
             }
         }
     }
 
-    std::tuple<std::string, std::string, std::vector<char>> CWavefrontObjExporter::GenerateObj(Mesh Mesh)
+    std::map<std::string, std::vector<char>> CWavefrontObjExporter::Generate(Mesh Mesh)
     {
         std::stringstream ObjFile, MTLFile;
-        if(m_MTLFileName.empty())
-            m_MTLFileName = "materials";
+        if(m_ExternalFilenames.empty())
+            m_ExternalFilenames = "materials";
 
         ObjFile << "# Generated with VoxelOptimizer" << std::endl;
         ObjFile << "# These comments can be removed" << std::endl;
-        ObjFile << "mtllib " << m_MTLFileName << ".mtl" << std::endl;
+        ObjFile << "mtllib " << m_ExternalFilenames << ".mtl" << std::endl;
 
         for (auto &&v : Mesh->Vertices)
             ObjFile << "v " << v.x << " " << v.y << " " << v.z << std::endl;
@@ -125,7 +99,7 @@ namespace VoxelOptimizer
             MTLFile << "d " << Alpha << std::endl;
             MTLFile << "Ni " << f->FaceMaterial->IOR << std::endl;
             MTLFile << "illum " << Illum << std::endl;
-            MTLFile << "map_Kd " << m_MTLFileName << ".png" << std::endl;
+            MTLFile << "map_Kd " << m_ExternalFilenames << ".png" << std::endl;
             
             ObjFile << "usemtl Mat" << MatCounter << std::endl;
 
@@ -149,6 +123,13 @@ namespace VoxelOptimizer
             InnerTexture->insert(InnerTexture->end(), (char*)data, ((char*)data) + size);
         }, &Texture, Mesh->Texture.size(), 1, 4, Mesh->Texture.data(), 4 * Mesh->Texture.size());
 
-        return std::make_tuple<std::string, std::string, std::vector<char>>(ObjFile.str(), MTLFile.str(), std::move(Texture)); 
+        std::string ObjFileStr = ObjFile.str();
+        std::string MTLFileStr = MTLFile.str();
+
+        return {
+            {"obj", std::vector<char>(ObjFileStr.begin(), ObjFileStr.end())},
+            {"mtl", std::vector<char>(MTLFileStr.begin(), MTLFileStr.end())},
+            {"png", Texture}
+        };
     }
 } // namespace VoxelOptimizer

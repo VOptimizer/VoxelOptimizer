@@ -7,7 +7,7 @@ using namespace std;
 int main(int argc, char const *argv[])
 {
     VoxelOptimizer::CMagicaVoxelLoader loader;
-    loader.Load("lantern.vox");
+    loader.Load("windmill.vox");
 
     VoxelOptimizer::CGreedyMesher Mesher;
 
@@ -47,7 +47,15 @@ int main(int argc, char const *argv[])
     VoxelOptimizer::CGLTFExporter exporter;
 
     // exporter.Save("lantern.gltf", Mesh);
-    exporter.Save("lantern.glb", Mesh);
+    exporter.Save("windmill.glb", Mesh);
+
+    VoxelOptimizer::CWavefrontObjExporter exporterObj;
+
+    // exporter.Save("lantern.gltf", Mesh);
+    exporterObj.Save("windmill.obj", Mesh);
+
+    VoxelOptimizer::CSpriteStackingExporter spriter;
+    spriter.Save("windmill_sprite.png", VoxelMesh, loader);
 
     return 0;
 }
