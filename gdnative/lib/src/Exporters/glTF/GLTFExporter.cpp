@@ -34,6 +34,8 @@ namespace VoxelOptimizer
 {
     void CGLTFExporter::Save(const std::string &Path, Mesh Mesh)
     {
+        m_Binary = Path.find(".glb") != std::string::npos;
+
         // Names the MTL the same as the obj file.
         m_ExternalFilenames = GetFilenameWithoutExt(Path);
         std::string PathWithoutExt = GetPathWithoutExt(Path);
@@ -41,7 +43,7 @@ namespace VoxelOptimizer
         auto Files = Generate(Mesh);
         for (auto &&f : Files)
         {
-            std::ofstream out(PathWithoutExt + "." + f.first, std::ios::out);
+            std::ofstream out(PathWithoutExt + std::string(".") + f.first, std::ios::binary);
             if(out.is_open())
             {
                 out.write(f.second.data(), f.second.size());
@@ -52,18 +54,6 @@ namespace VoxelOptimizer
 
     std::map<std::string, std::vector<char>> CGLTFExporter::Generate(Mesh Mesh)
     {
-        CJSON json;
-        json.AddPair("asset", GLTF::CAsset());
-        json.AddPair("scene", 0);
-        json.AddPair("scenes", std::vector<GLTF::CScene>() = { GLTF::CScene() });
-        json.AddPair("nodes", std::vector<GLTF::CNode>() = { GLTF::CNode() });
-
-        GLTF::CImage Image;
-        Image.Uri = m_ExternalFilenames + ".png";
-
-        json.AddPair("images", std::vector<GLTF::CImage>() = { Image });
-        json.AddPair("textures", std::vector<GLTF::CTexture>() = { GLTF::CTexture() });
-
         std::vector<GLTF::CBufferView> BufferViews;
         std::vector<GLTF::CAccessor> Accessors;
         std::vector<GLTF::CMaterial> Materials;
@@ -192,19 +182,8 @@ namespace VoxelOptimizer
             memcpy(Binary.data() + Pos, Indices.data(), IndexView.Size);
         }
 
-        json.AddPair("meshes", std::vector<GLTF::CMesh>() = { GLTFMesh });
-        json.AddPair("accessors", Accessors);
-        json.AddPair("bufferViews", BufferViews);
-        json.AddPair("materials", Materials);
-
+        GLTF::CImage Image;
         GLTF::CBuffer Buffer;
-        Buffer.Size = Binary.size();
-        Buffer.Uri = m_ExternalFilenames + ".bin";
-
-        json.AddPair("buffers", std::vector<GLTF::CBuffer>() = { Buffer });
-
-        std::string JS = json.Serialize();
-        std::vector<char> GLTF(JS.begin(), JS.end());
 
         std::vector<char> Texture;
         stbi_write_png_to_func([](void *context, void *data, int size){
@@ -212,10 +191,96 @@ namespace VoxelOptimizer
             InnerTexture->insert(InnerTexture->end(), (char*)data, ((char*)data) + size);
         }, &Texture, Mesh->Texture.size(), 1, 4, Mesh->Texture.data(), 4 * Mesh->Texture.size());
 
+        // For glb add padding to satify the 4 Byte boundary.
+        if(m_Binary)
+        {            
+            size_t Size = Binary.size();
+            int Padding = (Binary.size() + Texture.size()) % 4;
+
+            Binary.resize(Binary.size() + Texture.size() + Padding, '\0');
+            memcpy(Binary.data() + Size, Texture.data(), Texture.size());
+
+            GLTF::CBufferView ImageView;
+            ImageView.Offset = Size;
+            ImageView.Size = Texture.size();
+
+            Image.BufferView = BufferViews.size();
+            BufferViews.push_back(ImageView);
+
+            Texture.clear();    // Clear the memory
+        }
+        else
+        {
+            Image.Uri = m_ExternalFilenames + ".png";
+            Buffer.Uri = m_ExternalFilenames + ".bin";
+        }
+            
+
+        Buffer.Size = Binary.size(); 
+
+        CJSON json;
+        json.AddPair("asset", GLTF::CAsset());
+        json.AddPair("scene", 0);
+        json.AddPair("scenes", std::vector<GLTF::CScene>() = { GLTF::CScene() });
+        json.AddPair("nodes", std::vector<GLTF::CNode>() = { GLTF::CNode() });
+
+        json.AddPair("meshes", std::vector<GLTF::CMesh>() = { GLTFMesh });
+        json.AddPair("accessors", Accessors);
+        json.AddPair("bufferViews", BufferViews);
+        json.AddPair("materials", Materials);        
+
+        json.AddPair("images", std::vector<GLTF::CImage>() = { Image });
+        json.AddPair("textures", std::vector<GLTF::CTexture>() = { GLTF::CTexture() });   
+        json.AddPair("buffers", std::vector<GLTF::CBuffer>() = { Buffer });
+        
+        std::string JS = json.Serialize();
+        if(m_Binary)
+        {
+            int Padding = JS.size() % 4;
+            for (int i = 0; i < Padding; i++)
+                JS += ' ';
+        }
+
+        if(!m_Binary)
+        {
+            std::vector<char> GLTF(JS.begin(), JS.end());
+            return {
+                {"gltf", GLTF},
+                {"bin", Binary},
+                {"png", Texture}
+            };
+        }
+
+        // Builds the binary buffer.
+        std::vector<char> GLB(sizeof(uint32_t) * 3 + sizeof(uint32_t) * 2 + JS.size() + sizeof(uint32_t) * 2 + Binary.size(), '\0');
+        uint32_t Magic = 0x46546C67; //GLTF in ASCII
+        uint32_t Version = 2;
+        uint32_t Length = GLB.size();
+
+        memcpy(GLB.data(), &Magic, sizeof(uint32_t));
+        memcpy(GLB.data() + sizeof(uint32_t), &Version, sizeof(uint32_t));
+        memcpy(GLB.data() + sizeof(uint32_t) * 2, &Length, sizeof(uint32_t));
+
+        size_t Pos = sizeof(uint32_t) * 3; 
+
+        uint32_t ChunkLength = JS.size();
+        uint32_t ChunkType = 0x4E4F534A; //JSON in ASCII
+
+        memcpy(GLB.data() + Pos, &ChunkLength, sizeof(uint32_t));
+        memcpy(GLB.data() + Pos + sizeof(uint32_t), &ChunkType, sizeof(uint32_t));
+        memcpy(GLB.data() + Pos + sizeof(uint32_t) * 2, JS.data(), JS.size());
+
+        Pos += sizeof(uint32_t) * 2 + JS.size(); 
+
+        ChunkLength = Binary.size();
+        ChunkType = 0x004E4942; //Bin in ASCII
+
+        memcpy(GLB.data() + Pos, &ChunkLength, sizeof(uint32_t));
+        memcpy(GLB.data() + Pos + sizeof(uint32_t), &ChunkType, sizeof(uint32_t));
+        memcpy(GLB.data() + Pos + sizeof(uint32_t) * 2, Binary.data(), Binary.size());
+
         return {
-            {"gltf", GLTF},
-            {"bin", Binary},
-            {"png", Texture}
+            {"glb", GLB}
         };
     }
 } // namespace VoxelOptimizer

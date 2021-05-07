@@ -32,7 +32,7 @@ namespace VoxelOptimizer
     class CGLTFExporter : public IExporter
     {
         public:
-            CGLTFExporter() = default;
+            CGLTFExporter() : m_Binary(false) {}
 
             /**
              * @brief Generates and saves the mesh.
@@ -51,7 +51,15 @@ namespace VoxelOptimizer
              */
             std::map<std::string, std::vector<char>> Generate(Mesh Mesh) override;
 
+            inline void SetBinary(bool Binary)
+            {
+                m_Binary = Binary;
+            }
+
             virtual ~CGLTFExporter() = default;
+
+        private:
+            bool m_Binary;
     };
 } // namespace VoxelOptimizer
 

@@ -46,7 +46,8 @@ int main(int argc, char const *argv[])
 
     VoxelOptimizer::CGLTFExporter exporter;
 
-    exporter.Save("lantern.gltf", Mesh);
+    // exporter.Save("lantern.gltf", Mesh);
+    exporter.Save("lantern.glb", Mesh);
 
     return 0;
 }

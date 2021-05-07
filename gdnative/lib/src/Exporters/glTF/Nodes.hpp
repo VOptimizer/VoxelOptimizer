@@ -77,7 +77,9 @@ namespace VoxelOptimizer
                 void Serialize(CJSON &json) const
                 {
                     json.AddPair("byteLength", Size);
-                    json.AddPair("uri", Uri);
+
+                    if(!Uri.empty())
+                        json.AddPair("uri", Uri);
                 }    
         };
 
@@ -196,10 +198,17 @@ namespace VoxelOptimizer
         {
             public:
                 std::string Uri;
+                int BufferView;
 
                 void Serialize(CJSON &json) const
                 {
-                    json.AddPair("uri", Uri);
+                    if(!Uri.empty())
+                        json.AddPair("uri", Uri);
+                    else
+                    {
+                        json.AddPair("bufferView", BufferView);
+                        json.AddPair("mimeType", std::string("image/png"));
+                    }
                 }
         };
 
