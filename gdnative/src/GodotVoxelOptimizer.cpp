@@ -33,6 +33,7 @@ void CGodotVoxelOptimizer::_register_methods()
 {
     register_method("load", &CGodotVoxelOptimizer::Load);
     register_method("save", &CGodotVoxelOptimizer::Save);
+    register_method("save_slices", &CGodotVoxelOptimizer::SaveSlices);
     register_method("get_mesh", &CGodotVoxelOptimizer::GetMesh);
     register_method("get_statistics", &CGodotVoxelOptimizer::GetStatistics);
 }
@@ -84,9 +85,57 @@ godot_error CGodotVoxelOptimizer::Save(String Path)
     }
 
     Ref<File> VFile = File::_new();
-    VoxelOptimizer::CWavefrontObjExporter Exporter;
-    Exporter.SetMTLFileName(std::string(Path.get_basename().get_file().utf8().get_data()));
-    auto Res = Exporter.GenerateObj(m_Mesh);
+    VoxelOptimizer::Exporter Exporter;
+
+    String Ext = Path.get_extension();
+    if(Ext == "gltf" || Ext == "glb")
+    {
+        VoxelOptimizer::CGLTFExporter *GLTF = new VoxelOptimizer::CGLTFExporter();
+        GLTF->SetBinary(Ext == "glb");
+        Exporter = VoxelOptimizer::Exporter(GLTF);
+    }
+    else if(Ext == "obj")
+        Exporter = VoxelOptimizer::Exporter(new VoxelOptimizer::CWavefrontObjExporter());
+    else
+        return (godot_error)Error::ERR_FILE_UNRECOGNIZED;
+
+    Path = Path.get_basename();
+    Exporter->SetExternaFilenames(std::string(Path.get_file().utf8().get_data()));
+    auto Files = Exporter->Generate(m_Mesh);
+
+    for (auto &&f : Files)
+    {
+        VFile->open(Path + String(".") + String(f.first.c_str()), File::WRITE);
+        if(!VFile->is_open())
+        {
+            ERR_PRINT("Couldn't open file: " + Path);
+            return (godot_error)Error::ERR_FILE_CANT_WRITE;
+        }
+
+        PoolByteArray Data;
+        Data.resize(f.second.size());
+        auto Writer = Data.write();
+        memcpy(Writer.ptr(), f.second.data(), f.second.size());
+
+        VFile->store_buffer(Data);
+        VFile->close();
+    }
+    
+    return (godot_error)Error::OK;
+}
+
+godot_error CGodotVoxelOptimizer::SaveSlices(String Path)
+{
+    if(!m_Mesh)
+    {
+        ERR_PRINT("No mesh data to save.");
+        return (godot_error)Error::ERR_INVALID_DATA;
+    }
+
+    Ref<File> VFile = File::_new();
+    VoxelOptimizer::CSpriteStackingExporter Exporter;
+
+    auto Image = Exporter.Generate(m_Loader.GetModels().front(), m_Loader);
 
     VFile->open(Path, File::WRITE);
     if(!VFile->is_open())
@@ -95,48 +144,12 @@ godot_error CGodotVoxelOptimizer::Save(String Path)
         return (godot_error)Error::ERR_FILE_CANT_WRITE;
     }
 
-    auto ObjData = std::get<0>(Res);
-
     PoolByteArray Data;
-    Data.resize(ObjData.size());
+    Data.resize(Image.size());
     auto Writer = Data.write();
-    memcpy(Writer.ptr(), ObjData.data(), ObjData.size());
+    memcpy(Writer.ptr(), Image.data(), Image.size());
 
     VFile->store_buffer(Data);
-    VFile->close();
-
-    VFile->open(Path.replace(Path.get_extension(), "mtl"), File::WRITE);
-    if(!VFile->is_open())
-    {
-        ERR_PRINT("Couldn't open file: " + Path);
-        return (godot_error)Error::ERR_FILE_CANT_WRITE;
-    }
-
-    ObjData = std::get<1>(Res);
-
-    PoolByteArray Data1;
-    Data1.resize(ObjData.size());
-    Writer = Data1.write();
-    memcpy(Writer.ptr(), ObjData.data(), ObjData.size());
-
-    VFile->store_buffer(Data1);
-    VFile->close();
-
-    VFile->open(Path.replace(Path.get_extension(), "png"), File::WRITE);
-    if(!VFile->is_open())
-    {
-        ERR_PRINT("Couldn't open file: " + Path);
-        return (godot_error)Error::ERR_FILE_CANT_WRITE;
-    }
-
-    auto Texture = std::get<2>(Res);
-
-    PoolByteArray Data2;
-    Data2.resize(Texture.size());
-    Writer = Data2.write();
-    memcpy(Writer.ptr(), Texture.data(), Texture.size());
-
-    VFile->store_buffer(Data2);
     VFile->close();
 
     return (godot_error)Error::OK;
@@ -167,12 +180,7 @@ Ref<ArrayMesh> CGodotVoxelOptimizer::GetMesh(bool Optimized)
     std::map<size_t, int> m_Index;
 
     PoolVector3Array Vertices, Normals;
-    PoolVector2Array UVs;
-
-    // for (auto &&m : Mesh->Vertices)
-    //     Vec3Arr.append(Vector3(m.x, m.y, m.z));
-    // arr[ArrayMesh::ARRAY_VERTEX] = Vec3Arr;
-    
+    PoolVector2Array UVs;    
     PoolIntArray Indices;
 
     int Surface = 0;
@@ -268,14 +276,6 @@ Ref<ArrayMesh> CGodotVoxelOptimizer::GetMesh(bool Optimized)
         // UVs2 = PoolVector2Array();
         Indices = PoolIntArray();
     }
-
-
-    // arr[ArrayMesh::ARRAY_VERTEX] = Vertices;
-    // arr[ArrayMesh::ARRAY_NORMAL] = Normals;
-    // arr[ArrayMesh::ARRAY_INDEX] = Indices;
-    // Ret->add_surface_from_arrays(ArrayMesh::PRIMITIVE_TRIANGLES, arr);
-    // VoxelOptimizer::CWavefrontObjExporter obj;
-    // obj.SaveObj("test.obj", Mesh);
 
     return Ret;
 }

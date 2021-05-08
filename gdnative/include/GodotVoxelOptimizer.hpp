@@ -43,6 +43,7 @@ class CGodotVoxelOptimizer : public Reference
         static void _register_methods();
         godot_error Load(String Path);
         godot_error Save(String Path);
+        godot_error SaveSlices(String Path);
         Ref<ArrayMesh> GetMesh(bool Optimized);
         Dictionary GetStatistics();
 
