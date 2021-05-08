@@ -16,28 +16,32 @@ func _on_Fileselect_load_file(file : String):
 	if f.file_exists(file):
 		var err = _VoxelOptimizer.load(file)
 		if err == OK:
-			var mesh : ArrayMesh = _VoxelOptimizer.get_mesh(_Selected)
-			var mesh2 : ArrayMesh = ArrayMesh.new()
-			
-			for i in mesh.get_surface_count():
-				mesh2.add_surface_from_arrays(Mesh.PRIMITIVE_LINES, mesh.surface_get_arrays(i))
-			
-			_MeshInstance.mesh = mesh#_VoxelOptimizer.get_mesh(_Selected)
-			_Wireframe.mesh = mesh2
-			_set_statistics()
+			_generate_mesh()
 			
 	_OutputFile.FilePath = file.replace(file.get_extension(), "obj")
 
+func _generate_mesh():
+	var mesh : ArrayMesh = _VoxelOptimizer.get_mesh(_Selected)
+	var mesh2 : ArrayMesh = ArrayMesh.new()
+	
+	for i in mesh.get_surface_count():
+		mesh2.add_surface_from_arrays(Mesh.PRIMITIVE_LINES, mesh.surface_get_arrays(i))
+	
+	_MeshInstance.mesh = mesh#_VoxelOptimizer.get_mesh(_Selected)
+	_Wireframe.mesh = mesh2
+	_set_statistics()
 
 func _on_Button_pressed():
-	_VoxelOptimizer.save(_OutputFile.FilePath)
-
+	if _OutputFile.FilePath.get_extension() != "png":
+		_VoxelOptimizer.save(_OutputFile.FilePath)
+	else:
+		_VoxelOptimizer.save_slices(_OutputFile.FilePath)
 
 func _on_OptionButton_item_selected(index):	
 	_Selected = index
 	
 	if _InputFile.FilePath != "":
-		_on_Fileselect_load_file(_InputFile.FilePath)
+		_generate_mesh()
 
 func _set_statistics():
 	var stats = _VoxelOptimizer.get_statistics()
@@ -47,12 +51,10 @@ func _set_statistics():
 
 func _on_Button_toggled(button_pressed):
 	_Wireframe.visible = button_pressed
-
-
+	
 func _on_Button2_toggled(button_pressed):
 	_set_statistics()
 	_Statistics.visible = button_pressed
-
 
 func _on_Button3_pressed():
 	_AboutDialog.popup()

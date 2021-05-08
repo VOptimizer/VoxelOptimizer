@@ -116,7 +116,7 @@ rect_min_size = Vector2( 300, 0 )
 size_flags_horizontal = 3
 size_flags_vertical = 3
 Caption = "Outputfile"
-Filters = PoolStringArray( "*.obj ; Wavefront Obj file" )
+Filters = PoolStringArray( "*.obj ; Wavefront Obj file", "*.gltf, *.glb ; glTF Text", "*.png ; PNG Image" )
 SaveDialog = true
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
@@ -265,6 +265,7 @@ hint_tooltip = "About this tool"
 icon = ExtResource( 10 )
 
 [node name="AboutDialog" parent="." instance=ExtResource( 11 )]
+visible = false
 
 [connection signal="load_file" from="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Inputfile" to="." method="_on_Fileselect_load_file"]
 [connection signal="item_selected" from="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/OptionButton" to="." method="_on_OptionButton_item_selected"]
