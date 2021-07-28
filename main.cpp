@@ -6,12 +6,16 @@ using namespace std;
 
 int main(int argc, char const *argv[])
 {
+    VoxelOptimizer::CGoxelLoader GLoader;
+    GLoader.Load("untitled.gox");
+
+
     VoxelOptimizer::CMagicaVoxelLoader loader;
     loader.Load("windmill.vox");
 
     VoxelOptimizer::CGreedyMesher Mesher;
 
-    auto VoxelMesh = loader.GetModels().back();
+    auto VoxelMesh = GLoader.GetModels().back();//loader.GetModels().back();
 
     auto v = VoxelMesh->GetVoxels();
 

@@ -22,38 +22,29 @@
  * SOFTWARE.
  */
 
-#ifndef COLOR_HPP
-#define COLOR_HPP
-
-#include <stdint.h>
+#include <VoxelOptimizer/Exceptions.hpp>
+#include <fstream>
+#include <VoxelOptimizer/Loaders/ILoader.hpp>
 
 namespace VoxelOptimizer
 {
-    class CColor
+    void ILoader::Load(const std::string &File)
     {
-        public:
-            union
-            {
-                struct
-                {
-                    unsigned char R;
-                    unsigned char G;
-                    unsigned char B;
-                    unsigned char A;
-                };
+        std::ifstream in(File, std::ios::binary);
+        if(in.is_open())
+        {
+            in.seekg(0, in.end);
+            size_t Len = in.tellg();
+            in.seekg(0, in.beg);
 
-                unsigned char c[4];
-            };
+            char *Data = new char[Len];
+            in.read(Data, Len);
+            in.close();
 
-            CColor() : R(255), G(255), B(255), A(255) {}
-
-            inline uint32_t AsRGBA() const
-            {
-                return (uint32_t)R | (uint32_t)(G << 8) | (uint32_t)(B << 16) | (uint32_t)(A << 24);
-            }
-
-            ~CColor() = default;
-    };
+            Load(Data, Len);
+            delete[] Data;
+        }
+        else
+            throw CVoxelLoaderException("Failed to open '" + File + "'");
+    }
 } // namespace VoxelOptimizer
-
-#endif //COLOR_HPP

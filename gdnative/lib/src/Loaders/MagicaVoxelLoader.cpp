@@ -22,7 +22,6 @@
  * SOFTWARE.
  */
 
-#include <fstream>
 #include <string.h>
 #include <VoxelOptimizer/Loaders/MagicaVoxelLoader.hpp>
 #include <VoxelOptimizer/Exceptions.hpp>
@@ -48,26 +47,6 @@ namespace VoxelOptimizer
         0xff000022, 0xff000011, 0xff00ee00, 0xff00dd00, 0xff00bb00, 0xff00aa00, 0xff008800, 0xff007700, 0xff005500, 0xff004400, 0xff002200, 0xff001100, 0xffee0000, 0xffdd0000, 0xffbb0000, 0xffaa0000,
         0xff880000, 0xff770000, 0xff550000, 0xff440000, 0xff220000, 0xff110000, 0xffeeeeee, 0xffdddddd, 0xffbbbbbb, 0xffaaaaaa, 0xff888888, 0xff777777, 0xff555555, 0xff444444, 0xff222222, 0xff111111
     };
-
-    void CMagicaVoxelLoader::Load(const std::string &File)
-    {
-        std::ifstream in(File, std::ios::binary);
-        if(in.is_open())
-        {
-            in.seekg(0, in.end);
-            size_t Len = in.tellg();
-            in.seekg(0, in.beg);
-
-            char *Data = new char[Len];
-            in.read(Data, Len);
-            in.close();
-
-            Load(Data, Len);
-            delete[] Data;
-        }
-        else
-            throw CVoxelLoaderException("Failed to open '" + File + "'");
-    }
 
     void CMagicaVoxelLoader::Load(const char *Data, size_t Length)
     {

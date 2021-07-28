@@ -95,7 +95,7 @@ namespace VoxelOptimizer
             {
                 m_Size = Size;
 
-                m_Voxels.clear();
+                // m_Voxels.clear();
                 m_Voxels.resize(m_Size.x * m_Size.y * m_Size.z);
             }
 

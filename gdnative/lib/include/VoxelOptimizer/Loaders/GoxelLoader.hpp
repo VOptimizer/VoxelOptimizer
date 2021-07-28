@@ -22,38 +22,39 @@
  * SOFTWARE.
  */
 
-#ifndef COLOR_HPP
-#define COLOR_HPP
+#ifndef GOXELLOADER_HPP
+#define GOXELLOADER_HPP
 
-#include <stdint.h>
+#include <VoxelOptimizer/Loaders/ILoader.hpp>
 
 namespace VoxelOptimizer
 {
-    class CColor
+    class CGoxelLoader : public ILoader
     {
         public:
-            union
-            {
-                struct
-                {
-                    unsigned char R;
-                    unsigned char G;
-                    unsigned char B;
-                    unsigned char A;
-                };
+            CGoxelLoader() = default;
 
-                unsigned char c[4];
+            using ILoader::Load;
+
+            /**
+             * @brief Loads voxel file from memory.
+             * 
+             * @param Data: Data of the file.
+             * @param Lenght: Data size.
+             */
+            void Load(const char *Data, size_t Length) override;
+        
+            ~CGoxelLoader() = default;
+
+        private:
+            struct SChunkHeader
+            {
+                char Type[4];
+                int Size;   // Datasize
             };
 
-            CColor() : R(255), G(255), B(255), A(255) {}
-
-            inline uint32_t AsRGBA() const
-            {
-                return (uint32_t)R | (uint32_t)(G << 8) | (uint32_t)(B << 16) | (uint32_t)(A << 24);
-            }
-
-            ~CColor() = default;
+            SChunkHeader LoadChunk(const char *Data, size_t &Pos);
     };
 } // namespace VoxelOptimizer
 
-#endif //COLOR_HPP
+#endif //GOXELLOADER_HPP

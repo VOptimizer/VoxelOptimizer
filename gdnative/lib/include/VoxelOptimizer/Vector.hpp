@@ -59,6 +59,11 @@ namespace VoxelOptimizer
                 return x == vr.x && y == vr.y && z == vr.z;
             }
 
+            inline bool operator>(const CVector &vr) const
+            {
+                return x > vr.x || y > vr.y || z > vr.z;
+            }
+
             inline CVector Min(CVector &vec)
             {
                 return CVector(std::min(x, vec.x), std::min(y, vec.y), std::min(z, vec.z));

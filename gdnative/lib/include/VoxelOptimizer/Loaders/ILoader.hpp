@@ -22,19 +22,33 @@
  * SOFTWARE.
  */
 
-#ifndef VOXELLOADER_HPP
-#define VOXELLOADER_HPP
+#ifndef ILOADER_HPP
+#define ILOADER_HPP
 
-#include <VoxelOptimizer/Loaders/ILoader.hpp>
+#include <array>
+#include <VoxelOptimizer/Color.hpp>
+#include <map>
+#include <VoxelOptimizer/Material.hpp>
+#include <memory>
+#include <stdlib.h>
+#include <string>
+#include <vector>
+#include <VoxelOptimizer/Vector.hpp>
+#include <VoxelOptimizer/Loaders/VoxelMesh.hpp>
 
 namespace VoxelOptimizer
 {
-    class CMagicaVoxelLoader : public ILoader
+    class ILoader
     {
-        public:  
-            CMagicaVoxelLoader() = default;
+        public:
+            using ColorPalette = std::vector<CColor>;
 
-            using ILoader::Load;
+            /**
+             * @brief Loads a .vox file from disk.
+             * 
+             * @param File: Path to the voxel file.
+             */
+            virtual void Load(const std::string &File);
 
             /**
              * @brief Loads voxel file from memory.
@@ -42,34 +56,31 @@ namespace VoxelOptimizer
              * @param Data: Data of the file.
              * @param Lenght: Data size.
              */
-            void Load(const char *Data, size_t Length) override;
+            virtual void Load(const char *Data, size_t Length) = 0;
 
-            ~CMagicaVoxelLoader() = default;
-        private:
-            struct SChunkHeader
+            /**
+             * @return Gets a list with all models inside the voxel file.
+             */
+            inline std::vector<VoxelMesh> GetModels() const
             {
-                char ID[4];
-                int ChunkContentSize;
-                int ChildChunkSize;
-            };
+                return m_Models;
+            }
 
-            void LoadDefaultPalette();
+            inline ColorPalette GetColorPalette() const
+            {
+                return m_UsedColorPalette;
+            }
 
-            SChunkHeader LoadChunk(const char *Data, size_t &Pos);
-            void ProcessPack(const SChunkHeader &Chunk, const char *Data, size_t &Pos);
-            VoxelMesh ProcessSize(const char *Data, size_t &Pos);
-            void ProcessXYZI(VoxelMesh m, const char *Data, size_t &Pos, size_t Size);
-            void ProcessMaterial(const char *Data, size_t Pos, size_t Length);
+            inline std::vector<Material> GetMaterials() const
+            {
+                return m_Materials;
+            } 
 
-            std::map<int, int> m_ColorMapping;
-            std::map<int, int> m_MaterialMapping;
-
-            ColorPalette m_ColorPalette;
-
-            size_t m_Index;
-            size_t m_UsedColorsPos;
+        protected:
+            std::vector<VoxelMesh> m_Models;
+            std::vector<Material> m_Materials;
+            ColorPalette m_UsedColorPalette;
     };
 } // namespace VoxelOptimizer
 
-
-#endif //VOXELLOADER_HPP
+#endif //ILOADER_HPP

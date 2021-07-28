@@ -35,6 +35,8 @@
 #include <VoxelOptimizer/Exporters/SpriteStackingExporter.hpp>
 #include <VoxelOptimizer/Exporters/WavefrontObjExporter.hpp>
 #include <VoxelOptimizer/Exporters/GLTFExporter.hpp>
+#include <VoxelOptimizer/Loaders/ILoader.hpp>
+#include <VoxelOptimizer/Loaders/GoxelLoader.hpp>
 #include <VoxelOptimizer/Loaders/MagicaVoxelLoader.hpp>
 #include <VoxelOptimizer/Loaders/VoxelMesh.hpp>
 #include <VoxelOptimizer/Meshers/GreedyMesher.hpp>
