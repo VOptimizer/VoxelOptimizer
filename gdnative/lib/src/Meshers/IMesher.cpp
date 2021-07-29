@@ -50,7 +50,7 @@ namespace VoxelOptimizer
             Faces = GroupedFaces(new SGroupedFaces());
             Mesh->Faces.push_back(Faces);
 
-            Faces->FaceMaterial = m_Loader.GetMaterials()[Material];
+            Faces->FaceMaterial = m_Loader->GetMaterials()[Material];
             m_FacesIndex.insert({Material, Faces});
         }
         else

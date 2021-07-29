@@ -36,16 +36,9 @@ namespace VoxelOptimizer
 
             using ILoader::Load;
 
-            /**
-             * @brief Loads voxel file from memory.
-             * 
-             * @param Data: Data of the file.
-             * @param Lenght: Data size.
-             */
-            void Load(const char *Data, size_t Length) override;
-
             ~CMagicaVoxelLoader() = default;
         private:
+            void ParseFormat() override;
             struct SChunkHeader
             {
                 char ID[4];
@@ -55,11 +48,9 @@ namespace VoxelOptimizer
 
             void LoadDefaultPalette();
 
-            SChunkHeader LoadChunk(const char *Data, size_t &Pos);
-            void ProcessPack(const SChunkHeader &Chunk, const char *Data, size_t &Pos);
-            VoxelMesh ProcessSize(const char *Data, size_t &Pos);
-            void ProcessXYZI(VoxelMesh m, const char *Data, size_t &Pos, size_t Size);
-            void ProcessMaterial(const char *Data, size_t Pos, size_t Length);
+            VoxelMesh ProcessSize();
+            void ProcessXYZI(VoxelMesh m);
+            void ProcessMaterial();
 
             std::map<int, int> m_ColorMapping;
             std::map<int, int> m_MaterialMapping;

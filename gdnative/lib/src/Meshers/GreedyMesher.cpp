@@ -27,10 +27,10 @@
 
 namespace VoxelOptimizer
 {
-    Mesh CGreedyMesher::GenerateMesh(VoxelMesh m, CMagicaVoxelLoader Loader)
+    Mesh CGreedyMesher::GenerateMesh(VoxelMesh m, ILoader *Loader)
     {
         Mesh Ret = Mesh(new SMesh());
-        Ret->Texture = Loader.GetColorPalette();
+        Ret->Texture = Loader->GetColorPalette();
         m_Loader = Loader;
 
         auto Size = m->GetSize();

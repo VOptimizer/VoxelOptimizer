@@ -34,7 +34,7 @@ namespace VoxelOptimizer
         public:
             CGreedyMesher() = default;
 
-            Mesh GenerateMesh(VoxelMesh m, CMagicaVoxelLoader Loader) override;
+            Mesh GenerateMesh(VoxelMesh m, ILoader *Loader) override;
 
             ~CGreedyMesher() = default;
     };

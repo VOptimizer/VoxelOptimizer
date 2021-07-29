@@ -25,6 +25,7 @@
 #include <VoxelOptimizer/Exceptions.hpp>
 #include <fstream>
 #include <VoxelOptimizer/Loaders/ILoader.hpp>
+#include <string.h>
 
 namespace VoxelOptimizer
 {
@@ -33,18 +34,50 @@ namespace VoxelOptimizer
         std::ifstream in(File, std::ios::binary);
         if(in.is_open())
         {
+            m_Pos = 0;
+
             in.seekg(0, in.end);
             size_t Len = in.tellg();
             in.seekg(0, in.beg);
 
-            char *Data = new char[Len];
-            in.read(Data, Len);
+            m_Data.resize(Len);
+            in.read(&m_Data[0], Len);
             in.close();
 
-            Load(Data, Len);
-            delete[] Data;
+            ParseFormat();
         }
         else
             throw CVoxelLoaderException("Failed to open '" + File + "'");
+    }
+
+    void ILoader::Load(const char *Data, size_t Length)
+    {
+        m_Pos = 0;
+        m_Data = std::vector<char>(Data, Data + Length);
+        ParseFormat();
+    }
+
+    void ILoader::ReadData(char *Buf, size_t Size)
+    {
+        if(m_Pos + Size >= m_Data.size())
+            throw CVoxelLoaderException("Unexpected file ending.");
+
+        memcpy(Buf, m_Data.data() + m_Pos, Size);
+        m_Pos += Size;
+    }
+
+    bool ILoader::IsEof()
+    {
+        return m_Pos >= m_Data.size();
+    }
+
+    void ILoader::Skip(size_t Bytes)
+    {
+        m_Pos += Bytes;
+    }
+
+    void ILoader::Reset()
+    {
+        m_Pos = 0;
     }
 } // namespace VoxelOptimizer

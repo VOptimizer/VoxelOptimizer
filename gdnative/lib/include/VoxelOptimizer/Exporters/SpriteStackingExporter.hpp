@@ -42,7 +42,7 @@ namespace VoxelOptimizer
              * @param Path: Path of the file.
              * @param Mesh: Mesh to save.
              */
-            void Save(const std::string &Path, VoxelMesh m, CMagicaVoxelLoader Loader);
+            void Save(const std::string &Path, VoxelMesh m, ILoader *Loader);
 
             /**
              * @brief Generates the file stream.
@@ -51,7 +51,7 @@ namespace VoxelOptimizer
              * 
              * @return Returns a png image.
              */
-            std::vector<char> Generate(VoxelMesh m, CMagicaVoxelLoader Loader); 
+            std::vector<char> Generate(VoxelMesh m, ILoader *Loader); 
 
             ~CSpriteStackingExporter() = default;
         private:

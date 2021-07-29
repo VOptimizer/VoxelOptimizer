@@ -26,6 +26,7 @@
 #define GOXELLOADER_HPP
 
 #include <VoxelOptimizer/Loaders/ILoader.hpp>
+#include <string.h>
 
 namespace VoxelOptimizer
 {
@@ -35,14 +36,6 @@ namespace VoxelOptimizer
             CGoxelLoader() = default;
 
             using ILoader::Load;
-
-            /**
-             * @brief Loads voxel file from memory.
-             * 
-             * @param Data: Data of the file.
-             * @param Lenght: Data size.
-             */
-            void Load(const char *Data, size_t Length) override;
         
             ~CGoxelLoader() = default;
 
@@ -53,7 +46,35 @@ namespace VoxelOptimizer
                 int Size;   // Datasize
             };
 
-            SChunkHeader LoadChunk(const char *Data, size_t &Pos);
+            struct BL16
+            {
+                public:
+                    BL16()
+                    {
+                        m_Data.resize(16 * 16 * 16);
+                    }
+
+                    inline void SetData(uint32_t *Data)
+                    {
+                        memcpy(&m_Data[0], Data, m_Data.size());
+                    }
+
+                    inline uint32_t GetVoxel(CVector v)
+                    {
+                        return m_Data[(size_t)v.x + 16 * (size_t)v.y + 16 * 16 * (size_t)v.z];
+                    }
+
+                private:
+                    std::vector<uint32_t> m_Data;
+            }; 
+
+            struct Layer
+            {
+                CVector Pos;
+                size_t Index;
+            };
+
+            void ParseFormat() override;
     };
 } // namespace VoxelOptimizer
 

@@ -7,7 +7,7 @@ using namespace std;
 int main(int argc, char const *argv[])
 {
     VoxelOptimizer::CGoxelLoader GLoader;
-    GLoader.Load("untitled.gox");
+    GLoader.Load("windmill.gox");
 
 
     VoxelOptimizer::CMagicaVoxelLoader loader;
@@ -43,7 +43,7 @@ int main(int argc, char const *argv[])
     // }
     
 
-    auto Mesh = Mesher.GenerateMesh(VoxelMesh, loader);
+    auto Mesh = Mesher.GenerateMesh(VoxelMesh, &GLoader);
 
     // VoxelOptimizer::CWavefrontObjExporter exporter1;
     // exporter1.SaveObj("minicube.obj", Mesh);
@@ -59,7 +59,7 @@ int main(int argc, char const *argv[])
     exporterObj.Save("windmill.obj", Mesh);
 
     VoxelOptimizer::CSpriteStackingExporter spriter;
-    spriter.Save("windmill_sprite.png", VoxelMesh, loader);
+    spriter.Save("windmill_sprite.png", VoxelMesh, &GLoader);
 
     return 0;
 }

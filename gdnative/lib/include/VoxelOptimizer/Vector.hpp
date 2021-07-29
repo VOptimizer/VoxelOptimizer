@@ -74,6 +74,11 @@ namespace VoxelOptimizer
                 return CVector(std::max(x, vec.x), std::max(y, vec.y), std::max(z, vec.z));
             }
 
+            inline CVector Abs()
+            {
+                return CVector(fabs(x), fabs(y), fabs(z));
+            }
+
             // Upon here just math. Math is magic :D
 
             inline CVector operator*(const CVector &vr) const

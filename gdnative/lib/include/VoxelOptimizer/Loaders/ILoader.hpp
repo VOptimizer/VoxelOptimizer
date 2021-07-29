@@ -27,6 +27,7 @@
 
 #include <array>
 #include <VoxelOptimizer/Color.hpp>
+#include <istream>
 #include <map>
 #include <VoxelOptimizer/Material.hpp>
 #include <memory>
@@ -56,7 +57,7 @@ namespace VoxelOptimizer
              * @param Data: Data of the file.
              * @param Lenght: Data size.
              */
-            virtual void Load(const char *Data, size_t Length) = 0;
+            virtual void Load(const char *Data, size_t Length);
 
             /**
              * @return Gets a list with all models inside the voxel file.
@@ -80,6 +81,25 @@ namespace VoxelOptimizer
             std::vector<VoxelMesh> m_Models;
             std::vector<Material> m_Materials;
             ColorPalette m_UsedColorPalette;
+
+            virtual void ParseFormat() = 0;
+
+            template<class T>
+            T ReadData()
+            {
+                T Ret;
+                ReadData((char*)&Ret, sizeof(Ret));
+                return Ret;
+            }
+
+            void ReadData(char *Buf, size_t Size);
+            bool IsEof();
+            void Skip(size_t Bytes);
+            void Reset();
+
+        private:
+            std::vector<char> m_Data;
+            size_t m_Pos;
     };
 } // namespace VoxelOptimizer
 

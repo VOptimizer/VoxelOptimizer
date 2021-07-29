@@ -48,7 +48,7 @@ namespace VoxelOptimizer
         0xff880000, 0xff770000, 0xff550000, 0xff440000, 0xff220000, 0xff110000, 0xffeeeeee, 0xffdddddd, 0xffbbbbbb, 0xffaaaaaa, 0xff888888, 0xff777777, 0xff555555, 0xff444444, 0xff222222, 0xff111111
     };
 
-    void CMagicaVoxelLoader::Load(const char *Data, size_t Length)
+    void CMagicaVoxelLoader::ParseFormat()
     {
         m_Models.clear();
         LoadDefaultPalette();
@@ -59,59 +59,45 @@ namespace VoxelOptimizer
         m_MaterialMapping.clear();
         m_Materials.clear();
         m_UsedColorPalette.clear();
-
-        size_t Pos = 0;
-        if(Length < 8)
-            throw CVoxelLoaderException("File to short to be a legal voxel file");
-        
+       
         std::string Signature(4, '\0');
-        memcpy(&Signature[0], Data, 4);
+        ReadData(&Signature[0], 4);
         Signature += "\0";
 
         // Checks the file header
         if(Signature != "VOX ")
             throw CVoxelLoaderException("Unknown file format");
 
-        int Version = *((int*)(Data + 4));
+        int Version = ReadData<int>();
         if(Version != 150)
             throw CVoxelLoaderException("Version: " + std::to_string(Version) + " is not supported");
 
-        Pos += 8;
+        // First processes the materials that are at the end of the file. 
+        ProcessMaterial();
+        Skip(8);
 
-        // Processes first the Material which is at the end of the file.
-        ProcessMaterial(Data, Pos, Length);
-
-        if(Pos < Length && Pos + sizeof(SChunkHeader) < Length)
+        if(!IsEof())
         {
-            SChunkHeader Tmp = LoadChunk(Data, Pos);
+            SChunkHeader Tmp = ReadData<SChunkHeader>();
             if(strncmp(Tmp.ID, "MAIN", sizeof(Tmp.ID)) == 0)
             {
-                while (Pos < Length && Pos + sizeof(SChunkHeader) < Length)
+                while (!IsEof())
                 {
-                    Tmp = LoadChunk(Data, Pos);
+                    Tmp = ReadData<SChunkHeader>();
 
                     if(strncmp(Tmp.ID, "PACK", sizeof(Tmp.ID)) == 0)
                     {
-                        if(Pos + sizeof(int) >= Length)
-                            throw CVoxelLoaderException("Corrupted file. Chunk 'PACK' is not complete.");
-                        
                         // Make room for all models inside the file.
-                        ProcessPack(Tmp, Data, Pos);
+                        m_Models.resize(ReadData<int>());
                     }
                     else if(strncmp(Tmp.ID, "SIZE", sizeof(Tmp.ID)) == 0)
                     {
-                        if(Pos + sizeof(int) * 4 >= Length)
-                            throw CVoxelLoaderException("Corrupted file. Chunk 'SIZE' is not complete.");
-
-                        VoxelMesh m = ProcessSize(Data, Pos);
-                        Tmp = LoadChunk(Data, Pos);
+                        VoxelMesh m = ProcessSize();
+                        Tmp = ReadData<SChunkHeader>();
                         if(strncmp(Tmp.ID, "XYZI", sizeof(Tmp.ID)) != 0)
                             throw CVoxelLoaderException("Can't understand the format.");
 
-                        if(Pos + sizeof(int) >= Length)
-                            throw CVoxelLoaderException("Corrupted file. Chunk 'XYZI' is not complete.");
-
-                        ProcessXYZI(m, Data, Pos, Length);
+                        ProcessXYZI(m);
 
                         if(m_Models.empty())
                             m_Models.push_back(m);
@@ -123,19 +109,11 @@ namespace VoxelOptimizer
                     }
                     else if(strncmp(Tmp.ID, "RGBA", sizeof(Tmp.ID)) == 0)
                     {
-                        if(Pos + sizeof(int) * 256 >= Length)
-                            throw CVoxelLoaderException("Corrupted file. Chunk 'RGBA' is not complete.");
-
                         for (size_t i = 0; i < m_ColorPalette.size(); i++)
-                        {   
-                            memcpy(m_ColorPalette[i].c, Data + Pos, 4);
-                            Pos += 4;
-                        }
+                            ReadData((char*)m_ColorPalette[i].c, 4);
                     }
                     else
-                    {
-                        Pos += Tmp.ChunkContentSize + Tmp.ChildChunkSize;
-                    }
+                        Skip(Tmp.ChunkContentSize + Tmp.ChildChunkSize);
                 }
             }
         }
@@ -155,63 +133,34 @@ namespace VoxelOptimizer
         }
     }
 
-    CMagicaVoxelLoader::SChunkHeader CMagicaVoxelLoader::LoadChunk(const char *Data, size_t &Pos)
-    {
-        SChunkHeader Tmp;
-        memcpy(&Tmp, Data + Pos, sizeof(SChunkHeader));
-        Pos += sizeof(SChunkHeader);
-
-        return Tmp;
-    }
-
-    void CMagicaVoxelLoader::ProcessPack(const CMagicaVoxelLoader::SChunkHeader &Chunk, const char *Data, size_t &Pos)
-    {
-        m_Models.resize(*((int*)(Data + Pos)));
-        Pos += sizeof(int);
-    }
-
-    VoxelMesh CMagicaVoxelLoader::ProcessSize(const char *Data, size_t &Pos)
+    VoxelMesh CMagicaVoxelLoader::ProcessSize()
     {
         VoxelMesh Ret = VoxelMesh(new CVoxelMesh());
 
         CVector Size;
 
-        Size.x = *((int*)(Data + Pos));
-        Pos += sizeof(int);
-
-        Size.y = *((int*)(Data + Pos));
-        Pos += sizeof(int);
-
-        Size.z = *((int*)(Data + Pos));
-        Pos += sizeof(int);
+        Size.x = ReadData<int>();
+        Size.y = ReadData<int>();
+        Size.z = ReadData<int>();
 
         Ret->SetSize(Size);
 
         return Ret;
     }
 
-    void CMagicaVoxelLoader::ProcessXYZI(VoxelMesh m, const char *Data, size_t &Pos, size_t Size)
+    void CMagicaVoxelLoader::ProcessXYZI(VoxelMesh m)
     {
-        int VoxelCount = *((int*)(Data + Pos)); 
-        Pos += sizeof(int);
+        int VoxelCount = ReadData<int>();
 
         CVector Beg(1000, 1000, 1000), End;
-
-        if(Pos + VoxelCount * sizeof(int) >= Size)
-            throw CVoxelLoaderException("Corrupted file. Chunk 'XYZI' is not complete."); 
 
         for (size_t i = 0; i < VoxelCount; i++)
         {
             CVector vec;
 
-            vec.x = *((char*)(Data + Pos));
-            Pos += sizeof(char);
-
-            vec.y = *((char*)(Data + Pos));
-            Pos += sizeof(char);
-
-            vec.z = *((char*)(Data + Pos));
-            Pos += sizeof(char);
+            vec.x = ReadData<char>();
+            vec.y = ReadData<char>();
+            vec.z = ReadData<char>();
 
             Beg.x = std::min(Beg.x, vec.x);
             Beg.y = std::min(Beg.y, vec.y);
@@ -221,7 +170,7 @@ namespace VoxelOptimizer
             End.y = std::max(End.y, vec.y);
             End.z = std::max(End.z, vec.z);
 
-            int MatIdx = *((unsigned char*)(Data + Pos));
+            int MatIdx = ReadData<uint8_t>();
             int Color = 0;
             bool Transparent = false;
 
@@ -251,54 +200,46 @@ namespace VoxelOptimizer
             }
 
             m->SetVoxel(vec, MatIdx, Color, Transparent);
-            Pos += sizeof(char);
         } 
 
         m->SetMeshSize(End - Beg);
     }
 
-    void CMagicaVoxelLoader::ProcessMaterial(const char *Data, size_t Pos, size_t Length)
+    void CMagicaVoxelLoader::ProcessMaterial()
     {
         m_Materials.push_back(Material(new CMaterial()));
 
-        if(Pos < Length && Pos + sizeof(SChunkHeader) < Length)
+        if(!IsEof())
         {
-            SChunkHeader Tmp = LoadChunk(Data, Pos);
+            SChunkHeader Tmp = ReadData<SChunkHeader>();
             if(strncmp(Tmp.ID, "MAIN", sizeof(Tmp.ID)) == 0)
             {
-                while (Pos < Length && Pos + sizeof(SChunkHeader) < Length)
+                while (!IsEof())
                 {
-                    Tmp = LoadChunk(Data, Pos);
+                    Tmp = ReadData<SChunkHeader>();
 
                     if(strncmp(Tmp.ID, "MATL", sizeof(Tmp.ID)) == 0)
                     {
                         Material Mat = Material(new CMaterial());
-                        int ID = *((int*)(Data + Pos));
-                        Pos += sizeof(int);
-
-                        int KeyValueCount = *((int*)(Data + Pos));
-                        Pos += sizeof(int);
+                        int ID = ReadData<int>();
+                        int KeyValueCount = ReadData<int>();
 
                         std::string MaterialType;
 
                         for (int i = 0; i < KeyValueCount; i++)
                         {
-                            int StrLen = *((int*)(Data + Pos));
-                            Pos += sizeof(int);
+                            int StrLen = ReadData<int>();
 
                             std::string Key(StrLen, '\0'); 
-                            memcpy(&Key[0], Data + Pos, StrLen);
-                            Pos += StrLen;
+                            ReadData(&Key[0], StrLen);
 
                             if(Key == "_plastic")
                                 continue;
 
-                            StrLen = *((int*)(Data + Pos));
-                            Pos += sizeof(int);
+                            StrLen = ReadData<int>();
 
                             std::string Value(StrLen, '\0'); 
-                            memcpy(&Value[0], Data + Pos, StrLen);
-                            Pos += StrLen;
+                            ReadData(&Value[0], StrLen);
 
                             if(Key == "_type")
                                 MaterialType = Value;
@@ -323,11 +264,11 @@ namespace VoxelOptimizer
                         m_MaterialMapping.insert({ID, m_Materials.size() - 1});
                     }
                     else
-                    {
-                        Pos += Tmp.ChunkContentSize + Tmp.ChildChunkSize;
-                    }
+                        Skip(Tmp.ChunkContentSize + Tmp.ChildChunkSize);
                 }
             }
         }
+
+        Reset();
     }
 } // namespace VoxelOptimizer
