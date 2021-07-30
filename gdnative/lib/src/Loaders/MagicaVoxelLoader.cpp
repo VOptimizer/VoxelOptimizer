@@ -162,13 +162,16 @@ namespace VoxelOptimizer
             vec.y = ReadData<char>();
             vec.z = ReadData<char>();
 
-            Beg.x = std::min(Beg.x, vec.x);
-            Beg.y = std::min(Beg.y, vec.y);
-            Beg.z = std::min(Beg.z, vec.z);
+            Beg = Beg.Min(vec);
+            End = End.Max(vec);
 
-            End.x = std::max(End.x, vec.x);
-            End.y = std::max(End.y, vec.y);
-            End.z = std::max(End.z, vec.z);
+            // Beg.x = std::min(Beg.x, vec.x);
+            // Beg.y = std::min(Beg.y, vec.y);
+            // Beg.z = std::min(Beg.z, vec.z);
+
+            // End.x = std::max(End.x, vec.x);
+            // End.y = std::max(End.y, vec.y);
+            // End.z = std::max(End.z, vec.z);
 
             int MatIdx = ReadData<uint8_t>();
             int Color = 0;
@@ -202,7 +205,7 @@ namespace VoxelOptimizer
             m->SetVoxel(vec, MatIdx, Color, Transparent);
         } 
 
-        m->SetMeshSize(End - Beg);
+        m->SetBBox(CBBox(Beg, End));
     }
 
     void CMagicaVoxelLoader::ProcessMaterial()

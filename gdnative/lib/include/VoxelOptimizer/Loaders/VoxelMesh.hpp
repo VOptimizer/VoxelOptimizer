@@ -26,6 +26,7 @@
 #define VOXELMESH_HPP
 
 #include <array>
+#include <VoxelOptimizer/BBox.hpp>
 #include <memory>
 #include <vector>
 #include <VoxelOptimizer/Vector.hpp>
@@ -111,26 +112,21 @@ namespace VoxelOptimizer
             }
 
             /**
-             * @brief Gets the size of the mesh itself rather than the complete voxel space size.
+             * @brief Gets the bounding box.
              */
-            inline CVector GetMeshSize() const
+            inline CBBox GetBBox() const
             {
-                return m_MeshSize;
+                return m_BBox;
             }
             
             /**
-             * @brief Sets the mesh size.
+             * @brief Sets the bounding box.
              */
-            inline void SetMeshSize(CVector MeshSize)
+            inline void SetBBox(CBBox BBox)
             {
-                // Prevents a size of 0.
-                MeshSize.x = std::max(MeshSize.x, 1.f);
-                MeshSize.y = std::max(MeshSize.y, 1.f);
-                MeshSize.z = std::max(MeshSize.z, 1.f);
-
-                m_MeshSize = MeshSize;
+                m_BBox = BBox;
             }
-
+            
             /**
              * List of voxels. The size of the list is always the size of the voxel space.
              * Voxels which are null are empty space.
@@ -170,7 +166,7 @@ namespace VoxelOptimizer
             void SetNormal(Voxel Cur, Voxel Neighbor, CVoxel::Direction CurDir, CVoxel::Direction NeighborDir, CVector Val);
 
             CVector m_Size;
-            CVector m_MeshSize;
+            CBBox m_BBox;
             std::vector<Voxel> m_Voxels;
             size_t m_BlockCount;
     };

@@ -34,7 +34,11 @@ namespace VoxelOptimizer
         m_Loader = Loader;
 
         auto Voxels = m->GetVoxels();
-        CVector BoxCenter = m->GetSize() / 2;
+        auto BBox = m->GetBBox();
+        CVector Beg = BBox.Beg;
+        std::swap(Beg.y, Beg.z);
+
+        CVector BoxCenter = BBox.GetSize() / 2;
         std::swap(BoxCenter.y, BoxCenter.z);
 
         for (auto &&v : Voxels)
@@ -86,7 +90,7 @@ namespace VoxelOptimizer
                         }break;
                     }
 
-                    AddFace(Ret, v1, v2, v3, v4, Normal, v->Color, v->Material);
+                    AddFace(Ret, v1 - Beg, v2 - Beg, v3 - Beg, v4 - Beg, Normal, v->Color, v->Material);
                 }
             }
         }

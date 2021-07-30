@@ -56,7 +56,7 @@ namespace VoxelOptimizer
 
                     inline void SetData(uint32_t *Data)
                     {
-                        memcpy(&m_Data[0], Data, m_Data.size());
+                        memcpy(&m_Data[0], Data, m_Data.size() * sizeof(*Data));
                     }
 
                     inline uint32_t GetVoxel(CVector v)
@@ -64,17 +64,33 @@ namespace VoxelOptimizer
                         return m_Data[(size_t)v.x + 16 * (size_t)v.y + 16 * 16 * (size_t)v.z];
                     }
 
-                private:
+                // private:
                     std::vector<uint32_t> m_Data;
             }; 
 
-            struct Layer
+            struct Block
             {
                 CVector Pos;
                 size_t Index;
             };
 
+            struct Layer
+            {
+                std::vector<Block> Blocks;
+                int MatIdx;
+            };
+
+            std::vector<BL16> m_BL16s;
+            std::vector<Layer> m_Layers;
+            CBBox m_BBox;
+
             void ParseFormat() override;
+
+            void ReadFile();
+            void ProcessMaterial(const SChunkHeader &Chunk);
+            void ProcessLayer(const SChunkHeader &Chunk);
+            void ProcessBL16(const SChunkHeader &Chunk);
+            std::map<std::string, std::string> ReadDict(const SChunkHeader &Chunk, size_t StartPos);
     };
 } // namespace VoxelOptimizer
 

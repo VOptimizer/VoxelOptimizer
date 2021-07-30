@@ -33,8 +33,12 @@ namespace VoxelOptimizer
         Ret->Texture = Loader->GetColorPalette();
         m_Loader = Loader;
 
-        auto Size = m->GetSize();
-        CVector BoxCenter = Size / 2;
+        auto BBox = m->GetBBox();
+        CVector Beg = BBox.Beg;
+        std::swap(Beg.y, Beg.z);
+
+        // auto Size = BBox.GetSize();
+        CVector BoxCenter = BBox.GetSize() / 2;
         std::swap(BoxCenter.y, BoxCenter.z);
 
         CSlicer Slicer(m);
@@ -49,14 +53,14 @@ namespace VoxelOptimizer
             int x[3] = {0};
 
             // Iterate over each slice of the 3d model.
-            for (x[Axis] = -1; x[Axis] < Size.v[Axis];)
+            for (x[Axis] = BBox.Beg.v[Axis] -1; x[Axis] < BBox.End.v[Axis];)
             {
                 ++x[Axis];
 
                 // Foreach slice go over a 2d plane. 
-                for (int HeightAxis = 0; HeightAxis < Size.v[Axis2]; ++HeightAxis)
+                for (int HeightAxis = BBox.Beg.v[Axis2]; HeightAxis < BBox.End.v[Axis2]; ++HeightAxis)
                 {
-                    for (int WidthAxis = 0; WidthAxis < Size.v[Axis1];)
+                    for (int WidthAxis = BBox.Beg.v[Axis1]; WidthAxis < BBox.End.v[Axis1];)
                     {
                         CVector Pos;
                         Pos.v[Axis] = x[Axis] - 1;
@@ -71,7 +75,7 @@ namespace VoxelOptimizer
                             int Color = Slicer.Color();
 
                             //Claculates the width of the rect.
-                            for (w = 1; WidthAxis + w < Size.v[Axis1]; w++) 
+                            for (w = 1; WidthAxis + w < BBox.End.v[Axis1]; w++) 
                             {
                                 CVector WPos;
                                 WPos.v[Axis1] = w;
@@ -88,7 +92,7 @@ namespace VoxelOptimizer
                             }
 
                             bool done = false;
-                            for (h = 1; HeightAxis + h < Size.v[Axis2]; h++)
+                            for (h = 1; HeightAxis + h < BBox.End.v[Axis2]; h++)
                             {
                                 // Check each block next to this quad
                                 for (int k = 0; k < w; ++k)
@@ -125,12 +129,12 @@ namespace VoxelOptimizer
                             int dv[3] = {0};
                             dv[Axis2] = h;
 
-                            int I1, I2, I3, I4;
+                            int I1, I2, I3, I4;                            
 
-                            CVector v1 = CVector(x[0], x[2], x[1]) - BoxCenter;
-                            CVector v2 = CVector(x[0] + du[0], x[2] + du[2], x[1] + du[1]) - BoxCenter;
-                            CVector v3 = CVector(x[0] + du[0] + dv[0], x[2] + du[2] + dv[2], x[1] + du[1] + dv[1]) - BoxCenter;
-                            CVector v4 = CVector(x[0] + dv[0], x[2] + dv[2], x[1] + dv[1]) - BoxCenter;
+                            CVector v1 = CVector(x[0], x[2], x[1]) - Beg - BoxCenter;
+                            CVector v2 = CVector(x[0] + du[0], x[2] + du[2], x[1] + du[1]) - Beg - BoxCenter;
+                            CVector v3 = CVector(x[0] + du[0] + dv[0], x[2] + du[2] + dv[2], x[1] + du[1] + dv[1]) - Beg - BoxCenter;
+                            CVector v4 = CVector(x[0] + dv[0], x[2] + dv[2], x[1] + dv[1]) - Beg - BoxCenter;
 
                             std::swap(Normal.y, Normal.z);
                             AddFace(Ret, v1, v2, v3, v4, Normal, Color, Material);

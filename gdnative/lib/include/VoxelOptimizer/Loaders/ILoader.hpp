@@ -94,6 +94,7 @@ namespace VoxelOptimizer
 
             void ReadData(char *Buf, size_t Size);
             bool IsEof();
+            size_t Tellg();
             void Skip(size_t Bytes);
             void Reset();
 

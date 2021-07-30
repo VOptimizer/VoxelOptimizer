@@ -22,30 +22,30 @@
  * SOFTWARE.
  */
 
-#ifndef MATERIAL_HPP
-#define MATERIAL_HPP
+#ifndef BBOX_HPP
+#define BBOX_HPP
 
-#include <memory>
-#include <VoxelOptimizer/Color.hpp>
+#include <VoxelOptimizer/Vector.hpp>
 
 namespace VoxelOptimizer
 {
-    class CMaterial
+    class CBBox
     {
         public:
-            CMaterial() : Metallic(0), Specular(0), Roughness(1), IOR(0), Power(0), Transparency(0) {}
+            CVector Beg;
+            CVector End;
 
-            float Metallic;
-            float Specular;
-            float Roughness;
-            float IOR;
-            float Power;    //!< For emissive.
-            float Transparency;
+            CBBox() {}
+            CBBox(CVector beg, CVector end) : Beg(beg), End(end + CVector(1, 1, 1)) {}
 
-            ~CMaterial() {}
+            inline CVector GetSize() const
+            {
+                return (End - Beg).Max(CVector(1, 1, 1));
+            }
+
+            ~CBBox() = default;
     };
-
-    using Material = std::shared_ptr<CMaterial>;
 } // namespace VoxelOptimizer
 
-#endif //MATERIAL_HPP
+
+#endif //BBOX_HPP

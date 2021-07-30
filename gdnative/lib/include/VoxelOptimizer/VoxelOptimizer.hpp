@@ -25,6 +25,7 @@
 #ifndef VOXELOPTIMIZER_HPP
 #define VOXELOPTIMIZER_HPP
 
+#include <VoxelOptimizer/BBox.hpp>
 #include <VoxelOptimizer/Color.hpp>
 #include <VoxelOptimizer/Exceptions.hpp>
 #include <VoxelOptimizer/Material.hpp>

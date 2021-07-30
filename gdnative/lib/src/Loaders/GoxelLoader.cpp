@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
+#define STBI_ONLY_PNG
 #define STB_IMAGE_IMPLEMENTATION
-// #define STBI_ONLY_PNG
-#include "../stb_image.h"
+#include <stb_image.h>
 
 #include <VoxelOptimizer/Loaders/GoxelLoader.hpp>
 #include <string.h>
@@ -33,6 +33,8 @@
 #include <fstream>
 #include <string>
 
+#include <iostream>
+
 namespace VoxelOptimizer
 {
     void CGoxelLoader::ParseFormat()
@@ -40,7 +42,72 @@ namespace VoxelOptimizer
         m_Models.clear();
         m_Materials.clear();
         m_UsedColorPalette.clear();
+
+        ReadFile();
         
+        VoxelMesh m = VoxelMesh(new CVoxelMesh());
+        m->SetSize(m_BBox.End + m_BBox.Beg.Abs());
+
+        std::map<int, int> ColorIdx;
+        CVector Beg, End;
+        
+        for (auto &&l : m_Layers)
+        {
+            for (auto &&b : l.Blocks)
+            {
+                CVector v = b.Pos;
+                BL16 &tmp = m_BL16s[b.Index];
+
+                for (int z = v.z; z < v.z + 16; z++)
+                {
+                    for (int y = v.y; y < v.y + 16; y++)
+                    {
+                        for (int x = v.x; x < v.x + 16; x++)
+                        {
+                            CVector vi(x, y, z);
+                            vi += m_BBox.Beg.Abs();
+
+                            uint32_t p = tmp.GetVoxel(CVector(x - v.x, y - v.y, z - v.z));
+                            if(p != 0)
+                            {
+                                int IdxC = 0;
+                                if(ColorIdx.find(p) == ColorIdx.end())
+                                {
+                                    CColor c;
+                                    memcpy(c.c, &p, 4);
+
+                                    m_UsedColorPalette.push_back(c);
+                                    ColorIdx[p] = m_UsedColorPalette.size() - 1;
+                                    IdxC = m_UsedColorPalette.size() - 1;
+                                }
+                                else
+                                    IdxC = ColorIdx[p];
+
+                                if(Beg.IsZero())
+                                    Beg = vi;
+
+                                Beg = Beg.Min(vi);
+                                End = End.Max(vi);
+
+                                m->SetVoxel(vi, l.MatIdx, IdxC, false);
+                            }
+                        }
+                    }
+                }
+            }
+            
+        }
+
+        m->SetBBox(CBBox(Beg, End));
+        m_Models.push_back(m);
+
+        m_BBox = CBBox();
+        m_BL16s.clear();
+        m_Layers.clear();
+    }
+
+    void CGoxelLoader::ReadFile()
+    {
         std::string Signature(4, '\0');
         ReadData(&Signature[0], 4);
         Signature += "\0";
@@ -53,137 +120,103 @@ namespace VoxelOptimizer
         if(Version != 2)
             throw CVoxelLoaderException("Version: " + std::to_string(Version) + " is not supported");
 
-        VoxelMesh m = VoxelMesh(new CVoxelMesh());
-        std::vector<BL16> BL16s;
-        std::vector<Layer> Layers;
-
-        CVector MinSize, MaxSize;
-
         while (!IsEof())
         {
             SChunkHeader Chunk = ReadData<SChunkHeader>();
 
             if(strncmp(Chunk.Type, "BL16", sizeof(Chunk.Type)) == 0)
-            {
-                stbi_uc *PngData = new stbi_uc[Chunk.Size];
-                ReadData((char*)PngData, Chunk.Size);
-
-                int w, h, c;
-                uint32_t *ImgData = (uint32_t*)stbi_load_from_memory(PngData, Chunk.Size, &w, &h, &c, 4);
-                BL16s.emplace_back();
-                BL16s.back().SetData(ImgData);
-                delete[] ImgData;
-                delete[] PngData;
-
-                Skip(sizeof(int));
-            }
-            /*if(strncmp(Chunk.Type, "IMG ", sizeof(Chunk.Type)) == 0)
-            {
-                Pos += sizeof(int) + 3 + sizeof(int);
-                float Box[16];
-
-                memcpy(Box, Data + Pos, 64 * sizeof(float));
-
-                Pos += Chunk.Size + sizeof(int);
-            }*/
+                ProcessBL16(Chunk);
             else if(strncmp(Chunk.Type, "LAYR", sizeof(Chunk.Type)) == 0)
-            {
-                int Blocks = ReadData<int>();
-
-                for (size_t i = 0; i < Blocks; i++)
-                {
-                    Layer l;
-
-                    l.Index = ReadData<int>();
-                    l.Pos.x = ReadData<int>();
-                    l.Pos.y = ReadData<int>();
-                    l.Pos.z = ReadData<int>();
-
-                    CVector v = l.Pos + CVector(16, 16, 16);
-
-                    MinSize = MinSize.Min(l.Pos);
-                    MaxSize = MaxSize.Max(v);
-
-                    Skip(sizeof(int));
-
-                    Layers.push_back(l);
-
-                    // if(m->GetSize().IsZero())
-                    //     m->SetSize(CVector(64, 64, 64));
-
-                    // for (size_t z = v.z; z < v.z + 16; z++)
-                    // {
-                    //     for (size_t y = v.y; y < v.y + 16; y++)
-                    //     {
-                    //         for (size_t x = v.x; x < v.x + 16; x++)
-                    //         {
-                    //             BL16 &tmp = BL16s[idx];
-
-                    //             CVector vi(x, y, z);
-                    //             uint32_t p = tmp.GetVoxel(CVector(x - v.x, y - v.y, z - v.z));
-
-                    //             if(p != 0)
-                    //             {
-                    //                 m->SetVoxel(vi, 0, 0, false);
-                    //             }
-                    //         }
-                    //     }
-                    // }
-                    
-
-                    // if(v > m->GetSize())
-                    //     m->SetSize(v);
-
-                    // m->SetVoxel(v, 0, 0, false);
-                }
-                
-                Skip(Chunk.Size - (Blocks * sizeof(int) * 5));
-            }
+                ProcessLayer(Chunk);
+            else if(strncmp(Chunk.Type, "MATE", sizeof(Chunk.Type)) == 0)
+                ProcessMaterial(Chunk);
             else
                 Skip(Chunk.Size + sizeof(int));
         }
+    }
 
+    void CGoxelLoader::ProcessMaterial(const SChunkHeader &Chunk)
+    {
+        auto Dict = ReadDict(Chunk, Tellg());
         m_Materials.push_back(Material(new CMaterial()));
-        m->SetSize(MaxSize + MinSize.Abs());
 
-        std::map<int, int> ColorIdx;
-        
-        for (auto &&l : Layers)
+        float c[4];
+        memcpy(c, Dict["color"].data(), 4 * sizeof(float));
+
+        m_Materials.back()->Transparency = c[3];
+        m_Materials.back()->Metallic = *((float*)(Dict["metallic"]).data());
+        m_Materials.back()->Roughness = *((float*)(Dict["roughness"]).data());
+        m_Materials.back()->Power = *((float*)(Dict["emission"]).data());
+
+        Skip(sizeof(int));
+    }
+
+    void CGoxelLoader::ProcessLayer(const SChunkHeader &Chunk)
+    {
+        Layer l;
+        size_t StartPos = Tellg();
+
+        int Blocks = ReadData<int>();
+
+        for (size_t i = 0; i < Blocks; i++)
         {
-            CVector v = l.Pos;
-            for (int z = v.z; z < v.z + 16; z++)
-            {
-                for (int y = v.y; y < v.y + 16; y++)
-                {
-                    for (int x = v.x; x < v.x + 16; x++)
-                    {
-                        BL16 &tmp = BL16s[l.Index];
+            Block B;
 
-                        CVector vi(x, y, z);
-                        uint32_t p = tmp.GetVoxel(CVector(x - v.x, y - v.y, z - v.z));
+            B.Index = ReadData<int>();
+            B.Pos.x = ReadData<int>();
+            B.Pos.y = ReadData<int>();
+            B.Pos.z = ReadData<int>();
 
-                        if(p != 0)
-                        {
-                            int IdxC = 0;
-                            if(ColorIdx.find(p) == ColorIdx.end())
-                            {
-                                CColor c;
-                                memcpy(c.c, &p, 4);
+            CVector v = B.Pos + CVector(16, 16, 16);
 
-                                m_UsedColorPalette.push_back(c);
-                                ColorIdx[p] = m_UsedColorPalette.size() - 1;
-                                IdxC = m_UsedColorPalette.size() - 1;
-                            }
-                            else
-                                IdxC = ColorIdx[p];
+            m_BBox.Beg = m_BBox.Beg.Min(B.Pos);
+            m_BBox.End = m_BBox.End.Max(v);
 
-                            m->SetVoxel(vi + MinSize.Abs(), 0, IdxC, false);
-                        }
-                    }
-                }
-            }
+            Skip(sizeof(int));
+
+            l.Blocks.push_back(B);
         }
 
-        m_Models.push_back(m);
+        auto Dict = ReadDict(Chunk, StartPos);
+        l.MatIdx = *((int*)(Dict["material"].data()));
+        
+        m_Layers.push_back(l);
+        Skip(sizeof(int));
+    }
+
+    void CGoxelLoader::ProcessBL16(const SChunkHeader &Chunk)
+    {
+        stbi_uc *PngData = new stbi_uc[Chunk.Size];
+        ReadData((char*)PngData, Chunk.Size);
+
+        int w, h, c;
+        uint32_t *ImgData = (uint32_t*)stbi_load_from_memory(PngData, Chunk.Size, &w, &h, &c, 4);
+        m_BL16s.emplace_back();
+        m_BL16s.back().SetData(ImgData);
+        delete[] ImgData;
+        delete[] PngData;
+
+        Skip(sizeof(int));
+    }
+
+    std::map<std::string, std::string> CGoxelLoader::ReadDict(const SChunkHeader &Chunk, size_t StartPos)
+    {
+        std::map<std::string, std::string> Ret;
+
+        while (Tellg() - StartPos < Chunk.Size)
+        {
+            int Size = ReadData<int>();
+            std::string Key(Size, '\0');
+            ReadData(&Key[0], Size);
+            // Key += '\0';
+
+            Size = ReadData<int>();
+            std::string Value(Size, '\0');
+            ReadData(&Value[0], Size);
+
+            Ret[Key] = Value;
+        }
+
+        return Ret;
     }
 } // namespace VoxelOptimizer

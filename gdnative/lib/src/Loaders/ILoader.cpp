@@ -71,6 +71,11 @@ namespace VoxelOptimizer
         return m_Pos >= m_Data.size();
     }
 
+    size_t ILoader::Tellg()
+    {
+        return m_Pos;
+    }
+
     void ILoader::Skip(size_t Bytes)
     {
         m_Pos += Bytes;

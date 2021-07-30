@@ -28,6 +28,7 @@
 #include <functional>
 #include <string>
 #include <math.h>
+#include <iostream>
 
 namespace VoxelOptimizer
 {
@@ -48,6 +49,7 @@ namespace VoxelOptimizer
 
             CVector() : x(0), y(0), z(0) {}
             CVector(float x, float y, float z) : x(x), y(y), z(z) {}
+            CVector(const CVector &v) : x(v.x), y(v.y), z(v.z) {}
 
             inline bool IsZero() const
             {
@@ -64,17 +66,17 @@ namespace VoxelOptimizer
                 return x > vr.x || y > vr.y || z > vr.z;
             }
 
-            inline CVector Min(CVector &vec)
+            inline CVector Min(const CVector &vec) const
             {
                 return CVector(std::min(x, vec.x), std::min(y, vec.y), std::min(z, vec.z));
             }
 
-            inline CVector Max(CVector &vec)
+            inline CVector Max(const CVector &vec) const
             {
                 return CVector(std::max(x, vec.x), std::max(y, vec.y), std::max(z, vec.z));
             }
 
-            inline CVector Abs()
+            inline CVector Abs() const
             {
                 return CVector(fabs(x), fabs(y), fabs(z));
             }
@@ -95,6 +97,16 @@ namespace VoxelOptimizer
             {
                 return CVector(x + vr.x, y + vr.y, z + vr.z);
             }
+
+            inline CVector &operator+=(const CVector &vr)
+            {
+                x += vr.x;
+                y += vr.y;
+                z += vr.z;
+
+                return *this;
+            }
+
 
             inline CVector operator/(float scalar) const
             {
@@ -137,6 +149,12 @@ namespace VoxelOptimizer
 
             ~CVector() = default;
     };
+
+    inline std::ostream &operator<<(std::ostream &of, const CVector &vec)
+    {
+        of << "(" << vec.x << ", " << vec.y << ", " << vec.z << ")";
+        return of;
+    }
 } // namespace VoxelOptimizer
 
 #endif //VECTOR_HPP

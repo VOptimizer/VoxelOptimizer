@@ -7,15 +7,17 @@ using namespace std;
 int main(int argc, char const *argv[])
 {
     VoxelOptimizer::CGoxelLoader GLoader;
-    GLoader.Load("windmill.gox");
+    GLoader.Load("windmill2.gox");
 
 
     VoxelOptimizer::CMagicaVoxelLoader loader;
     loader.Load("windmill.vox");
 
-    VoxelOptimizer::CGreedyMesher Mesher;
+    // VoxelOptimizer::CGreedyMesher Mesher;
+    VoxelOptimizer::CSimpleMesher Mesher;
 
     auto VoxelMesh = GLoader.GetModels().back();//loader.GetModels().back();
+    cout << VoxelMesh->GetBlockCount() << endl;
 
     auto v = VoxelMesh->GetVoxels();
 
