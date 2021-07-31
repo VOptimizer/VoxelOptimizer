@@ -143,7 +143,7 @@ namespace VoxelOptimizer
         float c[4];
         memcpy(c, Dict["color"].data(), 4 * sizeof(float));
 
-        m_Materials.back()->Transparency = c[3];
+        m_Materials.back()->Transparency = 1.f - c[3];
         m_Materials.back()->Metallic = *((float*)(Dict["metallic"]).data());
         m_Materials.back()->Roughness = *((float*)(Dict["roughness"]).data());
         m_Materials.back()->Power = *((float*)(Dict["emission"]).data());

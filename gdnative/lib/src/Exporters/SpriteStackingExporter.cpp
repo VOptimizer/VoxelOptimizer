@@ -28,7 +28,7 @@
 
 namespace VoxelOptimizer
 {
-    void CSpriteStackingExporter::Save(const std::string &Path, VoxelMesh m, ILoader *Loader)
+    void CSpriteStackingExporter::Save(const std::string &Path, VoxelMesh m, Loader Loader)
     {
         auto Image = Generate(m, Loader);
         std::ofstream out(Path, std::ios::binary);
@@ -39,7 +39,7 @@ namespace VoxelOptimizer
         }
     }
 
-    std::vector<char> CSpriteStackingExporter::Generate(VoxelMesh m, ILoader *Loader)
+    std::vector<char> CSpriteStackingExporter::Generate(VoxelMesh m, Loader Loader)
     {
         CVector Size = m->GetSize();
         std::vector<uint32_t> Pixels(Size.x * Size.y * Size.z, 0);

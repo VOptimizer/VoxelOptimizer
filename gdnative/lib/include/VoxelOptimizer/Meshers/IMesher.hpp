@@ -45,7 +45,7 @@ namespace VoxelOptimizer
              * 
              * @param m: Voxel mesh to meshify.
              */
-            virtual Mesh GenerateMesh(VoxelMesh m, ILoader *Loader) = 0;
+            virtual Mesh GenerateMesh(VoxelMesh m, Loader Loader) = 0;
 
             virtual ~IMesher() = default;
         protected:
@@ -62,7 +62,7 @@ namespace VoxelOptimizer
             std::map<size_t, int> m_UVIndex;
             std::map<int, GroupedFaces> m_FacesIndex;
 
-            ILoader *m_Loader;
+            Loader m_Loader;
     };
 
     using Mesher = std::shared_ptr<IMesher>;

@@ -27,7 +27,7 @@
 
 namespace VoxelOptimizer
 {
-    Mesh CSimpleMesher::GenerateMesh(VoxelMesh m, ILoader *Loader)
+    Mesh CSimpleMesher::GenerateMesh(VoxelMesh m, Loader Loader)
     {
         Mesh Ret = Mesh(new SMesh());
         Ret->Texture = Loader->GetColorPalette();

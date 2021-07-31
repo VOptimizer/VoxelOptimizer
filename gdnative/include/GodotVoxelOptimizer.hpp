@@ -49,7 +49,7 @@ class CGodotVoxelOptimizer : public Reference
 
         virtual ~CGodotVoxelOptimizer() = default;
     private:
-        VoxelOptimizer::CMagicaVoxelLoader m_Loader;
+        VoxelOptimizer::Loader m_Loader;
         VoxelOptimizer::Mesh m_Mesh;
         int m_BlockCount;
 };

@@ -58,10 +58,18 @@ godot_error CGodotVoxelOptimizer::Load(String Path)
         return (godot_error)err;
 
     PoolByteArray Data = VFile->get_buffer(VFile->get_len());
+
+    String Ext = Path.get_extension().to_lower();
+    if(Ext == "vox")
+        m_Loader = VoxelOptimizer::Loader(new VoxelOptimizer::CMagicaVoxelLoader());
+    else if(Ext == "gox")
+        m_Loader = VoxelOptimizer::Loader(new VoxelOptimizer::CGoxelLoader());
+    else if(Ext == "kenshape")
+        m_Loader = VoxelOptimizer::Loader(new VoxelOptimizer::CKenshapeLoader());
     
     try
     {
-        m_Loader.Load((char*)Data.read().ptr(), Data.size());
+        m_Loader->Load((char*)Data.read().ptr(), Data.size());
     }
     catch(const VoxelOptimizer::CVoxelLoaderException &e)
     {
@@ -87,7 +95,7 @@ godot_error CGodotVoxelOptimizer::Save(String Path)
     Ref<File> VFile = File::_new();
     VoxelOptimizer::Exporter Exporter;
 
-    String Ext = Path.get_extension();
+    String Ext = Path.get_extension().to_lower();
     if(Ext == "gltf" || Ext == "glb")
     {
         VoxelOptimizer::CGLTFExporter *GLTF = new VoxelOptimizer::CGLTFExporter();
@@ -135,7 +143,7 @@ godot_error CGodotVoxelOptimizer::SaveSlices(String Path)
     Ref<File> VFile = File::_new();
     VoxelOptimizer::CSpriteStackingExporter Exporter;
 
-    auto Image = Exporter.Generate(m_Loader.GetModels().front(), m_Loader);
+    auto Image = Exporter.Generate(m_Loader->GetModels().front(), m_Loader);
 
     VFile->open(Path, File::WRITE);
     if(!VFile->is_open())
@@ -157,7 +165,7 @@ godot_error CGodotVoxelOptimizer::SaveSlices(String Path)
 
 Ref<ArrayMesh> CGodotVoxelOptimizer::GetMesh(bool Optimized)
 {
-    if(m_Loader.GetModels().empty())
+    if(m_Loader->GetModels().empty())
     {
         ERR_PRINT("No file loaded please call load before!");
         return nullptr;
@@ -170,8 +178,8 @@ Ref<ArrayMesh> CGodotVoxelOptimizer::GetMesh(bool Optimized)
     else
         Mesher = VoxelOptimizer::Mesher(new VoxelOptimizer::CSimpleMesher());
 
-    m_Mesh = Mesher->GenerateMesh(m_Loader.GetModels().front(), m_Loader);
-    m_BlockCount = m_Loader.GetModels().front()->GetBlockCount();
+    m_Mesh = Mesher->GenerateMesh(m_Loader->GetModels().front(), m_Loader);
+    m_BlockCount = m_Loader->GetModels().front()->GetBlockCount();
 
     Ref<ArrayMesh> Ret = ArrayMesh::_new();
     Array arr;

@@ -40,6 +40,7 @@
 #include <VoxelOptimizer/Loaders/GoxelLoader.hpp>
 #include <VoxelOptimizer/Loaders/MagicaVoxelLoader.hpp>
 #include <VoxelOptimizer/Loaders/VoxelMesh.hpp>
+#include <VoxelOptimizer/Loaders/KenshapeLoader.hpp>
 #include <VoxelOptimizer/Meshers/GreedyMesher.hpp>
 #include <VoxelOptimizer/Meshers/SimpleMesher.hpp>
 

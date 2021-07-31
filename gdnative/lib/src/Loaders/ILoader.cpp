@@ -85,4 +85,14 @@ namespace VoxelOptimizer
     {
         m_Pos = 0;
     }
+
+    size_t ILoader::Size()
+    {
+        return m_Data.size();
+    }
+
+    char *ILoader::Ptr()
+    {
+        return m_Data.data() + m_Pos;
+    }
 } // namespace VoxelOptimizer

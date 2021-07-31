@@ -22,42 +22,25 @@
  * SOFTWARE.
  */
 
-#ifndef SPRITESTACKINGEXPORTER_HPP
-#define SPRITESTACKINGEXPORTER_HPP
+#ifndef KENSHAPELOADER_HPP
+#define KENSHAPELOADER_HPP
 
-#include <VoxelOptimizer/Loaders/MagicaVoxelLoader.hpp>
-#include <string>
-#include <vector>
+#include <VoxelOptimizer/Loaders/ILoader.hpp>
 
 namespace VoxelOptimizer
 {
-    class CSpriteStackingExporter
+    class CKenshapeLoader : public ILoader
     {
         public:
-            CSpriteStackingExporter() = default;
+            CKenshapeLoader() = default;
 
-            /**
-             * @brief Generates and saves the mesh as png slices.
-             * 
-             * @param Path: Path of the file.
-             * @param Mesh: Mesh to save.
-             */
-            void Save(const std::string &Path, VoxelMesh m, Loader Loader);
+            using ILoader::Load;
 
-            /**
-             * @brief Generates the file stream.
-             * 
-             * @param Mesh: Mesh to save.
-             * 
-             * @return Returns a png image.
-             */
-            std::vector<char> Generate(VoxelMesh m, Loader Loader); 
-
-            ~CSpriteStackingExporter() = default;
+            ~CKenshapeLoader() = default;
         private:
-        /* data */
+            void ParseFormat() override;   
     };
 } // namespace VoxelOptimizer
 
 
-#endif //SPRITESTACKINGEXPORTER_HPP
+#endif //KENSHAPELOADER_HPP

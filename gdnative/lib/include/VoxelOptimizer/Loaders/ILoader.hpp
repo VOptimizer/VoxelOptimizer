@@ -97,11 +97,15 @@ namespace VoxelOptimizer
             size_t Tellg();
             void Skip(size_t Bytes);
             void Reset();
+            size_t Size();
+            char *Ptr();
 
         private:
             std::vector<char> m_Data;
             size_t m_Pos;
     };
+
+    using Loader = std::shared_ptr<ILoader>;
 } // namespace VoxelOptimizer
 
 #endif //ILOADER_HPP

@@ -9,6 +9,8 @@ int main(int argc, char const *argv[])
     VoxelOptimizer::CGoxelLoader GLoader;
     GLoader.Load("windmill2.gox");
 
+    VoxelOptimizer::CKenshapeLoader KLoader;
+    KLoader.Load("bottle-potion.kenshape");
 
     VoxelOptimizer::CMagicaVoxelLoader loader;
     loader.Load("windmill.vox");
@@ -16,7 +18,7 @@ int main(int argc, char const *argv[])
     // VoxelOptimizer::CGreedyMesher Mesher;
     VoxelOptimizer::CSimpleMesher Mesher;
 
-    auto VoxelMesh = GLoader.GetModels().back();//loader.GetModels().back();
+    auto VoxelMesh = KLoader.GetModels().back();//loader.GetModels().back();
     cout << VoxelMesh->GetBlockCount() << endl;
 
     auto v = VoxelMesh->GetVoxels();
@@ -45,7 +47,7 @@ int main(int argc, char const *argv[])
     // }
     
 
-    auto Mesh = Mesher.GenerateMesh(VoxelMesh, &GLoader);
+    auto Mesh = Mesher.GenerateMesh(VoxelMesh, &KLoader);
 
     // VoxelOptimizer::CWavefrontObjExporter exporter1;
     // exporter1.SaveObj("minicube.obj", Mesh);
@@ -61,7 +63,7 @@ int main(int argc, char const *argv[])
     exporterObj.Save("windmill.obj", Mesh);
 
     VoxelOptimizer::CSpriteStackingExporter spriter;
-    spriter.Save("windmill_sprite.png", VoxelMesh, &GLoader);
+    spriter.Save("windmill_sprite.png", VoxelMesh, &KLoader);
 
     return 0;
 }
