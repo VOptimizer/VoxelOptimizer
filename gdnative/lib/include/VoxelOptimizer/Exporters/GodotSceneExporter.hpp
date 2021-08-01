@@ -22,21 +22,25 @@
  * SOFTWARE.
  */
 
-#ifndef WAVEFRONTOBJEXPORTER_HPP
-#define WAVEFRONTOBJEXPORTER_HPP
+#ifndef GODOTSCENEEXPORTER_HPP
+#define GODOTSCENEEXPORTER_HPP
 
 #include <VoxelOptimizer/Exporters/IExporter.hpp>
+
 namespace VoxelOptimizer
 {
-    class CWavefrontObjExporter : public IExporter
+    class CGodotSceneExporter : public IExporter
     {
         public:
-            CWavefrontObjExporter() = default;
+            CGodotSceneExporter() = default;
 
             std::map<std::string, std::vector<char>> Generate(Mesh Mesh) override;
 
-            ~CWavefrontObjExporter() = default;
+            ~CGodotSceneExporter() = default;
+        private:
+        /* data */
     };
 } // namespace VoxelOptimizer
 
-#endif //WAVEFRONTOBJEXPORTER_HPP
+
+#endif //GODOTSCENEEXPORTER_HPP

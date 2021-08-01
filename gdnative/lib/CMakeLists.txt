@@ -17,6 +17,7 @@ set(SRCS "${PROJECT_SOURCE_DIR}/src/Loaders/MagicaVoxelLoader.cpp"
          "${PROJECT_SOURCE_DIR}/src/Exporters/WavefrontObjExporter.cpp"
          "${PROJECT_SOURCE_DIR}/src/Exporters/IExporter.cpp"
          "${PROJECT_SOURCE_DIR}/src/Exporters/SpriteStackingExporter.cpp"
+         "${PROJECT_SOURCE_DIR}/src/Exporters/GodotSceneExporter.cpp"
          "${PROJECT_SOURCE_DIR}/src/Exporters/glTF/GLTFExporter.cpp"
          "${PROJECT_SOURCE_DIR}/src/stb_image_write.c")
 #set(LIBS "")

@@ -6,19 +6,19 @@ using namespace std;
 
 int main(int argc, char const *argv[])
 {
-    VoxelOptimizer::CGoxelLoader GLoader;
-    GLoader.Load("windmill2.gox");
+    VoxelOptimizer::Loader GLoader(new VoxelOptimizer::CGoxelLoader());
+    GLoader->Load("windmill.gox");
 
-    VoxelOptimizer::CKenshapeLoader KLoader;
-    KLoader.Load("bottle-potion.kenshape");
+    VoxelOptimizer::Loader KLoader(new VoxelOptimizer::CKenshapeLoader());
+    KLoader->Load("bottle-potion.kenshape");
 
-    VoxelOptimizer::CMagicaVoxelLoader loader;
-    loader.Load("windmill.vox");
+    VoxelOptimizer::Loader loader(new VoxelOptimizer::CMagicaVoxelLoader());
+    loader->Load("windmill.vox");
 
     // VoxelOptimizer::CGreedyMesher Mesher;
     VoxelOptimizer::CSimpleMesher Mesher;
 
-    auto VoxelMesh = KLoader.GetModels().back();//loader.GetModels().back();
+    auto VoxelMesh = GLoader->GetModels().back();//loader.GetModels().back();
     cout << VoxelMesh->GetBlockCount() << endl;
 
     auto v = VoxelMesh->GetVoxels();
@@ -47,7 +47,7 @@ int main(int argc, char const *argv[])
     // }
     
 
-    auto Mesh = Mesher.GenerateMesh(VoxelMesh, &KLoader);
+    auto Mesh = Mesher.GenerateMesh(VoxelMesh, GLoader);
 
     // VoxelOptimizer::CWavefrontObjExporter exporter1;
     // exporter1.SaveObj("minicube.obj", Mesh);
@@ -63,7 +63,10 @@ int main(int argc, char const *argv[])
     exporterObj.Save("windmill.obj", Mesh);
 
     VoxelOptimizer::CSpriteStackingExporter spriter;
-    spriter.Save("windmill_sprite.png", VoxelMesh, &KLoader);
+    spriter.Save("windmill_sprite.png", VoxelMesh, KLoader);
+
+    VoxelOptimizer::CGodotSceneExporter godot;
+    godot.Save("windmill_2.escn", Mesh);
 
     return 0;
 }

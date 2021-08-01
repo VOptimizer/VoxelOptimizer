@@ -33,21 +33,7 @@ namespace VoxelOptimizer
         public:
             CGLTFExporter() : m_Binary(false) {}
 
-            /**
-             * @brief Generates and saves the mesh.
-             * 
-             * @param Path: Path of the file.
-             * @param Mesh: Mesh to save.
-             */
             void Save(const std::string &Path, Mesh Mesh) override;
-
-            /**
-             * @brief Generates the file streams.
-             * 
-             * @param Mesh: Mesh to save.
-             * 
-             * @return Returns a map where the key is the type and the std::vector<char> is the data.
-             */
             std::map<std::string, std::vector<char>> Generate(Mesh Mesh) override;
 
             inline void SetBinary(bool Binary)

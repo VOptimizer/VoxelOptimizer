@@ -23,10 +23,29 @@
  */
 
 #include <algorithm>
+#include <fstream>
 #include <VoxelOptimizer/Exporters/IExporter.hpp>
 
 namespace VoxelOptimizer
 {
+    void IExporter::Save(const std::string &Path, Mesh Mesh)
+    {
+        // Names all files like thhe output file.
+        m_ExternalFilenames = GetFilenameWithoutExt(Path);
+        std::string PathWithoutExt = GetPathWithoutExt(Path);
+
+        auto Files = Generate(Mesh);
+        for (auto &&f : Files)
+        {
+            std::ofstream out(PathWithoutExt + std::string(".") + f.first, std::ios::binary);
+            if(out.is_open())
+            {
+                out.write(f.second.data(), f.second.size());
+                out.close();
+            }
+        }
+    }
+
     std::string IExporter::GetPathWithoutExt(std::string Path)
     {
         // Removes the file extension.

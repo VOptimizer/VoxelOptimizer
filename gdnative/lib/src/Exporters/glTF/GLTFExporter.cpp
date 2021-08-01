@@ -35,21 +35,7 @@ namespace VoxelOptimizer
     void CGLTFExporter::Save(const std::string &Path, Mesh Mesh)
     {
         m_Binary = Path.find(".glb") != std::string::npos;
-
-        // Names all files like thhe output file.
-        m_ExternalFilenames = GetFilenameWithoutExt(Path);
-        std::string PathWithoutExt = GetPathWithoutExt(Path);
-
-        auto Files = Generate(Mesh);
-        for (auto &&f : Files)
-        {
-            std::ofstream out(PathWithoutExt + std::string(".") + f.first, std::ios::binary);
-            if(out.is_open())
-            {
-                out.write(f.second.data(), f.second.size());
-                out.close();
-            }
-        }
+        IExporter::Save(Path, Mesh);
     }
 
     std::map<std::string, std::vector<char>> CGLTFExporter::Generate(Mesh Mesh)
