@@ -15,8 +15,8 @@ int main(int argc, char const *argv[])
     VoxelOptimizer::Loader loader(new VoxelOptimizer::CMagicaVoxelLoader());
     loader->Load("windmill.vox");
 
-    // VoxelOptimizer::CGreedyMesher Mesher;
-    VoxelOptimizer::CSimpleMesher Mesher;
+    VoxelOptimizer::CGreedyMesher Mesher;
+    // VoxelOptimizer::CSimpleMesher Mesher;
 
     auto VoxelMesh = GLoader->GetModels().back();//loader.GetModels().back();
     cout << VoxelMesh->GetBlockCount() << endl;
@@ -45,9 +45,11 @@ int main(int argc, char const *argv[])
     //         cout << "\t" << v.x << " " << v.y << " " << v.z << endl;
     //     }        
     // }
-    
 
     auto Mesh = Mesher.GenerateMesh(VoxelMesh, GLoader);
+    // Mesh = VoxelOptimizer::Mesh(new VoxelOptimizer::SMesh());
+
+    // Mesh->Vertices.push_back()
 
     // VoxelOptimizer::CWavefrontObjExporter exporter1;
     // exporter1.SaveObj("minicube.obj", Mesh);
