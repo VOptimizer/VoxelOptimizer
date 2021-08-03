@@ -36,7 +36,7 @@ using namespace std;
 namespace fs = std::filesystem;
 
 const vector<string> SUPPORTED_EXTS({"gox", "vox", "kenshape"});
-const vector<string> SUPPORTED_OUT_EXTS({"gltf", "glb", "obj", "escn"});
+const vector<string> SUPPORTED_OUT_EXTS({"gltf", "glb", "obj", "escn", "png"});
 
 enum class VoxelType
 {
@@ -50,7 +50,8 @@ enum class OutputType
     GLTF,
     GLB,
     OBJ,
-    GODOT
+    GODOT,
+    PNG
 };
 
 struct SFile
@@ -102,7 +103,8 @@ File CreateFile(const fs::path &Input, const fs::path &OutputPattern)
         {"gltf", OutputType::GLTF},
         {"glb", OutputType::GLB},
         {"obj", OutputType::OBJ},
-        {"escn", OutputType::GODOT}
+        {"escn", OutputType::GODOT},
+        {"png", OutputType::PNG},
     };
 
     File Ret = File(new SFile());
@@ -174,7 +176,10 @@ vector<File> ResolveFilenames(const argh::parser &cmdl, const string &OutputPatt
                 {
                     auto IT = std::find(Exts.begin(), Exts.end(), ToLower(p.path().extension().string().substr(1)));
                     if(IT != Exts.end())
-                        Ret.push_back(CreateFile(p.path(), OutputPatternPath));
+                    {
+                        if(Filename == "*" || ToLower(p.path().stem().string()) == ToLower(Filename))
+                            Ret.push_back(CreateFile(p.path(), OutputPatternPath));
+                    }
                 }
             }
         }
@@ -257,8 +262,19 @@ int main(int argc, char const *argv[])
                 case OutputType::OBJ: Exporter = VoxelOptimizer::Exporter(new VoxelOptimizer::CWavefrontObjExporter()); break;
             }
 
+            if(!fs::is_directory(f->OutputFile))
+                fs::create_directories(fs::path(f->OutputFile).parent_path());
+
             Loader->Load(f->InputFile);
             auto VoxelMesh = Loader->GetModels().back();
+
+            if(f->OutType == OutputType::PNG)
+            {
+                VoxelOptimizer::CSpriteStackingExporter Stacker;
+                Stacker.Save(f->OutputFile, VoxelMesh, Loader);
+                continue;
+            }
+
             auto Mesh = Mesher->GenerateMesh(VoxelMesh, Loader);
 
             Exporter->Save(f->OutputFile, Mesh);
