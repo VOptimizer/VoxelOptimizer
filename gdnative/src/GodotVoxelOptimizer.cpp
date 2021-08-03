@@ -104,6 +104,8 @@ godot_error CGodotVoxelOptimizer::Save(String Path)
     }
     else if(Ext == "obj")
         Exporter = VoxelOptimizer::Exporter(new VoxelOptimizer::CWavefrontObjExporter());
+    else if(Ext == "escn")
+        Exporter = VoxelOptimizer::Exporter(new VoxelOptimizer::CGodotSceneExporter());
     else
         return (godot_error)Error::ERR_FILE_UNRECOGNIZED;
 

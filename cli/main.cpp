@@ -72,12 +72,13 @@ void HelpDialog(const argh::parser &cmdl)
     cout << "Usage: " << CliName << " [INPUT] [OPTIONS]\n" << endl;
     cout << "-h, --help\tThis dialog" << endl;
     cout << "-m, --mesher\tSets the mesher to meshify the voxel mesh. Default: simple. (simple, greedy)" << endl;
-    cout << "-o, --output\tOutput path\n" << endl;
+    cout << "-o, --output\tOutput path. If the output path doesn't exist it will be created\n" << endl;
     cout << "Examples:" << endl;
     cout << CliName << " windmill.vox -o windmill.glb\tConverts the *.vox file to a *.glb" << endl;
     cout << CliName << " voxels/*.vox -o *.glb\tConverts all *.vox files to *.glb with the same name as the *.vox files" << endl;
     cout << CliName << " voxels/*.vox -o output/Mesh{0}.glb\tConverts all *.vox files to a *.glb with the names Mesh0.glb Mesh1.glb ..." << endl;
     cout << CliName << " voxels/ -o *.glb\tConverts all supported file formats inside a folder to *.glb files" << endl;
+    cout << CliName << " *.* -o *.glb\tConverts all supported file formats to *.glb files" << endl;
 }
 
 string ToLower(const string &str)
@@ -131,7 +132,7 @@ File CreateFile(const fs::path &Input, const fs::path &OutputPattern)
         Filename = regex_replace(Filename, regex("\\{0\\}"), to_string(ID++));
 
     if(OutputPattern.has_parent_path())
-        Ret->OutputFile = OutputPattern.parent_path().string() + fs::path::preferred_separator;
+        Ret->OutputFile = OutputPattern.parent_path().string() + "/";
 
     Ret->OutputFile += Filename + "." + Ext;
     Ret->Type = TYPE_MATCHER[ToLower(Input.extension().string().substr(1))];
@@ -148,6 +149,27 @@ vector<File> ResolveFilenames(const argh::parser &cmdl, const string &OutputPatt
     for (size_t i = 1; i < cmdl.size(); i++)
     {
         fs::path InputPattern = cmdl(i).str();
+        if(InputPattern.filename().string().empty())
+        {
+            if(!fs::is_directory(InputPattern))
+            {
+                cerr << "Unsupported format: " << InputPattern << endl;
+                exit(-1);
+            }
+
+            for(auto& p: fs::directory_iterator(InputPattern))
+            {
+                if(p.is_regular_file() && p.path().has_extension())
+                {
+                    auto IT = std::find(SUPPORTED_EXTS.begin(), SUPPORTED_EXTS.end(), ToLower(p.path().extension().string().substr(1)));
+                    if(IT != SUPPORTED_EXTS.end())
+                        Ret.push_back(CreateFile(p.path(), OutputPatternPath));
+                }
+            }
+
+            continue;
+        }
+
         if(!InputPattern.has_extension())
         {
             cerr << "Missing file extension: " << InputPattern << endl;

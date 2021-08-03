@@ -9,7 +9,7 @@ set(SRCS "${PROJECT_SOURCE_DIR}/main.cpp")
 
 include_directories("${PROJECT_SOURCE_DIR}/../gdnative/lib/include")
 
-add_subdirectory("${PROJECT_SOURCE_DIR}/../gdnative/lib" build/)
+add_subdirectory("${PROJECT_SOURCE_DIR}/../gdnative/lib" voxeloptimizer/)
 
 add_executable(${PROJECT_NAME} ${SRCS})
 target_link_libraries(${PROJECT_NAME} voxeloptimizer)
