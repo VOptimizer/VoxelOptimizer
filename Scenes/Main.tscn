@@ -86,7 +86,7 @@ rect_min_size = Vector2( 300, 0 )
 size_flags_horizontal = 3
 size_flags_vertical = 3
 Caption = "Voxelfile"
-Filters = PoolStringArray( "*.vox ; MagicaVoxel file" )
+Filters = PoolStringArray( "*.vox ; MagicaVoxel file", "*.gox; Goxel", "*.kenshape; Kenshape" )
 
 [node name="Caption" parent="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Inputfile" index="0"]
 margin_right = 300.0
@@ -116,7 +116,7 @@ rect_min_size = Vector2( 300, 0 )
 size_flags_horizontal = 3
 size_flags_vertical = 3
 Caption = "Outputfile"
-Filters = PoolStringArray( "*.obj ; Wavefront Obj file", "*.gltf, *.glb ; glTF Text", "*.png ; PNG Image" )
+Filters = PoolStringArray( "*.obj ; Wavefront Obj file", "*.gltf, *.glb ; glTF Text", "*.png ; PNG Image", "*.escn; Godot Scene" )
 SaveDialog = true
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
@@ -152,7 +152,7 @@ custom_constants/margin_bottom = 10
 margin_left = 10.0
 margin_right = 416.0
 margin_bottom = 18.0
-text = "Version: 0.0.1-Alpha"
+text = "Version: 0.0.3-Alpha"
 script = ExtResource( 5 )
 
 [node name="ViewportContainer" type="ViewportContainer" parent="HBoxContainer"]
