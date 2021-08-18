@@ -96,7 +96,7 @@ namespace VoxelOptimizer
             {
                 m_Size = Size;
 
-                // m_Voxels.clear();
+                m_Voxels.clear();
                 m_Voxels.resize(m_Size.x * m_Size.y * m_Size.z);
             }
 
@@ -149,6 +149,18 @@ namespace VoxelOptimizer
             void SetVoxel(CVector Pos, int Material, int Color, bool Transparent);
 
             /**
+             * @brief Removes a voxel on a given position
+             * 
+             * @param Pos: Position of the voxel to remove.
+             */
+            void RemoveVoxel(CVector Pos);
+
+            /**
+             * @brief Clears the mesh
+             */
+            void Clear();
+
+            /**
              * @return Gets a voxel on a given position.
              */
             Voxel GetVoxel(CVector Pos);
@@ -162,8 +174,10 @@ namespace VoxelOptimizer
             }
             
             ~CVoxelMesh() = default;
-        private:
+        private:       
             void SetNormal(Voxel Cur, Voxel Neighbor, CVoxel::Direction CurDir, CVoxel::Direction NeighborDir, CVector Val);
+
+            void SetNormal(CVector Pos, CVector Neighbor, bool IsInvisible = true);
 
             CVector m_Size;
             CBBox m_BBox;

@@ -22,6 +22,7 @@
  * SOFTWARE.
  */
 
+#include <map>
 #include <VoxelOptimizer/Loaders/VoxelMesh.hpp>
 
 namespace VoxelOptimizer
@@ -88,6 +89,29 @@ namespace VoxelOptimizer
         m_BlockCount++;
     }
 
+    void CVoxelMesh::RemoveVoxel(CVector Pos)
+    {
+        size_t ArrPos = (size_t)Pos.x + (size_t)m_Size.x * (size_t)Pos.y + (size_t)m_Size.x * (size_t)m_Size.y * (size_t)Pos.z;
+        if(ArrPos > m_Voxels.size() - 1)
+            return;
+
+        SetNormal(Pos, CVoxel::FACE_UP, false);
+        SetNormal(Pos, CVoxel::FACE_DOWN, false);
+
+        SetNormal(Pos, CVoxel::FACE_LEFT, false);
+        SetNormal(Pos, CVoxel::FACE_RIGHT, false);
+
+        SetNormal(Pos, CVoxel::FACE_FORWARD, false);
+        SetNormal(Pos, CVoxel::FACE_BACKWARD, false);
+
+        m_Voxels[ArrPos] = nullptr;
+    }
+    
+    void CVoxelMesh::Clear()
+    {
+        SetSize(m_Size);
+    }
+
     Voxel CVoxelMesh::GetVoxel(CVector Pos)
     {
         size_t ArrPos = (size_t)Pos.x + (size_t)m_Size.x * (size_t)Pos.y + (size_t)m_Size.x * (size_t)m_Size.y * (size_t)Pos.z;
@@ -98,6 +122,11 @@ namespace VoxelOptimizer
         return m_Voxels[ArrPos];
     }
     
+    //(Tmp, Up, CVoxel::Direction::UP, CVoxel::Direction::DOWN, CVoxel::FACE_UP);
+    // U
+    // X
+    //
+
     void CVoxelMesh::SetNormal(Voxel Cur, Voxel Neighbor, CVoxel::Direction CurDir, CVoxel::Direction NeighborDir, CVector Val)
     {
         if(Neighbor && !Neighbor->Transparent && !Cur->Transparent)
@@ -107,5 +136,33 @@ namespace VoxelOptimizer
         }
         else
             Cur->Normals[CurDir] = Val;
+    }
+
+    void CVoxelMesh::SetNormal(CVector Pos, CVector Neighbor, bool IsInvisible)
+    {
+        static const std::map<size_t, std::pair<CVoxel::Direction, CVoxel::Direction>> NEIGHBOR_INDEX = {
+            {CVoxel::FACE_UP.hash(), {CVoxel::Direction::UP, CVoxel::Direction::DOWN}},
+            {CVoxel::FACE_DOWN.hash(), {CVoxel::Direction::DOWN, CVoxel::Direction::UP}},
+
+            {CVoxel::FACE_LEFT.hash(), {CVoxel::Direction::LEFT, CVoxel::Direction::RIGHT}},
+            {CVoxel::FACE_RIGHT.hash(), {CVoxel::Direction::RIGHT, CVoxel::Direction::LEFT}},
+
+            {CVoxel::FACE_FORWARD.hash(), {CVoxel::Direction::FORWARD, CVoxel::Direction::BACKWARD}},
+            {CVoxel::FACE_BACKWARD.hash(), {CVoxel::Direction::BACKWARD, CVoxel::Direction::FORWARD}},
+        };
+
+        Voxel cur = GetVoxel(Pos);
+        if(cur == nullptr)
+            return;
+
+        Voxel neighbor = GetVoxel(Pos + Neighbor);
+        auto directions = NEIGHBOR_INDEX.at(Neighbor.hash());
+        if(neighbor && !neighbor->Transparent && !cur->Transparent)
+        {
+            neighbor->Normals[directions.second] = IsInvisible ? CVoxel::FACE_ZERO : (Neighbor * -1.f);
+            cur->Normals[directions.first] = IsInvisible ? CVoxel::FACE_ZERO : Neighbor;
+        }
+        else
+            cur->Normals[directions.first] = Neighbor;
     }
 } // namespace VoxelOptimizer
