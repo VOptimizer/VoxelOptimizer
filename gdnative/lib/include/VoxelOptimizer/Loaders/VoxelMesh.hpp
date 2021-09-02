@@ -27,8 +27,9 @@
 
 #include <array>
 #include <VoxelOptimizer/BBox.hpp>
+#include <map>
 #include <memory>
-#include <vector>
+#include <mutex>
 #include <VoxelOptimizer/Vector.hpp>
 
 namespace VoxelOptimizer
@@ -92,12 +93,12 @@ namespace VoxelOptimizer
             /**
              * @brief Sets the size of the voxel space.
              */
-            inline void SetSize(CVector Size)
+            inline void SetSize(const CVector &Size)
             {
                 m_Size = Size;
 
-                m_Voxels.clear();
-                m_Voxels.resize(m_Size.x * m_Size.y * m_Size.z);
+                // m_Voxels.clear();
+                // m_Voxels.resize(m_Size.x * m_Size.y * m_Size.z);
             }
 
             /**
@@ -133,8 +134,9 @@ namespace VoxelOptimizer
              * 
              * @return Returns the list of voxels.
              */
-            inline std::vector<Voxel> GetVoxels() const
+            inline std::map<CVector, Voxel> GetVoxels() const
             {
+                std::lock_guard<std::recursive_mutex> lock(m_Lock);
                 return m_Voxels;
             }
 
@@ -146,14 +148,14 @@ namespace VoxelOptimizer
              * @param Color: Color index.
              * @param Transparent: Is the block transparent?
              */
-            void SetVoxel(CVector Pos, int Material, int Color, bool Transparent);
+            void SetVoxel(const CVector &Pos, int Material, int Color, bool Transparent);
 
             /**
              * @brief Removes a voxel on a given position
              * 
              * @param Pos: Position of the voxel to remove.
              */
-            void RemoveVoxel(CVector Pos);
+            void RemoveVoxel(const CVector &Pos);
 
             /**
              * @brief Clears the mesh
@@ -163,7 +165,7 @@ namespace VoxelOptimizer
             /**
              * @return Gets a voxel on a given position.
              */
-            Voxel GetVoxel(CVector Pos);
+            Voxel GetVoxel(const CVector &Pos);
 
             /**
              * @brief Gets the count of all setted blocks.
@@ -175,14 +177,13 @@ namespace VoxelOptimizer
             
             ~CVoxelMesh() = default;
         private:       
-            void SetNormal(Voxel Cur, Voxel Neighbor, CVoxel::Direction CurDir, CVoxel::Direction NeighborDir, CVector Val);
-
-            void SetNormal(CVector Pos, CVector Neighbor, bool IsInvisible = true);
+            void SetNormal(const CVector &Pos, const CVector &Neighbor, bool IsInvisible = true);
 
             CVector m_Size;
             CBBox m_BBox;
-            std::vector<Voxel> m_Voxels;
+            std::map<CVector, Voxel> m_Voxels;
             size_t m_BlockCount;
+            mutable std::recursive_mutex m_Lock;
     };
 
     using VoxelMesh = std::shared_ptr<CVoxelMesh>;

@@ -6,11 +6,11 @@ using namespace std;
 
 int main(int argc, char const *argv[])
 {
-    VoxelOptimizer::Loader GLoader(new VoxelOptimizer::CGoxelLoader());
-    GLoader->Load("windmill.gox");
+    // VoxelOptimizer::Loader GLoader(new VoxelOptimizer::CGoxelLoader());
+    // GLoader->Load("windmill.gox");
 
-    VoxelOptimizer::Loader KLoader(new VoxelOptimizer::CKenshapeLoader());
-    KLoader->Load("bottle-potion.kenshape");
+    // VoxelOptimizer::Loader KLoader(new VoxelOptimizer::CKenshapeLoader());
+    // KLoader->Load("bottle-potion.kenshape");
 
     VoxelOptimizer::Loader loader(new VoxelOptimizer::CMagicaVoxelLoader());
     loader->Load("windmill.vox");
@@ -18,7 +18,7 @@ int main(int argc, char const *argv[])
     VoxelOptimizer::CGreedyMesher Mesher;
     // VoxelOptimizer::CSimpleMesher Mesher;
 
-    auto VoxelMesh = GLoader->GetModels().back();//loader.GetModels().back();
+    auto VoxelMesh = loader->GetModels().back();//loader.GetModels().back();
     cout << VoxelMesh->GetBlockCount() << endl;
 
     auto v = VoxelMesh->GetVoxels();
@@ -46,7 +46,7 @@ int main(int argc, char const *argv[])
     //     }        
     // }
 
-    auto Mesh = Mesher.GenerateMesh(VoxelMesh, GLoader);
+    auto Mesh = Mesher.GenerateMesh(VoxelMesh, loader);
     // Mesh = VoxelOptimizer::Mesh(new VoxelOptimizer::SMesh());
 
     // Mesh->Vertices.push_back()
@@ -64,8 +64,8 @@ int main(int argc, char const *argv[])
     // exporter.Save("lantern.gltf", Mesh);
     exporterObj.Save("windmill.obj", Mesh);
 
-    VoxelOptimizer::CSpriteStackingExporter spriter;
-    spriter.Save("windmill_sprite.png", VoxelMesh, KLoader);
+    // VoxelOptimizer::CSpriteStackingExporter spriter;
+    // spriter.Save("windmill_sprite.png", VoxelMesh, KLoader);
 
     VoxelOptimizer::CGodotSceneExporter godot;
     godot.Save("windmill_2.escn", Mesh);

@@ -61,39 +61,53 @@ namespace VoxelOptimizer
                 return x == vr.x && y == vr.y && z == vr.z;
             }
 
+            inline bool operator!=(const CVector &vr) const
+            {
+                return x != vr.x || y != vr.y || z != vr.z;
+            }
+
             inline bool operator>(const CVector &vr) const
             {
-                return x > vr.x || y > vr.y || z > vr.z;
+                if(x != vr.x)
+                    return x > vr.x;
+
+                if(y != vr.y)
+                    return y > vr.y;
+
+                return z > vr.z;
             }
 
             inline bool operator>=(const CVector &vr) const
             {
-                return x >= vr.x || y >= vr.y || z >= vr.z;
+                if(x != vr.x)
+                    return x >= vr.x;
+
+                if(y != vr.y)
+                    return y >= vr.y;
+
+                return z >= vr.z;
             }
 
             inline bool operator<(const CVector &vr) const
             {
-                return x < vr.x || y < vr.y || z < vr.z;
+                if(x != vr.x)
+                    return x < vr.x;
+
+                if(y != vr.y)
+                    return y < vr.y;
+
+                return z < vr.z;
             }
 
             inline bool operator<=(const CVector &vr) const
             {
-                return x <= vr.x || y <= vr.y || z <= vr.z;
-            }
+                if(x != vr.x)
+                    return x <= vr.x;
 
-            inline CVector Min(const CVector &vec) const
-            {
-                return CVector(std::min(x, vec.x), std::min(y, vec.y), std::min(z, vec.z));
-            }
+                if(y != vr.y)
+                    return y <= vr.y;
 
-            inline CVector Max(const CVector &vec) const
-            {
-                return CVector(std::max(x, vec.x), std::max(y, vec.y), std::max(z, vec.z));
-            }
-
-            inline CVector Abs() const
-            {
-                return CVector(fabs(x), fabs(y), fabs(z));
+                return z <= vr.z;
             }
 
             // Upon here just math. Math is magic :D
@@ -165,6 +179,21 @@ namespace VoxelOptimizer
             {
                 std::hash<std::string> Hash;
                 return Hash(std::to_string(x) + "_" + std::to_string(y) + "_" + std::to_string(z));
+            }
+
+            inline CVector Min(const CVector &vec) const
+            {
+                return CVector(std::min(x, vec.x), std::min(y, vec.y), std::min(z, vec.z));
+            }
+
+            inline CVector Max(const CVector &vec) const
+            {
+                return CVector(std::max(x, vec.x), std::max(y, vec.y), std::max(z, vec.z));
+            }
+
+            inline CVector Abs() const
+            {
+                return CVector(fabs(x), fabs(y), fabs(z));
             }
 
             ~CVector() = default;

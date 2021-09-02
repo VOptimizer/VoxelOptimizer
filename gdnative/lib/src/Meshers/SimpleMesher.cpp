@@ -41,8 +41,10 @@ namespace VoxelOptimizer
         CVector BoxCenter = BBox.GetSize() / 2;
         std::swap(BoxCenter.y, BoxCenter.z);
 
-        for (auto &&v : Voxels)
+        for (auto &&pair : Voxels)
         {          
+            Voxel v = pair.second;
+
             if(v && v->IsVisible())
             {
                 for (char i = 0; i < v->Normals.size(); i++)

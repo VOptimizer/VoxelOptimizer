@@ -45,100 +45,65 @@ namespace VoxelOptimizer
         Normals[Direction::BACKWARD] = FACE_BACKWARD;
     }
 
-    void CVoxelMesh::SetVoxel(CVector Pos, int Material, int Color, bool Transparent)
+    void CVoxelMesh::SetVoxel(const CVector &Pos, int Material, int Color, bool Transparent)
     {
+        std::lock_guard<std::recursive_mutex> lock(m_Lock);
         Voxel Tmp = Voxel(new CVoxel());
         Tmp->Pos = Pos;
         Tmp->Material = Material;
         Tmp->Color = Color;
         Tmp->Transparent = Transparent;
 
-        Voxel Up, Down, Left, Right, Forward, Backward;
+        m_Voxels.insert({Pos, Tmp});
 
-        if(!Transparent)
-        {
-            if(Pos.z + 1 != m_Size.z)
-                Up = m_Voxels[Pos.x + m_Size.x * Pos.y + m_Size.x * m_Size.y * (Pos.z + 1)];
+        SetNormal(Pos, CVoxel::FACE_UP);
+        SetNormal(Pos, CVoxel::FACE_DOWN);
 
-            if(Pos.z != 0)
-                Down = m_Voxels[Pos.x + m_Size.x * Pos.y + m_Size.x * m_Size.y * (Pos.z - 1)];
+        SetNormal(Pos, CVoxel::FACE_LEFT);
+        SetNormal(Pos, CVoxel::FACE_RIGHT);
 
-            if(Pos.x != 0)
-                Left = m_Voxels[(Pos.x - 1) + m_Size.x * Pos.y + m_Size.x * m_Size.y * Pos.z];
+        SetNormal(Pos, CVoxel::FACE_FORWARD);
+        SetNormal(Pos, CVoxel::FACE_BACKWARD);
 
-            if(Pos.x + 1 != m_Size.x)
-                Right = m_Voxels[(Pos.x + 1) + m_Size.x * Pos.y + m_Size.x * m_Size.y * Pos.z];
-
-            if(Pos.y + 1 != m_Size.y)
-                Forward = m_Voxels[Pos.x + m_Size.x * (Pos.y + 1) + m_Size.x * m_Size.y * Pos.z];
-
-            if(Pos.y != 0)
-                Backward = m_Voxels[Pos.x + m_Size.x * (Pos.y - 1) + m_Size.x * m_Size.y * Pos.z];
-        }
-
-        SetNormal(Tmp, Up, CVoxel::Direction::UP, CVoxel::Direction::DOWN, CVoxel::FACE_UP);
-        SetNormal(Tmp, Down, CVoxel::Direction::DOWN, CVoxel::Direction::UP, CVoxel::FACE_DOWN);
-
-        SetNormal(Tmp, Left, CVoxel::Direction::LEFT, CVoxel::Direction::RIGHT, CVoxel::FACE_LEFT);
-        SetNormal(Tmp, Right, CVoxel::Direction::RIGHT, CVoxel::Direction::LEFT, CVoxel::FACE_RIGHT);
-
-        SetNormal(Tmp, Forward, CVoxel::Direction::FORWARD, CVoxel::Direction::BACKWARD, CVoxel::FACE_FORWARD);
-        SetNormal(Tmp, Backward, CVoxel::Direction::BACKWARD, CVoxel::Direction::FORWARD, CVoxel::FACE_BACKWARD);
-
-        m_Voxels[Pos.x + m_Size.x * Pos.y + m_Size.x * m_Size.y * Pos.z] = Tmp;
         m_BlockCount++;
     }
 
-    void CVoxelMesh::RemoveVoxel(CVector Pos)
+    void CVoxelMesh::RemoveVoxel(const CVector &Pos)
     {
-        size_t ArrPos = (size_t)Pos.x + (size_t)m_Size.x * (size_t)Pos.y + (size_t)m_Size.x * (size_t)m_Size.y * (size_t)Pos.z;
-        if(ArrPos > m_Voxels.size() - 1)
-            return;
+        std::lock_guard<std::recursive_mutex> lock(m_Lock);
+        auto IT = m_Voxels.find(Pos);
+        if(IT != m_Voxels.end())
+        {
+            SetNormal(Pos, CVoxel::FACE_UP, false);
+            SetNormal(Pos, CVoxel::FACE_DOWN, false);
 
-        SetNormal(Pos, CVoxel::FACE_UP, false);
-        SetNormal(Pos, CVoxel::FACE_DOWN, false);
+            SetNormal(Pos, CVoxel::FACE_LEFT, false);
+            SetNormal(Pos, CVoxel::FACE_RIGHT, false);
 
-        SetNormal(Pos, CVoxel::FACE_LEFT, false);
-        SetNormal(Pos, CVoxel::FACE_RIGHT, false);
+            SetNormal(Pos, CVoxel::FACE_FORWARD, false);
+            SetNormal(Pos, CVoxel::FACE_BACKWARD, false);
 
-        SetNormal(Pos, CVoxel::FACE_FORWARD, false);
-        SetNormal(Pos, CVoxel::FACE_BACKWARD, false);
-
-        m_Voxels[ArrPos] = nullptr;
+            m_Voxels.erase(IT);
+        }
     }
     
     void CVoxelMesh::Clear()
     {
-        SetSize(m_Size);
+        std::lock_guard<std::recursive_mutex> lock(m_Lock);
+        m_Voxels.clear();
     }
 
-    Voxel CVoxelMesh::GetVoxel(CVector Pos)
+    Voxel CVoxelMesh::GetVoxel(const CVector &Pos)
     {
-        size_t ArrPos = (size_t)Pos.x + (size_t)m_Size.x * (size_t)Pos.y + (size_t)m_Size.x * (size_t)m_Size.y * (size_t)Pos.z;
-
-        if(ArrPos > m_Voxels.size() - 1)
+        std::lock_guard<std::recursive_mutex> lock(m_Lock);
+        auto IT = m_Voxels.find(Pos);
+        if(IT == m_Voxels.end())
             return nullptr;
 
-        return m_Voxels[ArrPos];
-    }
-    
-    //(Tmp, Up, CVoxel::Direction::UP, CVoxel::Direction::DOWN, CVoxel::FACE_UP);
-    // U
-    // X
-    //
-
-    void CVoxelMesh::SetNormal(Voxel Cur, Voxel Neighbor, CVoxel::Direction CurDir, CVoxel::Direction NeighborDir, CVector Val)
-    {
-        if(Neighbor && !Neighbor->Transparent && !Cur->Transparent)
-        {
-            Neighbor->Normals[NeighborDir] = CVoxel::FACE_ZERO;
-            Cur->Normals[CurDir] = CVoxel::FACE_ZERO;
-        }
-        else
-            Cur->Normals[CurDir] = Val;
+        return IT->second;
     }
 
-    void CVoxelMesh::SetNormal(CVector Pos, CVector Neighbor, bool IsInvisible)
+    void CVoxelMesh::SetNormal(const CVector &Pos, const CVector &Neighbor, bool IsInvisible)
     {
         static const std::map<size_t, std::pair<CVoxel::Direction, CVoxel::Direction>> NEIGHBOR_INDEX = {
             {CVoxel::FACE_UP.hash(), {CVoxel::Direction::UP, CVoxel::Direction::DOWN}},
