@@ -67,7 +67,7 @@ namespace VoxelOptimizer
             arrayMesh << "\t\"primitive\":4," << std::endl;
             arrayMesh << "\t\"arrays\":[" << std::endl;
 
-            std::map<size_t, int> Index;
+            std::map<CVector, int> Index;
             int TmpIndices[3];
             int VertexCounter = 0;
 
@@ -76,8 +76,7 @@ namespace VoxelOptimizer
 
             for (auto &&v : f->Indices)
             {
-                size_t Hash = v.hash();
-                auto IT = Index.find(Hash);
+                auto IT = Index.find(v);
                 if(IT != Index.end())
                     TmpIndices[VertexCounter] = IT->second;
                 else
@@ -92,7 +91,7 @@ namespace VoxelOptimizer
                     UVs.push_back(UV);
 
                     int Idx = Vertices.size() - 1;
-                    Index.insert({Hash, Idx});
+                    Index.insert({v, Idx});
                     TmpIndices[VertexCounter] = Idx;
                 }
 

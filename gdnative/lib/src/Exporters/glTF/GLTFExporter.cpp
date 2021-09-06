@@ -52,7 +52,7 @@ namespace VoxelOptimizer
         {
             std::vector<CVector> Vertices, Normals, UVs;
             std::vector<int> Indices;
-            std::map<size_t, int> IndicesIndex;
+            std::map<CVector, int> IndicesIndex;
 
             CVector Max, Min(10000, 10000, 10000);
 
@@ -71,9 +71,8 @@ namespace VoxelOptimizer
                     CVector vec = f->Indices[i + j];
 
                     int Index = 0;
-                    size_t Hash = vec.hash();
 
-                    auto IT = IndicesIndex.find(Hash);
+                    auto IT = IndicesIndex.find(vec);
                     if(IT == IndicesIndex.end())
                     {
                         Vertices.push_back(Mesh->Vertices[(size_t)vec.x - 1]);
@@ -84,7 +83,7 @@ namespace VoxelOptimizer
                         Max = Max.Max(Mesh->Vertices[(size_t)vec.x - 1]);
 
                         Index = Vertices.size() - 1;
-                        IndicesIndex.insert({Hash, Index});
+                        IndicesIndex.insert({vec, Index});
                     }
                     else
                         Index = IT->second;

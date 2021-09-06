@@ -86,7 +86,7 @@ namespace VoxelOptimizer
     {
         int Ret = 0;
         // auto End = Mesh->Vertices.data() + Mesh->Vertices.size();
-        auto IT = m_Index.find(Vertex.hash()); //std::find(Mesh->Vertices.data(), End, Vertex);
+        auto IT = m_Index.find(Vertex); //std::find(Mesh->Vertices.data(), End, Vertex);
 
         if(IT != m_Index.end())
             Ret = IT->second;
@@ -95,7 +95,7 @@ namespace VoxelOptimizer
             Mesh->Vertices.push_back(Vertex);
             Ret = Mesh->Vertices.size();
 
-            m_Index.insert({Vertex.hash(), Ret});
+            m_Index.insert({Vertex, Ret});
         }
 
         return Ret;
@@ -107,7 +107,7 @@ namespace VoxelOptimizer
         // Normal = CVector(Normal.x, Normal.z, Normal.y);
 
         // auto End = Mesh->Vertices.data() + Mesh->Vertices.size();
-        auto IT = m_NormalIndex.find(Normal.hash()); //std::find(Mesh->Vertices.data(), End, Vertex);
+        auto IT = m_NormalIndex.find(Normal); //std::find(Mesh->Vertices.data(), End, Vertex);
 
         if(IT != m_NormalIndex.end())
             Ret = IT->second;
@@ -116,7 +116,7 @@ namespace VoxelOptimizer
             Mesh->Normals.push_back(Normal);
             Ret = Mesh->Normals.size();
 
-            m_NormalIndex.insert({Normal.hash(), Ret});
+            m_NormalIndex.insert({Normal, Ret});
         }
 
         return Ret;
@@ -128,7 +128,7 @@ namespace VoxelOptimizer
         // Normal = CVector(Normal.x, Normal.z, Normal.y);
 
         // auto End = Mesh->Vertices.data() + Mesh->Vertices.size();
-        auto IT = m_UVIndex.find(UV.hash()); //std::find(Mesh->Vertices.data(), End, Vertex);
+        auto IT = m_UVIndex.find(UV); //std::find(Mesh->Vertices.data(), End, Vertex);
 
         if(IT != m_UVIndex.end())
             Ret = IT->second;
@@ -137,7 +137,7 @@ namespace VoxelOptimizer
             Mesh->UVs.push_back(UV);
             Ret = Mesh->UVs.size();
 
-            m_UVIndex.insert({UV.hash(), Ret});
+            m_UVIndex.insert({UV, Ret});
         }
 
         return Ret;

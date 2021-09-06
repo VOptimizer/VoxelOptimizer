@@ -105,15 +105,15 @@ namespace VoxelOptimizer
 
     void CVoxelMesh::SetNormal(const CVector &Pos, const CVector &Neighbor, bool IsInvisible)
     {
-        static const std::map<size_t, std::pair<CVoxel::Direction, CVoxel::Direction>> NEIGHBOR_INDEX = {
-            {CVoxel::FACE_UP.hash(), {CVoxel::Direction::UP, CVoxel::Direction::DOWN}},
-            {CVoxel::FACE_DOWN.hash(), {CVoxel::Direction::DOWN, CVoxel::Direction::UP}},
+        static const std::map<CVector, std::pair<CVoxel::Direction, CVoxel::Direction>> NEIGHBOR_INDEX = {
+            {CVoxel::FACE_UP, {CVoxel::Direction::UP, CVoxel::Direction::DOWN}},
+            {CVoxel::FACE_DOWN, {CVoxel::Direction::DOWN, CVoxel::Direction::UP}},
 
-            {CVoxel::FACE_LEFT.hash(), {CVoxel::Direction::LEFT, CVoxel::Direction::RIGHT}},
-            {CVoxel::FACE_RIGHT.hash(), {CVoxel::Direction::RIGHT, CVoxel::Direction::LEFT}},
+            {CVoxel::FACE_LEFT, {CVoxel::Direction::LEFT, CVoxel::Direction::RIGHT}},
+            {CVoxel::FACE_RIGHT, {CVoxel::Direction::RIGHT, CVoxel::Direction::LEFT}},
 
-            {CVoxel::FACE_FORWARD.hash(), {CVoxel::Direction::FORWARD, CVoxel::Direction::BACKWARD}},
-            {CVoxel::FACE_BACKWARD.hash(), {CVoxel::Direction::BACKWARD, CVoxel::Direction::FORWARD}},
+            {CVoxel::FACE_FORWARD, {CVoxel::Direction::FORWARD, CVoxel::Direction::BACKWARD}},
+            {CVoxel::FACE_BACKWARD, {CVoxel::Direction::BACKWARD, CVoxel::Direction::FORWARD}},
         };
 
         Voxel cur = GetVoxel(Pos);
@@ -121,7 +121,7 @@ namespace VoxelOptimizer
             return;
 
         Voxel neighbor = GetVoxel(Pos + Neighbor);
-        auto directions = NEIGHBOR_INDEX.at(Neighbor.hash());
+        auto directions = NEIGHBOR_INDEX.at(Neighbor);
         if(neighbor && !neighbor->Transparent && !cur->Transparent)
         {
             neighbor->Normals[directions.second] = IsInvisible ? CVoxel::FACE_ZERO : (Neighbor * -1.f);

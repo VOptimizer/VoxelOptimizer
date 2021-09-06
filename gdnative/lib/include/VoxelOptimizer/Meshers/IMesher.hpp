@@ -57,9 +57,9 @@ namespace VoxelOptimizer
             int AddNormal(Mesh Mesh, CVector Normal);
             int AddUV(Mesh Mesh, CVector UV);
 
-            std::map<size_t, int> m_Index;
-            std::map<size_t, int> m_NormalIndex;
-            std::map<size_t, int> m_UVIndex;
+            std::map<CVector, int> m_Index;
+            std::map<CVector, int> m_NormalIndex;
+            std::map<CVector, int> m_UVIndex;
             std::map<int, GroupedFaces> m_FacesIndex;
 
             Loader m_Loader;

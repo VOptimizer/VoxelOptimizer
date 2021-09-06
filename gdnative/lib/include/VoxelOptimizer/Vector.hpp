@@ -50,6 +50,21 @@ namespace VoxelOptimizer
             CVector() : x(0), y(0), z(0) {}
             CVector(float x, float y, float z) : x(x), y(y), z(z) {}
             CVector(const CVector &v) : x(v.x), y(v.y), z(v.z) {}
+            
+            inline CVector Round()
+            {
+                return CVector(roundf(x), roundf(y), roundf(z));
+            }
+
+            inline CVector Floor()
+            {
+                return CVector(floorf(x), floorf(y), floorf(z));
+            }
+
+            inline CVector Sign()
+            {
+                return CVector(Sign(x), Sign(y), Sign(z));
+            }
 
             inline bool IsZero() const
             {
@@ -136,6 +151,10 @@ namespace VoxelOptimizer
                 return *this;
             }
 
+            inline CVector operator/(const CVector &vr) const
+            {
+                return CVector(x / vr.x, y / vr.y, z / vr.z);
+            }
 
             inline CVector operator/(float scalar) const
             {
@@ -197,6 +216,12 @@ namespace VoxelOptimizer
             }
 
             ~CVector() = default;
+
+        private:
+            inline float Sign(float v)
+            {
+                return v == 0 ? 0 : v < 0 ? -1 : 1;
+            }
     };
 
     inline std::ostream &operator<<(std::ostream &of, const CVector &vec)

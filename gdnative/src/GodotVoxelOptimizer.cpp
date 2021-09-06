@@ -187,7 +187,7 @@ Ref<ArrayMesh> CGodotVoxelOptimizer::GetMesh(bool Optimized)
     Array arr;
     arr.resize(ArrayMesh::ARRAY_MAX);
 
-    std::map<size_t, int> Index;
+    std::map<VoxelOptimizer::CVector, int> Index;
 
     PoolVector3Array Vertices, Normals;
     PoolVector2Array UVs;    
@@ -218,8 +218,7 @@ Ref<ArrayMesh> CGodotVoxelOptimizer::GetMesh(bool Optimized)
     {
         for (auto &&v : f->Indices)
         {
-            size_t Hash = v.hash();
-            auto IT = Index.find(Hash);
+            auto IT = Index.find(v);
             if(IT != Index.end())
                 TmpIndices[VertexCounter] = IT->second;
                 // Indices.append(IT->second);
@@ -235,7 +234,7 @@ Ref<ArrayMesh> CGodotVoxelOptimizer::GetMesh(bool Optimized)
                 UVs.append(Vector2(UV.x, UV.y));
 
                 int Idx = Vertices.size() - 1;
-                Index.insert({Hash, Idx});
+                Index.insert({v, Idx});
                 TmpIndices[VertexCounter] = Idx;
             }
 
