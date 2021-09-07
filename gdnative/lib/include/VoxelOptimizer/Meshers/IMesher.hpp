@@ -41,11 +41,11 @@ namespace VoxelOptimizer
             IMesher() = default;
 
             /**
-             * @brief Generates a mesh from given voxel model data.
+             * @brief Generates list of meshed chunks.
              * 
              * @param m: Voxel mesh to meshify.
              */
-            virtual Mesh GenerateMesh(VoxelMesh m, Loader Loader) = 0;
+            virtual std::map<CVector, Mesh> GenerateMeshes(VoxelMesh m, Loader Loader) = 0;
 
             virtual ~IMesher() = default;
         protected:

@@ -34,6 +34,7 @@ namespace VoxelOptimizer
     const CVector CVoxel::FACE_FORWARD = CVector(0, 1, 0);
     const CVector CVoxel::FACE_BACKWARD = CVector(0, -1, 0);
     const CVector CVoxel::FACE_ZERO = CVector(0, 0, 0);
+    const CVector CVoxelMesh::CHUNK_SIZE = CVector(16, 16, 16);
 
     CVoxel::CVoxel()
     {
@@ -66,6 +67,8 @@ namespace VoxelOptimizer
         SetNormal(Pos, CVoxel::FACE_BACKWARD);
 
         m_BlockCount++;
+
+        MarkChunk(Pos);
     }
 
     void CVoxelMesh::RemoveVoxel(const CVector &Pos)
@@ -84,6 +87,7 @@ namespace VoxelOptimizer
             SetNormal(Pos, CVoxel::FACE_BACKWARD, false);
 
             m_Voxels.erase(IT);
+            MarkChunk(Pos);
         }
     }
     
@@ -91,6 +95,14 @@ namespace VoxelOptimizer
     {
         std::lock_guard<std::recursive_mutex> lock(m_Lock);
         m_Voxels.clear();
+
+        if(m_RemeshAll)
+            InsertMarkedChunk(m_BBox);
+        else
+        {
+            for (auto &&c : m_Chunks)
+                InsertMarkedChunk(c.second);
+        }
     }
 
     Voxel CVoxelMesh::GetVoxel(const CVector &Pos)
@@ -129,5 +141,32 @@ namespace VoxelOptimizer
         }
         else
             cur->Normals[directions.first] = Neighbor;
+    }
+
+    void CVoxelMesh::MarkChunk(const CVector &Pos)
+    {
+        auto ChunkPos = (Pos / CHUNK_SIZE).Floor() * CHUNK_SIZE;
+        CBBox BBox;
+
+        auto IT = m_Chunks.find(ChunkPos);
+        if(IT != m_Chunks.end())
+            BBox = IT->second;
+        else
+        {
+            BBox = CBBox(ChunkPos, ChunkPos + CHUNK_SIZE);
+            m_Chunks[ChunkPos] = BBox;
+        }
+
+        if(m_RemeshAll)
+            BBox = m_BBox;
+
+        InsertMarkedChunk(BBox);
+    }
+
+    void CVoxelMesh::InsertMarkedChunk(const CBBox &BBox)
+    {
+        auto IT = m_ChunksToRemesh.find(BBox.Beg);
+        if(IT == m_ChunksToRemesh.end())
+            m_ChunksToRemesh[BBox.Beg] = BBox;
     }
 } // namespace VoxelOptimizer

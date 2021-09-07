@@ -34,6 +34,7 @@ namespace VoxelOptimizer
 {
     struct SGroupedFaces
     {
+        int MaterialIndex;             
         Material FaceMaterial;              //!< Material which are applied to this faces.
         std::vector<CVector> Indices;   //!< Indices of the faces. 3 indices are alway 1 triangle. One index is a tripple of x = vertex, y = normal, z = uv.
     };

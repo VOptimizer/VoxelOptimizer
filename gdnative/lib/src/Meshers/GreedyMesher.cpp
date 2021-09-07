@@ -27,135 +27,145 @@
 
 namespace VoxelOptimizer
 {
-    Mesh CGreedyMesher::GenerateMesh(VoxelMesh m, Loader Loader)
+    std::map<CVector, Mesh> CGreedyMesher::GenerateMeshes(VoxelMesh m, Loader Loader)
     {
-        Mesh Ret = Mesh(new SMesh());
-        Ret->Texture = Loader->GetColorPalette();
+        std::map<CVector, Mesh> Ret;
+
         m_Loader = Loader;
 
         auto BBox = m->GetBBox();
+        auto Chunks = m->GetChunksToRemesh();
+
         CVector Beg = BBox.Beg;
         std::swap(Beg.y, Beg.z);
 
-        // auto Size = BBox.GetSize();
         CVector BoxCenter = BBox.GetSize() / 2;
         std::swap(BoxCenter.y, BoxCenter.z);
 
         CSlicer Slicer(m);
 
-        // For all 3 axis (x, y, z)
-        for (size_t Axis = 0; Axis < 3; Axis++)
+        for (auto &&c : Chunks)
         {
-            Slicer.SetActiveAxis(Axis);
+            Mesh RetMesh = Mesh(new SMesh());
+            RetMesh->Texture = Loader->GetColorPalette();
+            BBox = c;
 
-            int Axis1 = (Axis + 1) % 3; // 1 = 1 = y, 2 = 2 = z, 3 = 0 = x
-            int Axis2 = (Axis + 2) % 3; // 2 = 2 = z, 3 = 0 = x, 4 = 1 = y
-            int x[3] = {0};
-
-            // Iterate over each slice of the 3d model.
-            for (x[Axis] = BBox.Beg.v[Axis] -1; x[Axis] < BBox.End.v[Axis];)
+            // For all 3 axis (x, y, z)
+            for (size_t Axis = 0; Axis < 3; Axis++)
             {
-                ++x[Axis];
+                Slicer.SetActiveAxis(Axis);
 
-                // Foreach slice go over a 2d plane. 
-                for (int HeightAxis = BBox.Beg.v[Axis2]; HeightAxis < BBox.End.v[Axis2]; ++HeightAxis)
+                int Axis1 = (Axis + 1) % 3; // 1 = 1 = y, 2 = 2 = z, 3 = 0 = x
+                int Axis2 = (Axis + 2) % 3; // 2 = 2 = z, 3 = 0 = x, 4 = 1 = y
+                int x[3] = {0};
+
+                // Iterate over each slice of the 3d model.
+                for (x[Axis] = BBox.Beg.v[Axis] -1; x[Axis] < BBox.End.v[Axis];)
                 {
-                    for (int WidthAxis = BBox.Beg.v[Axis1]; WidthAxis < BBox.End.v[Axis1];)
+                    ++x[Axis];
+
+                    // Foreach slice go over a 2d plane. 
+                    for (int HeightAxis = BBox.Beg.v[Axis2]; HeightAxis < BBox.End.v[Axis2]; ++HeightAxis)
                     {
-                        CVector Pos;
-                        Pos.v[Axis] = x[Axis] - 1;
-                        Pos.v[Axis1] = WidthAxis;
-                        Pos.v[Axis2] = HeightAxis;
-
-                        if(Slicer.IsFace(Pos))
+                        for (int WidthAxis = BBox.Beg.v[Axis1]; WidthAxis < BBox.End.v[Axis1];)
                         {
-                            int w, h;
-                            CVector Normal = Slicer.Normal();
-                            int Material = Slicer.Material();
-                            int Color = Slicer.Color();
+                            CVector Pos;
+                            Pos.v[Axis] = x[Axis] - 1;
+                            Pos.v[Axis1] = WidthAxis;
+                            Pos.v[Axis2] = HeightAxis;
 
-                            //Claculates the width of the rect.
-                            for (w = 1; WidthAxis + w < BBox.End.v[Axis1]; w++) 
+                            if(Slicer.IsFace(Pos))
                             {
-                                CVector WPos;
-                                WPos.v[Axis1] = w;
+                                int w, h;
+                                CVector Normal = Slicer.Normal();
+                                int Material = Slicer.Material();
+                                int Color = Slicer.Color();
 
-                                bool IsFace = Slicer.IsFace(Pos + WPos);
-                                if(IsFace)
+                                //Claculates the width of the rect.
+                                for (w = 1; WidthAxis + w < BBox.End.v[Axis1]; w++) 
                                 {
-                                    CVector FaceNormal = Slicer.Normal();
-                                    IsFace = Normal == FaceNormal && Material == Slicer.Material() && Color == Slicer.Color();
-                                }
+                                    CVector WPos;
+                                    WPos.v[Axis1] = w;
 
-                                if(!IsFace)
-                                    break;
-                            }
-
-                            bool done = false;
-                            for (h = 1; HeightAxis + h < BBox.End.v[Axis2]; h++)
-                            {
-                                // Check each block next to this quad
-                                for (int k = 0; k < w; ++k)
-                                {
-                                    CVector QuadPos = Pos;
-                                    QuadPos.v[Axis1] += k;
-                                    QuadPos.v[Axis2] += h;
-
-                                    bool IsFace = Slicer.IsFace(QuadPos);
+                                    bool IsFace = Slicer.IsFace(Pos + WPos);
                                     if(IsFace)
                                     {
                                         CVector FaceNormal = Slicer.Normal();
                                         IsFace = Normal == FaceNormal && Material == Slicer.Material() && Color == Slicer.Color();
                                     }
 
-                                    // If there's a hole in the mask, exit
-                                    if (!IsFace)
-                                    {
-                                        done = true;
+                                    if(!IsFace)
                                         break;
-                                    }
                                 }
 
-                                if (done)
-                                    break;
+                                bool done = false;
+                                for (h = 1; HeightAxis + h < BBox.End.v[Axis2]; h++)
+                                {
+                                    // Check each block next to this quad
+                                    for (int k = 0; k < w; ++k)
+                                    {
+                                        CVector QuadPos = Pos;
+                                        QuadPos.v[Axis1] += k;
+                                        QuadPos.v[Axis2] += h;
+
+                                        bool IsFace = Slicer.IsFace(QuadPos);
+                                        if(IsFace)
+                                        {
+                                            CVector FaceNormal = Slicer.Normal();
+                                            IsFace = Normal == FaceNormal && Material == Slicer.Material() && Color == Slicer.Color();
+                                        }
+
+                                        // If there's a hole in the mask, exit
+                                        if (!IsFace)
+                                        {
+                                            done = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if (done)
+                                        break;
+                                }
+
+                                x[Axis1] = WidthAxis;
+                                x[Axis2] = HeightAxis;
+
+                                int du[3] = {0};
+                                du[Axis1] = w;
+
+                                int dv[3] = {0};
+                                dv[Axis2] = h;
+
+                                int I1, I2, I3, I4;                            
+
+                                CVector v1 = CVector(x[0], x[2], x[1]) - Beg - BoxCenter;
+                                CVector v2 = CVector(x[0] + du[0], x[2] + du[2], x[1] + du[1]) - Beg - BoxCenter;
+                                CVector v3 = CVector(x[0] + du[0] + dv[0], x[2] + du[2] + dv[2], x[1] + du[1] + dv[1]) - Beg - BoxCenter;
+                                CVector v4 = CVector(x[0] + dv[0], x[2] + dv[2], x[1] + dv[1]) - Beg - BoxCenter;
+
+                                std::swap(Normal.y, Normal.z);
+                                AddFace(RetMesh, v1, v2, v3, v4, Normal, Color, Material);
+
+                                Slicer.AddProcessedQuad(CVector(x[0], x[1], x[2]), CVector(du[0] + dv[0], du[1] + dv[1], du[2] + dv[2]));
+
+                                // Increment counters and continue
+                                WidthAxis += w;
                             }
-
-                            x[Axis1] = WidthAxis;
-                            x[Axis2] = HeightAxis;
-
-                            int du[3] = {0};
-                            du[Axis1] = w;
-
-                            int dv[3] = {0};
-                            dv[Axis2] = h;
-
-                            int I1, I2, I3, I4;                            
-
-                            CVector v1 = CVector(x[0], x[2], x[1]) - Beg - BoxCenter;
-                            CVector v2 = CVector(x[0] + du[0], x[2] + du[2], x[1] + du[1]) - Beg - BoxCenter;
-                            CVector v3 = CVector(x[0] + du[0] + dv[0], x[2] + du[2] + dv[2], x[1] + du[1] + dv[1]) - Beg - BoxCenter;
-                            CVector v4 = CVector(x[0] + dv[0], x[2] + dv[2], x[1] + dv[1]) - Beg - BoxCenter;
-
-                            std::swap(Normal.y, Normal.z);
-                            AddFace(Ret, v1, v2, v3, v4, Normal, Color, Material);
-
-                            Slicer.AddProcessedQuad(CVector(x[0], x[1], x[2]), CVector(du[0] + dv[0], du[1] + dv[1], du[2] + dv[2]));
-
-                            // Increment counters and continue
-                            WidthAxis += w;
+                            else
+                                WidthAxis++;
                         }
-                        else
-                            WidthAxis++;
                     }
+
+                    Slicer.ClearQuads();
                 }
 
-                Slicer.ClearQuads();
+                // break;
             }
 
-            // break;
+            ClearCache();
+            Ret[c.Beg] = RetMesh;
         }
-
-        ClearCache();
+        
         return Ret;
     }
 } // namespace VoxelOptimizer

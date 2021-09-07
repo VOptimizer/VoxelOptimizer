@@ -30,6 +30,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <vector>
 #include <VoxelOptimizer/Vector.hpp>
 
 namespace VoxelOptimizer
@@ -88,7 +89,7 @@ namespace VoxelOptimizer
     class CVoxelMesh
     {
         public:
-            CVoxelMesh() : m_BlockCount(0) { }
+            CVoxelMesh() : m_RemeshAll(false), m_BlockCount(0) { }
 
             /**
              * @brief Sets the size of the voxel space.
@@ -140,6 +141,23 @@ namespace VoxelOptimizer
                 return m_Voxels;
             }
 
+            inline std::vector<CBBox> GetChunksToRemesh()
+            {
+                std::lock_guard<std::recursive_mutex> lock(m_Lock);
+                std::vector<CBBox> Ret(m_ChunksToRemesh.size(), CBBox());
+                size_t Pos = 0;
+
+                for (auto &&c : m_ChunksToRemesh)
+                {
+                    Ret[Pos] = c.second;
+                    Pos++;
+                }
+
+                m_ChunksToRemesh.clear();
+
+                return Ret;
+            }
+
             /**
              * @brief Sets a voxel with an given material index.
              * 
@@ -174,14 +192,30 @@ namespace VoxelOptimizer
             {
                 return m_BlockCount;
             }
+
+            /**
+             * @brief If true, the mesh will be always completely remeshed, regardless of the chunks.
+             */
+            inline void RemeshAlways(bool val)
+            {
+                m_RemeshAll = val;
+            }
             
             ~CVoxelMesh() = default;
-        private:       
+        private:   
+            const static CVector CHUNK_SIZE;
+
             void SetNormal(const CVector &Pos, const CVector &Neighbor, bool IsInvisible = true);
+            void MarkChunk(const CVector &Pos);
+            void InsertMarkedChunk(const CBBox &BBox);
 
             CVector m_Size;
             CBBox m_BBox;
             std::map<CVector, Voxel> m_Voxels;
+            std::map<CVector, CBBox> m_Chunks;
+            std::map<CVector, CBBox> m_ChunksToRemesh;
+
+            bool m_RemeshAll;
             size_t m_BlockCount;
             mutable std::recursive_mutex m_Lock;
     };

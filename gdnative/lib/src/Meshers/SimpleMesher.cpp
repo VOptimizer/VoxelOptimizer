@@ -27,13 +27,13 @@
 
 namespace VoxelOptimizer
 {
-    Mesh CSimpleMesher::GenerateMesh(VoxelMesh m, Loader Loader)
+    std::map<CVector, Mesh> CSimpleMesher::GenerateMeshes(VoxelMesh m, Loader Loader)
     {
-        Mesh Ret = Mesh(new SMesh());
-        Ret->Texture = Loader->GetColorPalette();
+        std::map<CVector, Mesh> Ret;
+
         m_Loader = Loader;
 
-        auto Voxels = m->GetVoxels();
+        auto Chunks = m->GetChunksToRemesh();
         auto BBox = m->GetBBox();
         CVector Beg = BBox.Beg;
         std::swap(Beg.y, Beg.z);
@@ -41,63 +41,78 @@ namespace VoxelOptimizer
         CVector BoxCenter = BBox.GetSize() / 2;
         std::swap(BoxCenter.y, BoxCenter.z);
 
-        for (auto &&pair : Voxels)
+        for (auto &&c : Chunks)
         {          
-            Voxel v = pair.second;
+            Mesh M = Mesh(new SMesh());
+            M->Texture = Loader->GetColorPalette();
 
-            if(v && v->IsVisible())
+            for(float x = c.Beg.x; x < c.End.x; x++)
             {
-                for (char i = 0; i < v->Normals.size(); i++)
+                for(float y = c.Beg.y; y < c.End.y; y++)
                 {
-                    // Invisible
-                    if(v->Normals[i] == CVector(0, 0, 0))
-                        continue;
-
-                    CVector v1, v2, v3, v4, Normal = v->Normals[i];
-                    std::swap(Normal.y, Normal.z);
-                    
-                    switch (i)
+                    for(float z = c.Beg.z; z < c.End.z; z++)
                     {
-                        case CVoxel::Direction::UP:
-                        case CVoxel::Direction::DOWN:
+
+                        Voxel v = m->GetVoxel(CVector(x, y, z));
+
+                        if(v && v->IsVisible())
                         {
-                            float PosZ = v->Normals[i].z < 0 ? 0 : v->Normals[i].z;
+                            for (char i = 0; i < v->Normals.size(); i++)
+                            {
+                                // Invisible
+                                if(v->Normals[i] == CVector(0, 0, 0))
+                                    continue;
 
-                            v1 = CVector(v->Pos.x, v->Pos.z + PosZ, v->Pos.y + 1.f) - BoxCenter;
-                            v2 = CVector(v->Pos.x, v->Pos.z + PosZ, v->Pos.y) - BoxCenter;
-                            v3 = CVector(v->Pos.x + 1.f, v->Pos.z + PosZ, v->Pos.y) - BoxCenter;
-                            v4 = CVector(v->Pos.x + 1.f, v->Pos.z + PosZ, v->Pos.y + 1.f) - BoxCenter;
-                        }break;
+                                CVector v1, v2, v3, v4, Normal = v->Normals[i];
+                                std::swap(Normal.y, Normal.z);
+                                
+                                switch (i)
+                                {
+                                    case CVoxel::Direction::UP:
+                                    case CVoxel::Direction::DOWN:
+                                    {
+                                        float PosZ = v->Normals[i].z < 0 ? 0 : v->Normals[i].z;
 
-                        case CVoxel::Direction::LEFT:
-                        case CVoxel::Direction::RIGHT:
-                        {
-                            float Posx = v->Normals[i].x < 0 ? 0 : v->Normals[i].x;
+                                        v1 = CVector(v->Pos.x, v->Pos.z + PosZ, v->Pos.y + 1.f) - BoxCenter;
+                                        v2 = CVector(v->Pos.x, v->Pos.z + PosZ, v->Pos.y) - BoxCenter;
+                                        v3 = CVector(v->Pos.x + 1.f, v->Pos.z + PosZ, v->Pos.y) - BoxCenter;
+                                        v4 = CVector(v->Pos.x + 1.f, v->Pos.z + PosZ, v->Pos.y + 1.f) - BoxCenter;
+                                    }break;
 
-                            v1 = CVector(v->Pos.x + Posx, v->Pos.z, v->Pos.y) - BoxCenter;
-                            v2 = CVector(v->Pos.x + Posx, v->Pos.z, v->Pos.y + 1.f) - BoxCenter;
-                            v3 = CVector(v->Pos.x + Posx, v->Pos.z + 1.f, v->Pos.y + 1.f) - BoxCenter;
-                            v4 = CVector(v->Pos.x + Posx, v->Pos.z + 1.f, v->Pos.y) - BoxCenter;
-                        }break;
+                                    case CVoxel::Direction::LEFT:
+                                    case CVoxel::Direction::RIGHT:
+                                    {
+                                        float Posx = v->Normals[i].x < 0 ? 0 : v->Normals[i].x;
 
-                        case CVoxel::Direction::FORWARD:
-                        case CVoxel::Direction::BACKWARD:
-                        {
-                            float PosY = v->Normals[i].y < 0 ? 0 : v->Normals[i].y;
+                                        v1 = CVector(v->Pos.x + Posx, v->Pos.z, v->Pos.y) - BoxCenter;
+                                        v2 = CVector(v->Pos.x + Posx, v->Pos.z, v->Pos.y + 1.f) - BoxCenter;
+                                        v3 = CVector(v->Pos.x + Posx, v->Pos.z + 1.f, v->Pos.y + 1.f) - BoxCenter;
+                                        v4 = CVector(v->Pos.x + Posx, v->Pos.z + 1.f, v->Pos.y) - BoxCenter;
+                                    }break;
 
-                            v1 = CVector(v->Pos.x, v->Pos.z + 1.f, v->Pos.y + PosY) - BoxCenter;
-                            v2 = CVector(v->Pos.x, v->Pos.z, v->Pos.y + PosY) - BoxCenter;
-                            v3 = CVector(v->Pos.x + 1.f, v->Pos.z, v->Pos.y + PosY) - BoxCenter;
-                            v4 = CVector(v->Pos.x + 1.f, v->Pos.z + 1.f, v->Pos.y + PosY) - BoxCenter;
-                        }break;
+                                    case CVoxel::Direction::FORWARD:
+                                    case CVoxel::Direction::BACKWARD:
+                                    {
+                                        float PosY = v->Normals[i].y < 0 ? 0 : v->Normals[i].y;
+
+                                        v1 = CVector(v->Pos.x, v->Pos.z + 1.f, v->Pos.y + PosY) - BoxCenter;
+                                        v2 = CVector(v->Pos.x, v->Pos.z, v->Pos.y + PosY) - BoxCenter;
+                                        v3 = CVector(v->Pos.x + 1.f, v->Pos.z, v->Pos.y + PosY) - BoxCenter;
+                                        v4 = CVector(v->Pos.x + 1.f, v->Pos.z + 1.f, v->Pos.y + PosY) - BoxCenter;
+                                    }break;
+                                }
+
+                                AddFace(M, v1 - Beg, v2 - Beg, v3 - Beg, v4 - Beg, Normal, v->Color, v->Material);
+                            }
+                        }
                     }
-
-                    AddFace(Ret, v1 - Beg, v2 - Beg, v3 - Beg, v4 - Beg, Normal, v->Color, v->Material);
                 }
             }
+
+            Ret[c.Beg] = M;
+            ClearCache();
         }
 
-        ClearCache();
         return Ret;
     }
 } // namespace VoxelOptimizer
