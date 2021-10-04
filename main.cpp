@@ -27,11 +27,12 @@ int main(int argc, char const *argv[])
 
     auto VoxelMesh = loader->GetModels().back();//loader.GetModels().back();
     cout << VoxelMesh->GetBlockCount() << endl;
+    VoxelMesh->RemeshAlways(true);
 
-    start = chrono::system_clock::now();
-    DummyMesher(VoxelMesh, loader);
-    end = chrono::system_clock::now();
-    auto DummyTime = end - start;
+    // start = chrono::system_clock::now();
+    // DummyMesher(VoxelMesh, loader);
+    // end = chrono::system_clock::now();
+    // auto DummyTime = end - start;
 
     // auto v = VoxelMesh->GetVoxels();
 
@@ -59,14 +60,15 @@ int main(int argc, char const *argv[])
     // }
 
     start = chrono::system_clock::now();
-    auto Mesh = Mesher.GenerateMesh(VoxelMesh, loader);
+    auto Meshes = Mesher.GenerateMeshes(VoxelMesh, loader);
+    auto Mesh = Meshes.begin()->second; 
     end = chrono::system_clock::now();
     auto RealTime = end - start;
 
     
 
     cout << "Load: " << std::chrono::duration_cast<std::chrono::milliseconds>(LoadTime).count() << endl;
-    cout << "Dummy: " << std::chrono::duration_cast<std::chrono::milliseconds>(DummyTime).count() << endl;
+    // cout << "Dummy: " << std::chrono::duration_cast<std::chrono::milliseconds>(DummyTime).count() << endl;
     cout << "Real: " << std::chrono::duration_cast<std::chrono::milliseconds>(RealTime).count() << endl;
 
     // Mesh = VoxelOptimizer::Mesh(new VoxelOptimizer::SMesh());
