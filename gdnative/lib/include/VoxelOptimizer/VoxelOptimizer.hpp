@@ -33,6 +33,7 @@
 #include <VoxelOptimizer/Vector.hpp>
 
 #include <VoxelOptimizer/Exporters/IExporter.hpp>
+#include <VoxelOptimizer/Exporters/FBXExporter.hpp>
 #include <VoxelOptimizer/Exporters/SpriteStackingExporter.hpp>
 #include <VoxelOptimizer/Exporters/WavefrontObjExporter.hpp>
 #include <VoxelOptimizer/Exporters/GLTFExporter.hpp>

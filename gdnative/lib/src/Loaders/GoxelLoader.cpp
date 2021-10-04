@@ -45,14 +45,14 @@ namespace VoxelOptimizer
 
         ReadFile();
         
-        VoxelMesh m = VoxelMesh(new CVoxelMesh());
-        m->SetSize(m_BBox.End + m_BBox.Beg.Abs());
-
         std::map<int, int> ColorIdx;
         CVector Beg, End;
         
         for (auto &&l : m_Layers)
         {
+            VoxelMesh m = VoxelMesh(new CVoxelMesh());
+            m->SetSize(m_BBox.End + m_BBox.Beg.Abs());
+
             for (auto &&b : l.Blocks)
             {
                 CVector v = b.Pos;
@@ -96,10 +96,9 @@ namespace VoxelOptimizer
                 }
             }
             
+            m->SetBBox(CBBox(Beg, End));
+            m_Models.push_back(m);
         }
-
-        m->SetBBox(CBBox(Beg, End));
-        m_Models.push_back(m);
 
         m_BBox = CBBox();
         m_BL16s.clear();

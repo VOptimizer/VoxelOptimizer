@@ -47,6 +47,8 @@ namespace VoxelOptimizer
 
             CColor() : R(255), G(255), B(255), A(255) {}
 
+            CColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a) : R(r), G(g), B(b), A(a) {}
+
             inline uint32_t AsRGBA() const
             {
                 return (uint32_t)R | (uint32_t)(G << 8) | (uint32_t)(B << 16) | (uint32_t)(A << 24);

@@ -128,6 +128,18 @@ namespace VoxelOptimizer
             {
                 m_BBox = BBox;
             }
+
+            inline void RecalcBBox()
+            {
+                std::lock_guard<std::recursive_mutex> lock(m_Lock);
+                m_BBox = CBBox(CVector(INFINITY, INFINITY, INFINITY), CVector(0, 0, 0));
+
+                for (auto &&v : m_Voxels)
+                {
+                    m_BBox.Beg = m_BBox.Beg.Min(v.first);
+                    m_BBox.End = m_BBox.End.Max(v.first + CVector(1, 1, 1));
+                }
+            }
             
             /**
              * List of voxels. The size of the list is always the size of the voxel space.
@@ -143,6 +155,9 @@ namespace VoxelOptimizer
 
             inline std::vector<CBBox> GetChunksToRemesh()
             {
+                if(m_RemeshAll)
+                    return {m_BBox};
+
                 std::lock_guard<std::recursive_mutex> lock(m_Lock);
                 std::vector<CBBox> Ret(m_ChunksToRemesh.size(), CBBox());
                 size_t Pos = 0;

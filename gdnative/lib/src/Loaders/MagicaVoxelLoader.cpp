@@ -85,12 +85,13 @@ namespace VoxelOptimizer
                 {
                     Tmp = ReadData<SChunkHeader>();
 
-                    if(strncmp(Tmp.ID, "PACK", sizeof(Tmp.ID)) == 0)
+                    /*if(strncmp(Tmp.ID, "PACK", sizeof(Tmp.ID)) == 0)
                     {
                         // Make room for all models inside the file.
                         m_Models.resize(ReadData<int>());
                     }
-                    else if(strncmp(Tmp.ID, "SIZE", sizeof(Tmp.ID)) == 0)
+                    else */
+                    if(strncmp(Tmp.ID, "SIZE", sizeof(Tmp.ID)) == 0)
                     {
                         VoxelMesh m = ProcessSize();
                         Tmp = ReadData<SChunkHeader>();
@@ -99,13 +100,13 @@ namespace VoxelOptimizer
 
                         ProcessXYZI(m);
 
-                        if(m_Models.empty())
-                            m_Models.push_back(m);
-                        else
+                        //if(m_Models.empty())
+                        m_Models.push_back(m);
+                        /*else
                         {
                             m_Models[m_Index] = m;
                             m_Index++;
-                        }
+                        }*/
                     }
                     else if(strncmp(Tmp.ID, "RGBA", sizeof(Tmp.ID)) == 0)
                     {
