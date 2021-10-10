@@ -25,6 +25,8 @@
 #include <string.h>
 #include <VoxelOptimizer/Loaders/MagicaVoxelLoader.hpp>
 #include <VoxelOptimizer/Exceptions.hpp>
+#include <stack>
+#include <sstream>
 
 namespace VoxelOptimizer
 {
@@ -73,7 +75,7 @@ namespace VoxelOptimizer
             throw CVoxelLoaderException("Version: " + std::to_string(Version) + " is not supported");
 
         // First processes the materials that are at the end of the file. 
-        ProcessMaterial();
+        ProcessMaterialAndSceneGraph();
         Skip(8);
 
         if(!IsEof())
@@ -85,12 +87,6 @@ namespace VoxelOptimizer
                 {
                     Tmp = ReadData<SChunkHeader>();
 
-                    /*if(strncmp(Tmp.ID, "PACK", sizeof(Tmp.ID)) == 0)
-                    {
-                        // Make room for all models inside the file.
-                        m_Models.resize(ReadData<int>());
-                    }
-                    else */
                     if(strncmp(Tmp.ID, "SIZE", sizeof(Tmp.ID)) == 0)
                     {
                         VoxelMesh m = ProcessSize();
@@ -100,13 +96,24 @@ namespace VoxelOptimizer
 
                         ProcessXYZI(m);
 
-                        //if(m_Models.empty())
                         m_Models.push_back(m);
-                        /*else
-                        {
-                            m_Models[m_Index] = m;
-                            m_Index++;
-                        }*/
+                        auto halfSize = (m->GetSize() / 2.0);
+
+                        // 1. Translation is always relative to the center of the voxel space size. (Without fraction)
+                        // 2. All meshers centers the mehs in object space so we need to add the fractal part to the translation
+                        // 3. Add the distance from object center to space center and add the start position of the voxel mesh
+
+                        CVector spaceCenter = halfSize.Fract() + m->GetBBox().Beg + (m->GetBBox().GetSize() / 2 - halfSize);
+
+                        auto modelMatrix = m_ModelMatrices.at(m_Models.size() - 1);
+
+                        // TODO: This is dumb! The model matrix should be created on a central point!
+                        modelMatrix += CMat4x4(CVector4(0, 0, 0, spaceCenter.x),
+                                               CVector4(0, 0, 0, spaceCenter.z),
+                                               CVector4(0, 0, 0, -spaceCenter.y),
+                                               CVector4(0, 0, 0, 0));
+
+                        m->SetModelMatrix(modelMatrix);
                     }
                     else if(strncmp(Tmp.ID, "RGBA", sizeof(Tmp.ID)) == 0)
                     {
@@ -166,14 +173,6 @@ namespace VoxelOptimizer
             Beg = Beg.Min(vec);
             End = End.Max(vec);
 
-            // Beg.x = std::min(Beg.x, vec.x);
-            // Beg.y = std::min(Beg.y, vec.y);
-            // Beg.z = std::min(Beg.z, vec.z);
-
-            // End.x = std::max(End.x, vec.x);
-            // End.y = std::max(End.y, vec.y);
-            // End.z = std::max(End.z, vec.z);
-
             int MatIdx = ReadData<uint8_t>();
             int Color = 0;
             bool Transparent = false;
@@ -209,8 +208,9 @@ namespace VoxelOptimizer
         m->SetBBox(CBBox(Beg, End));
     }
 
-    void CMagicaVoxelLoader::ProcessMaterial()
+    void CMagicaVoxelLoader::ProcessMaterialAndSceneGraph()
     {
+        std::map<int, Node> nodes;
         m_Materials.push_back(Material(new CMaterial()));
 
         if(!IsEof())
@@ -267,12 +267,220 @@ namespace VoxelOptimizer
                         m_Materials.push_back(Mat);
                         m_MaterialMapping.insert({ID, m_Materials.size() - 1});
                     }
+                    else if(strncmp(Tmp.ID, "nTRN", sizeof(Tmp.ID)) == 0)
+                    {
+                        auto tmp = ProcessTransformNode();
+                        nodes.insert({tmp->NodeID, tmp});
+                    }
+                    else if(strncmp(Tmp.ID, "nGRP", sizeof(Tmp.ID)) == 0)
+                    {
+                        auto tmp = ProcessGroupNode();
+                        nodes.insert({tmp->NodeID, tmp});
+                    }
+                    else if(strncmp(Tmp.ID, "nSHP", sizeof(Tmp.ID)) == 0)
+                    {
+                        auto tmp = ProcessShapeNode();
+                        nodes.insert({tmp->NodeID, tmp});
+                    }
                     else
                         Skip(Tmp.ChunkContentSize + Tmp.ChildChunkSize);
                 }
             }
         }
 
+        std::stack<int> nodeIDs;
+        std::stack<CVector> vectors;
+        std::stack<CMat4x4> rotations;
+        CVector currentTranslation;
+        CMat4x4 currentRotation;
+
+        nodeIDs.push(0);
+        while (!nodeIDs.empty())
+        {
+            Node tmp = nodes[nodeIDs.top()];
+
+            switch (tmp->Type)
+            {
+                case NodeType::TRANSFORM:
+                {
+                    auto transform = std::static_pointer_cast<STransformNode>(tmp);
+                    nodeIDs.pop();
+
+                    currentTranslation += transform->Translation;
+                    currentRotation *= transform->Rotation;
+
+                    nodeIDs.push(transform->ChildID);
+                } break;
+
+                case NodeType::GROUP:
+                {
+                    auto group = std::static_pointer_cast<SGroupNode>(tmp);
+                    if(group->ChildIdx > 0)
+                    {
+                        currentTranslation = vectors.top();
+                        currentRotation = rotations.top();
+                        vectors.pop();
+                        rotations.pop();
+                    }
+
+                    if(group->ChildIdx < group->ChildrensID.size())
+                    {
+                        vectors.push(currentTranslation);
+                        rotations.push(currentRotation);
+
+                        nodeIDs.push(group->ChildrensID[group->ChildIdx]);
+                        group->ChildIdx++;
+                    }
+                    else                     
+                        nodeIDs.pop();
+                } break;
+
+                case NodeType::SHAPE:
+                {
+                    nodeIDs.pop();
+                    auto shapes = std::static_pointer_cast<SShapeNode>(tmp);
+
+                    for (auto &&m : shapes->Models)
+                        m_ModelMatrices.insert({m, CMat4x4::Translation(CVector(currentTranslation.x, currentTranslation.z, -currentTranslation.y)) * currentRotation});                
+                } break;
+            }
+        }
+
         Reset();
+    }
+
+    CMagicaVoxelLoader::TransformNode CMagicaVoxelLoader::ProcessTransformNode()
+    {
+        TransformNode Ret = TransformNode(new STransformNode());
+
+        Ret->NodeID = ReadData<int>();
+        
+        // Skips the dictionary
+        int keys = ReadData<int>();
+        for (size_t i = 0; i < keys; i++)
+        {
+            int size = ReadData<int>();
+            Skip(size);
+            size = ReadData<int>();
+            Skip(size);
+        }
+
+        Ret->ChildID = ReadData<int>();
+        Skip(sizeof(int));
+        Ret->LayerID = ReadData<int>();
+
+        int frames = ReadData<int>();
+        for (size_t i = 0; i < frames; i++)
+        {
+            keys = ReadData<int>();
+            for (size_t j = 0; j < keys; j++)
+            {
+                int size = ReadData<int>();
+                std::string Key(size, '\0'); 
+                ReadData(&Key[0], size);
+
+                if(Key == "_t")
+                {
+                    size = ReadData<int>();
+                    std::string Value(size, '\0'); 
+                    ReadData(&Value[0], size);
+
+                    std::stringstream tmp;
+                    tmp << Value;
+
+                    tmp >> Ret->Translation.x >> Ret->Translation.y >> Ret->Translation.z;
+                }
+                else if(Key == "_r")
+                {
+                    size = ReadData<int>();
+                    std::string Value(size, '\0'); 
+                    ReadData(&Value[0], size);
+
+                    char rot = std::stoi(Value);
+
+                    char idx1 = rot & 3;
+                    char idx2 = (rot >> 2) & 3;
+                    char idx3 = 3 - idx1 - idx2;
+
+                    Ret->Rotation = CMat4x4(CVector4(0, 0, 0, 0),
+                                            CVector4(0, 0, 0, 0),
+                                            CVector4(0, 0, 0, 0),
+                                            CVector4(0, 0, 0, 1));
+
+                    Ret->Rotation.x.v[idx1] = ((rot & 0x10) == 0x10) ? -1 : 1;
+                    Ret->Rotation.y.v[idx2] = ((rot & 0x20) == 0x20) ? -1 : 1;
+                    Ret->Rotation.z.v[idx3] = ((rot & 0x40) == 0x40) ? -1 : 1;
+
+                    CVector rotation;
+
+                    // Calculates the euler angle of the roation matrix.
+                    // Source: http://eecs.qmul.ac.uk/~gslabaugh/publications/euler.pdf (09.10.2021)
+                    if(Ret->Rotation.z.x != 1 && Ret->Rotation.z.x != -1)
+                    {
+                        rotation.y = -asin(Ret->Rotation.z.x);
+                        rotation.x = atan2(Ret->Rotation.z.y / cos(rotation.y), Ret->Rotation.z.z / cos(rotation.y));
+                        rotation.z = atan2(Ret->Rotation.y.x / cos(rotation.y), Ret->Rotation.x.x / cos(rotation.y));
+                    }
+                    else
+                    {
+                        if(Ret->Rotation.z.x == -1)
+                        {
+                            rotation.y = M_PI / 2.f;
+                            rotation.x = atan2(Ret->Rotation.x.y, Ret->Rotation.x.z);
+                        }
+                        else
+                        {
+                            rotation.y = -M_PI / 2.f;
+                            rotation.x = atan2(-Ret->Rotation.x.y, -Ret->Rotation.x.z);
+                        }
+                    }
+
+                    // Builds a new rotation matrix, around the y-axis
+                    Ret->Rotation = CMat4x4::Rotation(rotation);
+                }
+                else if(Key == "_f")
+                    Skip(ReadData<int>());
+            }
+        }
+
+        return Ret;
+    }
+    
+    CMagicaVoxelLoader::GroupNode CMagicaVoxelLoader::ProcessGroupNode()
+    {
+        GroupNode Ret = GroupNode(new SGroupNode());
+
+        Ret->NodeID = ReadData<int>();
+        Skip(sizeof(int));
+
+        int childs = ReadData<int>();
+        for (size_t i = 0; i < childs; i++)
+            Ret->ChildrensID.push_back(ReadData<int>());
+
+        return Ret;
+    }
+
+    CMagicaVoxelLoader::ShapeNode CMagicaVoxelLoader::ProcessShapeNode()
+    {
+        ShapeNode Ret = ShapeNode(new SShapeNode());
+
+        Ret->NodeID = ReadData<int>();
+        Skip(sizeof(int));
+
+        int childs = ReadData<int>();
+        for (size_t i = 0; i < childs; i++)
+        {
+            Ret->Models.push_back(ReadData<int>());
+
+            // Skips the dictionary
+            int keys = ReadData<int>();
+            for (size_t i = 0; i < keys; i++)
+            {
+                Skip(ReadData<int>());
+                Skip(ReadData<int>());
+            }
+        }
+
+        return Ret;
     }
 } // namespace VoxelOptimizer

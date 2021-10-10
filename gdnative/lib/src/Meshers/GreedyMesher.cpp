@@ -38,9 +38,11 @@ namespace VoxelOptimizer
 
         CVector Beg = BBox.Beg;
         std::swap(Beg.y, Beg.z);
+        Beg.z *= -1;
 
         CVector BoxCenter = BBox.GetSize() / 2;
         std::swap(BoxCenter.y, BoxCenter.z);
+        BoxCenter.z *= -1;
 
         CSlicer Slicer(m);
 
@@ -138,12 +140,15 @@ namespace VoxelOptimizer
 
                                 int I1, I2, I3, I4;                            
 
-                                CVector v1 = CVector(x[0], x[2], x[1]) - Beg - BoxCenter;
-                                CVector v2 = CVector(x[0] + du[0], x[2] + du[2], x[1] + du[1]) - Beg - BoxCenter;
-                                CVector v3 = CVector(x[0] + du[0] + dv[0], x[2] + du[2] + dv[2], x[1] + du[1] + dv[1]) - Beg - BoxCenter;
-                                CVector v4 = CVector(x[0] + dv[0], x[2] + dv[2], x[1] + dv[1]) - Beg - BoxCenter;
+                                CVector v1 = CVector(x[0], x[2], -x[1]) - Beg - BoxCenter;
+                                CVector v2 = CVector(x[0] + du[0], x[2] + du[2], -x[1] - du[1]) - Beg - BoxCenter;
+                                CVector v3 = CVector(x[0] + du[0] + dv[0], x[2] + du[2] + dv[2], -x[1] - du[1] - dv[1]) - Beg - BoxCenter;
+                                CVector v4 = CVector(x[0] + dv[0], x[2] + dv[2], -x[1] - dv[1]) - Beg - BoxCenter;
 
                                 std::swap(Normal.y, Normal.z);
+                                if(Normal.z != 0)
+                                    Normal.z *= -1;
+
                                 AddFace(RetMesh, v1, v2, v3, v4, Normal, Color, Material);
 
                                 Slicer.AddProcessedQuad(CVector(x[0], x[1], x[2]), CVector(du[0] + dv[0], du[1] + dv[1], du[2] + dv[2]));

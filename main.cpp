@@ -15,10 +15,10 @@ int main(int argc, char const *argv[])
     // VoxelOptimizer::Loader KLoader(new VoxelOptimizer::CKenshapeLoader());
     // KLoader->Load("bottle-potion.kenshape");
 
-    VoxelOptimizer::Loader loader(new VoxelOptimizer::CMagicaVoxelLoader());
+    VoxelOptimizer::Loader loader(new VoxelOptimizer::CGoxelLoader());
 
     auto start = chrono::system_clock::now();
-    loader->Load("teapot.vox");
+    loader->Load("objects_rot.gox");
     auto end = chrono::system_clock::now();
     auto LoadTime = end - start;
 
@@ -60,8 +60,24 @@ int main(int argc, char const *argv[])
     // }
 
     start = chrono::system_clock::now();
-    auto Meshes = Mesher.GenerateMeshes(VoxelMesh, loader);
-    auto Mesh = Meshes.begin()->second; 
+
+    auto voxels = loader->GetModels();
+    int counter = 0;
+
+    for (auto &&v : voxels)
+    {
+        VoxelOptimizer::CWavefrontObjExporter exporterObj;
+        // exporterObj.SetBinary(true);
+
+        v->RemeshAlways(true);
+
+        auto Meshes = Mesher.GenerateMeshes(v, loader);
+        auto Mesh = Meshes.begin()->second; 
+
+        exporterObj.Save(std::to_string(counter) + ".glb", Mesh);
+        counter++;
+    }
+    
     end = chrono::system_clock::now();
     auto RealTime = end - start;
 
@@ -78,21 +94,21 @@ int main(int argc, char const *argv[])
     // VoxelOptimizer::CWavefrontObjExporter exporter1;
     // exporter1.SaveObj("minicube.obj", Mesh);
 
-    VoxelOptimizer::CGLTFExporter exporter;
+    // VoxelOptimizer::CGLTFExporter exporter;
 
-    // exporter.Save("lantern.gltf", Mesh);
-    exporter.Save("windmill.glb", Mesh);
+    // // exporter.Save("lantern.gltf", Mesh);
+    // exporter.Save("windmill.glb", Mesh);
 
-    VoxelOptimizer::CWavefrontObjExporter exporterObj;
+    // VoxelOptimizer::CWavefrontObjExporter exporterObj;
 
-    // exporter.Save("lantern.gltf", Mesh);
-    exporterObj.Save("windmill.obj", Mesh);
+    // // exporter.Save("lantern.gltf", Mesh);
+    // exporterObj.Save("windmill.obj", Mesh);
 
-    // VoxelOptimizer::CSpriteStackingExporter spriter;
-    // spriter.Save("windmill_sprite.png", VoxelMesh, KLoader);
+    // // VoxelOptimizer::CSpriteStackingExporter spriter;
+    // // spriter.Save("windmill_sprite.png", VoxelMesh, KLoader);
 
-    VoxelOptimizer::CGodotSceneExporter godot;
-    godot.Save("windmill_2.escn", Mesh);
+    // VoxelOptimizer::CGodotSceneExporter godot;
+    // godot.Save("windmill_2.escn", Mesh);
 
     return 0;
 }

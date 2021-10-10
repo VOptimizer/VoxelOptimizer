@@ -66,6 +66,11 @@ namespace VoxelOptimizer
                 return CVector(Sign(x), Sign(y), Sign(z));
             }
 
+            inline CVector Fract()
+            {
+                return CVector(x - (int)x, y - (int)y, z - (int)z);
+            }
+
             inline bool IsZero() const
             {
                 return x == 0 && y == 0 && z == 0;
@@ -222,6 +227,77 @@ namespace VoxelOptimizer
             {
                 return v == 0 ? 0 : v < 0 ? -1 : 1;
             }
+    };
+
+    class CVector4
+    {
+        public:
+            union
+            {
+                struct
+                {
+                    float x;
+                    float y;
+                    float z;
+                    float w;
+                };
+                
+                float v[4];
+            };
+
+            CVector4() : x(0), y(0), z(0), w(0) {}
+            CVector4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
+            CVector4(const CVector &v) : x(v.x), y(v.y), z(v.z), w(1.0) {}
+            CVector4(const CVector4 &v) : x(v.x), y(v.y), z(v.z), w(v.w) {}
+
+            inline CVector ToVector3() const
+            {
+                return CVector(x, y, z);
+            }
+
+            // Upon here just math. Math is magic :D
+
+            inline CVector4 operator*(const CVector4 &vr) const
+            {
+                return CVector4(x * vr.x, y * vr.y, z * vr.z, w * vr.w);
+            }
+
+            inline CVector4 operator-(const CVector4 &vr) const
+            {
+                return CVector4(x - vr.x, y - vr.y, z - vr.z, w - vr.w);
+            }
+
+            inline CVector4 operator+(const CVector4 &vr) const
+            {
+                return CVector4(x + vr.x, y + vr.y, z + vr.z, w + vr.w);
+            }
+
+            inline CVector4 &operator+=(const CVector4 &vr)
+            {
+                x += vr.x;
+                y += vr.y;
+                z += vr.z;
+                w += vr.w;
+
+                return *this;
+            }
+
+            inline CVector4 operator/(const CVector4 &vr) const
+            {
+                return CVector4(x / vr.x, y / vr.y, z / vr.z, w / vr.w);
+            }
+
+            inline CVector4 operator/(float scalar) const
+            {
+                return CVector4(x / scalar, y / scalar, z / scalar, w / scalar);
+            }
+
+            inline CVector4 operator*(float scalar) const
+            {
+                return CVector4(x * scalar, y * scalar, z * scalar, w * scalar);
+            }
+
+            ~CVector4() = default;
     };
 
     inline std::ostream &operator<<(std::ostream &of, const CVector &vec)

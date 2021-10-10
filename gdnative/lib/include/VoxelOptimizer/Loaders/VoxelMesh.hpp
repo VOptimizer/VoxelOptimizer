@@ -27,6 +27,7 @@
 
 #include <array>
 #include <VoxelOptimizer/BBox.hpp>
+#include <VoxelOptimizer/Mat4x4.hpp>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -100,6 +101,16 @@ namespace VoxelOptimizer
 
                 // m_Voxels.clear();
                 // m_Voxels.resize(m_Size.x * m_Size.y * m_Size.z);
+            }
+
+            inline void SetModelMatrix(const CMat4x4 &m)
+            {
+                m_ModelMatrix = m;
+            }
+
+            inline CMat4x4 GetModelMatrix()
+            {
+                return m_ModelMatrix;
             }
 
             /**
@@ -223,6 +234,8 @@ namespace VoxelOptimizer
             void SetNormal(const CVector &Pos, const CVector &Neighbor, bool IsInvisible = true);
             void MarkChunk(const CVector &Pos);
             void InsertMarkedChunk(const CBBox &BBox);
+
+            CMat4x4 m_ModelMatrix;
 
             CVector m_Size;
             CBBox m_BBox;

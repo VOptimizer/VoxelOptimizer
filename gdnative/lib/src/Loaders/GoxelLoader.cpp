@@ -46,10 +46,10 @@ namespace VoxelOptimizer
         ReadFile();
         
         std::map<int, int> ColorIdx;
-        CVector Beg, End;
         
         for (auto &&l : m_Layers)
         {
+            CVector Beg, End, TranslationBeg;
             VoxelMesh m = VoxelMesh(new CVoxelMesh());
             m->SetSize(m_BBox.End + m_BBox.Beg.Abs());
 
@@ -84,7 +84,12 @@ namespace VoxelOptimizer
                                     IdxC = ColorIdx[p];
 
                                 if(Beg.IsZero())
+                                {
                                     Beg = vi;
+                                    TranslationBeg = CVector(x, y, z);
+                                }
+
+                                TranslationBeg = TranslationBeg.Min(CVector(x, y, z));
 
                                 Beg = Beg.Min(vi);
                                 End = End.Max(vi);
@@ -97,6 +102,13 @@ namespace VoxelOptimizer
             }
             
             m->SetBBox(CBBox(Beg, End));
+
+            // TODO: This is dumb! The model matrix should be created on a central point!
+            CVector translation = TranslationBeg + (m->GetBBox().GetSize() / 2);
+            std::swap(translation.y, translation.z);
+            translation.z *= -1;
+            m->SetModelMatrix(CMat4x4::Translation(translation));
+
             m_Models.push_back(m);
         }
 

@@ -25,6 +25,7 @@
 #ifndef MESH_HPP
 #define MESH_HPP
 
+#include <VoxelOptimizer/Mat4x4.hpp>
 #include <VoxelOptimizer/Material.hpp>
 #include <memory>
 #include <vector>
@@ -48,6 +49,8 @@ namespace VoxelOptimizer
 
         std::vector<GroupedFaces> Faces;    //!< All faces of this mesh.
         std::vector<CColor> Texture;        //!< Texture used by this mesh.
+
+        CMat4x4 ModelMatrix;
     };
     using Mesh = std::shared_ptr<SMesh>;
 } // namespace VoxelOptimizer

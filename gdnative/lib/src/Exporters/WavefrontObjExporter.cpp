@@ -42,10 +42,22 @@ namespace VoxelOptimizer
         ObjFile << "mtllib " << m_ExternalFilenames << ".mtl" << std::endl;
 
         for (auto &&v : Mesh->Vertices)
-            ObjFile << "v " << v.x << " " << v.y << " " << v.z << std::endl;
+        {
+            // CVector add = CVector(Mesh->Translation.x, Mesh->Translation.z, Mesh->Translation.y);
+            CVector tmp = Mesh->ModelMatrix * v;
+            ObjFile << "v " << tmp.x << " " << tmp.y << " " << tmp.z << std::endl;
+        }
 
         for (auto &&vn : Mesh->Normals)
-            ObjFile << "vn " << vn.x << " " << vn.y << " " << vn.z << std::endl;
+        {
+            CMat4x4 rotMat = Mesh->ModelMatrix;
+            rotMat.x.w = 0;
+            rotMat.y.w = 0;
+            rotMat.z.w = 0;
+
+            CVector tmp = rotMat * vn;
+            ObjFile << "vn " << tmp.x << " " << tmp.y << " " << tmp.z << std::endl;
+        }
 
         for (auto &&vt : Mesh->UVs)
             ObjFile << "vt " << vt.x << " " << vt.y << std::endl;

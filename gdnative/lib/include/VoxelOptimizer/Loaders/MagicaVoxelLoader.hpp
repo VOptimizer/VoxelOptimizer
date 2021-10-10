@@ -25,6 +25,7 @@
 #ifndef VOXELLOADER_HPP
 #define VOXELLOADER_HPP
 
+#include <VoxelOptimizer/Mat4x4.hpp>
 #include <VoxelOptimizer/Loaders/ILoader.hpp>
 
 namespace VoxelOptimizer
@@ -39,6 +40,62 @@ namespace VoxelOptimizer
             ~CMagicaVoxelLoader() = default;
         private:
             void ParseFormat() override;
+
+            enum NodeType
+            {
+                TRANSFORM,
+                GROUP,
+                SHAPE
+            };
+
+            struct SNode
+            {
+                public:
+                    SNode() = default;
+                    SNode(NodeType type) : Type(type) {} 
+
+                    NodeType Type;
+
+                    int NodeID;
+                    std::map<std::string, std::string> Attributes;
+            };
+
+            struct STransformNode : public SNode
+            {
+                public:
+                    STransformNode() : SNode(NodeType::TRANSFORM) {}
+
+                    int LayerID;
+                    int NumFrames;
+                    CVector Translation;
+                    CMat4x4 Rotation;
+
+                    int ChildID;
+            };
+
+            struct SGroupNode : public SNode
+            {
+                public:
+                    SGroupNode() : SNode(NodeType::GROUP), ChildIdx(0) {}
+
+                    int ChildIdx;
+
+                    std::vector<int> ChildrensID;
+            };
+
+            struct SShapeNode : public SNode
+            {
+                public:
+                    SShapeNode() : SNode(NodeType::SHAPE) {}
+
+                    std::vector<int> Models;
+            };
+
+            using Node = std::shared_ptr<SNode>;
+            using TransformNode = std::shared_ptr<STransformNode>;
+            using GroupNode = std::shared_ptr<SGroupNode>;
+            using ShapeNode = std::shared_ptr<SShapeNode>;
+            
             struct SChunkHeader
             {
                 char ID[4];
@@ -50,10 +107,16 @@ namespace VoxelOptimizer
 
             VoxelMesh ProcessSize();
             void ProcessXYZI(VoxelMesh m);
-            void ProcessMaterial();
+            void ProcessMaterialAndSceneGraph();
+
+            TransformNode ProcessTransformNode();
+            GroupNode ProcessGroupNode();
+            ShapeNode ProcessShapeNode();
 
             std::map<int, int> m_ColorMapping;
             std::map<int, int> m_MaterialMapping;
+
+            std::map<int, CMat4x4> m_ModelMatrices;
 
             ColorPalette m_ColorPalette;
 
