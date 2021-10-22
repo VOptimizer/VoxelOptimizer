@@ -22,21 +22,28 @@
  * SOFTWARE.
  */
 
-#ifndef GLTFEXPORTER_HPP
-#define GLTFEXPORTER_HPP
+#ifndef EXPORTSETTINGS_HPP
+#define EXPORTSETTINGS_HPP
 
-#include <VoxelOptimizer/Exporters/IExporter.hpp>
+#include <memory>
+
 namespace VoxelOptimizer
 {
-    class CGLTFExporter : public IExporter
+    class CExportSettings
     {
         public:
-            CGLTFExporter() = default;
+            CExportSettings() : WorldSpace(false), Binary(false) {}
 
-            std::map<std::string, std::vector<char>> Generate(std::vector<Mesh> Meshes) override;
+            //!< Exports the models in world space instead of object space.
+            bool WorldSpace;
 
-            virtual ~CGLTFExporter() = default;
+            //!< Not supported by all formats.
+            bool Binary;
+
+            ~CExportSettings() = default;
     };
+
+    using ExportSettings = std::shared_ptr<CExportSettings>;
 } // namespace VoxelOptimizer
 
-#endif //GLTFEXPORTER_HPP
+#endif //EXPORTSETTINGS_HPP

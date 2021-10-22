@@ -15,10 +15,10 @@ int main(int argc, char const *argv[])
     // VoxelOptimizer::Loader KLoader(new VoxelOptimizer::CKenshapeLoader());
     // KLoader->Load("bottle-potion.kenshape");
 
-    VoxelOptimizer::Loader loader(new VoxelOptimizer::CGoxelLoader());
+    VoxelOptimizer::Loader loader(new VoxelOptimizer::CMagicaVoxelLoader());
 
     auto start = chrono::system_clock::now();
-    loader->Load("objects_rot.gox");
+    loader->Load("objects_rot.vox");
     auto end = chrono::system_clock::now();
     auto LoadTime = end - start;
 
@@ -64,24 +64,41 @@ int main(int argc, char const *argv[])
     auto voxels = loader->GetModels();
     int counter = 0;
 
+    std::vector<VoxelOptimizer::Mesh> meshes;
+
     for (auto &&v : voxels)
     {
-        VoxelOptimizer::CWavefrontObjExporter exporterObj;
+        // VoxelOptimizer::CWavefrontObjExporter exporterObj;
         // exporterObj.SetBinary(true);
 
         v->RemeshAlways(true);
 
         auto Meshes = Mesher.GenerateMeshes(v, loader);
         auto Mesh = Meshes.begin()->second; 
+        meshes.push_back(Mesh);
 
-        exporterObj.Save(std::to_string(counter) + ".glb", Mesh);
-        counter++;
+
+        // exporterObj.Save(std::to_string(counter) + ".glb", Mesh);
+        // counter++;
     }
     
     end = chrono::system_clock::now();
     auto RealTime = end - start;
 
-    
+    VoxelOptimizer::CWavefrontObjExporter objExporter;
+    VoxelOptimizer::CPLYExporter plyExporter;
+    VoxelOptimizer::CGLTFExporter gltfExporter;
+    VoxelOptimizer::CGodotSceneExporter escnExporter;
+
+    objExporter.Settings()->WorldSpace = true;
+    gltfExporter.Settings()->WorldSpace = true;
+    escnExporter.Settings()->WorldSpace = true;
+    plyExporter.Settings()->WorldSpace = true;
+
+    objExporter.Save("object_rot.obj", meshes);
+    gltfExporter.Save("object_rot.gltf", meshes);
+    escnExporter.Save("object_rot.esn", meshes);
+    plyExporter.Save("object_rot.ply", meshes);
 
     cout << "Load: " << std::chrono::duration_cast<std::chrono::milliseconds>(LoadTime).count() << endl;
     // cout << "Dummy: " << std::chrono::duration_cast<std::chrono::milliseconds>(DummyTime).count() << endl;

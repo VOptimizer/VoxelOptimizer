@@ -34,7 +34,7 @@ namespace VoxelOptimizer
         public:
             CGodotSceneExporter() = default;
 
-            std::map<std::string, std::vector<char>> Generate(Mesh Mesh) override;
+            std::map<std::string, std::vector<char>> Generate(std::vector<Mesh> Meshes) override;
 
             ~CGodotSceneExporter() = default;
         private:

@@ -28,13 +28,23 @@
 
 namespace VoxelOptimizer
 {
+    IExporter::IExporter() : m_Settings(new CExportSettings())
+    {
+
+    }
+
     void IExporter::Save(const std::string &Path, Mesh Mesh)
+    {
+        Save(Path, { Mesh });
+    }
+
+    void IExporter::Save(const std::string &Path, std::vector<Mesh> Meshes)
     {
         // Names all files like thhe output file.
         m_ExternalFilenames = GetFilenameWithoutExt(Path);
         std::string PathWithoutExt = GetPathWithoutExt(Path);
 
-        auto Files = Generate(Mesh);
+        auto Files = Generate(Meshes);
         for (auto &&f : Files)
         {
             std::ofstream out(PathWithoutExt + std::string(".") + f.first, std::ios::binary);
@@ -44,6 +54,11 @@ namespace VoxelOptimizer
                 out.close();
             }
         }
+    }
+
+    std::map<std::string, std::vector<char>> IExporter::Generate(Mesh Mesh)
+    {
+        return Generate({ Mesh });
     }
 
     std::string IExporter::GetPathWithoutExt(std::string Path)

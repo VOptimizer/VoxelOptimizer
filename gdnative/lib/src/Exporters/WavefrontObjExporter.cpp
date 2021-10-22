@@ -31,7 +31,7 @@
 
 namespace VoxelOptimizer
 {   
-    std::map<std::string, std::vector<char>> CWavefrontObjExporter::Generate(Mesh Mesh)
+    std::map<std::string, std::vector<char>> CWavefrontObjExporter::Generate(std::vector<Mesh> Meshes)
     {
         std::stringstream ObjFile, MTLFile;
         if(m_ExternalFilenames.empty())
@@ -41,81 +41,113 @@ namespace VoxelOptimizer
         ObjFile << "# These comments can be removed" << std::endl;
         ObjFile << "mtllib " << m_ExternalFilenames << ".mtl" << std::endl;
 
-        for (auto &&v : Mesh->Vertices)
-        {
-            // CVector add = CVector(Mesh->Translation.x, Mesh->Translation.z, Mesh->Translation.y);
-            CVector tmp = Mesh->ModelMatrix * v;
-            ObjFile << "v " << tmp.x << " " << tmp.y << " " << tmp.z << std::endl;
-        }
+        size_t meshCounter = 0;
+        size_t MatCounter = 0;
+        std::map<int, size_t> processedMaterials;
+        CVector indicesOffset;
 
-        for (auto &&vn : Mesh->Normals)
+        for (auto &&mesh : Meshes)
         {
-            CMat4x4 rotMat = Mesh->ModelMatrix;
+            ObjFile << "o VoxelMesh" << meshCounter << std::endl;
+            meshCounter++;
+
+            for (auto &&v : mesh->Vertices)
+            {
+                CVector tmp = v;
+                if(m_Settings->WorldSpace)
+                    tmp = mesh->ModelMatrix * v;
+
+                ObjFile << "v " << tmp.x << " " << tmp.y << " " << tmp.z << std::endl;
+            }
+
+            //"Extracts" the rotation matrix. Quick'n Dirty
+            CMat4x4 rotMat = mesh->ModelMatrix;
             rotMat.x.w = 0;
             rotMat.y.w = 0;
             rotMat.z.w = 0;
 
-            CVector tmp = rotMat * vn;
-            ObjFile << "vn " << tmp.x << " " << tmp.y << " " << tmp.z << std::endl;
-        }
-
-        for (auto &&vt : Mesh->UVs)
-            ObjFile << "vt " << vt.x << " " << vt.y << std::endl;
-
-        size_t MatCounter = 0;
-        for (auto &&f : Mesh->Faces)
-        {
-            float Ambient = 1.0;
-            int Illum = 2;
-            float Transparency = 0;
-            float Alpha = 1.0;
-
-            if(f->FaceMaterial->Metallic != 0.0)
+            for (auto &&vn : mesh->Normals)
             {
-                Ambient = f->FaceMaterial->Metallic;
-                Illum = 3;
-            }
-            else if(f->FaceMaterial->Transparency != 0.0) // Glass
-            {
-                Illum = 4;
-                Transparency = f->FaceMaterial->Transparency;
-                Alpha = 1 - f->FaceMaterial->Transparency;
+                CVector tmp = vn;
+                if(m_Settings->WorldSpace)
+                    tmp = rotMat * vn;
+
+                ObjFile << "vn " << tmp.x << " " << tmp.y << " " << tmp.z << std::endl;
             }
 
-            MTLFile << "newmtl Mat" << MatCounter << std::endl;
-            MTLFile << "Ns " << f->FaceMaterial->Roughness * 1000.f << std::endl;
-            MTLFile << "Ka " << Ambient << " " << Ambient << " " << Ambient << std::endl;
-            MTLFile << "Kd 1.0 1.0 1.0" << std::endl;
-            MTLFile << "Ks " << f->FaceMaterial->Specular << " " << f->FaceMaterial->Specular << " " << f->FaceMaterial->Specular << std::endl;
-            if(f->FaceMaterial->Power != 0.0)
-                MTLFile << "Ke " << f->FaceMaterial->Power << " " << f->FaceMaterial->Power << " " << f->FaceMaterial->Power << std::endl;
-            MTLFile << "Tr " << Transparency << std::endl;
-            MTLFile << "d " << Alpha << std::endl;
-            MTLFile << "Ni " << f->FaceMaterial->IOR << std::endl;
-            MTLFile << "illum " << Illum << std::endl;
-            MTLFile << "map_Kd " << m_ExternalFilenames << ".png" << std::endl;
-            
-            ObjFile << "usemtl Mat" << MatCounter << std::endl;
+            for (auto &&vt : mesh->UVs)
+                ObjFile << "vt " << vt.x << " " << vt.y << std::endl;
 
-            for (size_t i = 0; i < f->Indices.size(); i += 3)
+            for (auto &&f : mesh->Faces)
             {
-                ObjFile << "f";
-                for (char j = 0; j < 3; j++)
+                size_t matID = 0;
+                auto IT = processedMaterials.find(f->MaterialIndex);
+
+                if(IT == processedMaterials.end())
                 {
-                    ObjFile << " ";
-                    ObjFile << f->Indices[i + j].x << "/" << f->Indices[i + j].z << "/" << f->Indices[i + j].y;
+                    processedMaterials.insert({f->MaterialIndex, MatCounter});
+                    matID = MatCounter;
+
+                    float Ambient = 1.0;
+                    int Illum = 2;
+                    float Transparency = 0;
+                    float Alpha = 1.0;
+
+                    if(f->FaceMaterial->Metallic != 0.0)
+                    {
+                        Ambient = f->FaceMaterial->Metallic;
+                        Illum = 3;
+                    }
+                    else if(f->FaceMaterial->Transparency != 0.0) // Glass
+                    {
+                        Illum = 4;
+                        Transparency = f->FaceMaterial->Transparency;
+                        Alpha = 1 - f->FaceMaterial->Transparency;
+                    }
+
+                    MTLFile << "newmtl Mat" << MatCounter << std::endl;
+                    MTLFile << "Ns " << f->FaceMaterial->Roughness * 1000.f << std::endl;
+                    MTLFile << "Ka " << Ambient << " " << Ambient << " " << Ambient << std::endl;
+                    MTLFile << "Kd 1.0 1.0 1.0" << std::endl;
+                    MTLFile << "Ks " << f->FaceMaterial->Specular << " " << f->FaceMaterial->Specular << " " << f->FaceMaterial->Specular << std::endl;
+                    if(f->FaceMaterial->Power != 0.0)
+                        MTLFile << "Ke " << f->FaceMaterial->Power << " " << f->FaceMaterial->Power << " " << f->FaceMaterial->Power << std::endl;
+                    MTLFile << "Tr " << Transparency << std::endl;
+                    MTLFile << "d " << Alpha << std::endl;
+                    MTLFile << "Ni " << f->FaceMaterial->IOR << std::endl;
+                    MTLFile << "illum " << Illum << std::endl;
+                    MTLFile << "map_Kd " << m_ExternalFilenames << ".png" << std::endl;
+
+
+                    MatCounter++;  
                 }
-                ObjFile << std::endl;
+                else
+                    matID = IT->second;
+                
+                ObjFile << "usemtl Mat" << matID << std::endl;
+
+                for (size_t i = 0; i < f->Indices.size(); i += 3)
+                {
+                    ObjFile << "f";
+                    for (char j = 0; j < 3; j++)
+                    {
+                        CVector tmp = f->Indices[i + j] + indicesOffset;
+
+                        ObjFile << " ";
+                        ObjFile << tmp.x << "/" << tmp.z << "/" << tmp.y;
+                    }
+                    ObjFile << std::endl;
+                }       
             }
-
-            MatCounter++;         
+        
+            indicesOffset += CVector(mesh->Vertices.size(), mesh->Normals.size(), mesh->UVs.size());
         }
-
+        
         std::vector<char> Texture;
         stbi_write_png_to_func([](void *context, void *data, int size){
             std::vector<char> *InnerTexture = (std::vector<char>*)context;
             InnerTexture->insert(InnerTexture->end(), (char*)data, ((char*)data) + size);
-        }, &Texture, Mesh->Texture.size(), 1, 4, Mesh->Texture.data(), 4 * Mesh->Texture.size());
+        }, &Texture, Meshes[0]->Texture.size(), 1, 4, Meshes[0]->Texture.data(), 4 * Meshes[0]->Texture.size());
 
         std::string ObjFileStr = ObjFile.str();
         std::string MTLFileStr = MTLFile.str();

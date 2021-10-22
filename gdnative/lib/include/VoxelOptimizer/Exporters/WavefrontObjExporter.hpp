@@ -10,8 +10,8 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -26,17 +26,15 @@
 #define WAVEFRONTOBJEXPORTER_HPP
 
 #include <VoxelOptimizer/Exporters/IExporter.hpp>
-namespace VoxelOptimizer
-{
-    class CWavefrontObjExporter : public IExporter
-    {
-        public:
-            CWavefrontObjExporter() = default;
+namespace VoxelOptimizer {
+class CWavefrontObjExporter : public IExporter {
+public:
+  CWavefrontObjExporter() = default;
 
-            std::map<std::string, std::vector<char>> Generate(Mesh Mesh) override;
+  std::map<std::string, std::vector<char>> Generate(std::vector<Mesh> Meshes) override;
 
-            ~CWavefrontObjExporter() = default;
-    };
+  ~CWavefrontObjExporter() = default;
+};
 } // namespace VoxelOptimizer
 
-#endif //WAVEFRONTOBJEXPORTER_HPP
+#endif // WAVEFRONTOBJEXPORTER_HPP

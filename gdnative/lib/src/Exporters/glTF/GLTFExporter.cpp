@@ -32,13 +32,7 @@
 
 namespace VoxelOptimizer
 {
-    void CGLTFExporter::Save(const std::string &Path, Mesh Mesh)
-    {
-        m_Binary = Path.find(".glb") != std::string::npos;
-        IExporter::Save(Path, Mesh);
-    }
-
-    std::map<std::string, std::vector<char>> CGLTFExporter::Generate(Mesh Mesh)
+    std::map<std::string, std::vector<char>> CGLTFExporter::Generate(std::vector<Mesh> Meshes)
     {
         std::vector<GLTF::CBufferView> BufferViews;
         std::vector<GLTF::CAccessor> Accessors;
@@ -46,127 +40,143 @@ namespace VoxelOptimizer
 
         std::vector<char> Binary;
 
-        GLTF::CMesh GLTFMesh;
+        std::vector<GLTF::CNode> Nodes;
+        std::vector<GLTF::CMesh> GLTFMeshes;
+        std::map<int, bool> processedMaterials;
 
-        for (auto &&f : Mesh->Faces)
+        for (auto &&mesh : Meshes)
         {
-            std::vector<CVector> Vertices, Normals, UVs;
-            std::vector<int> Indices;
-            std::map<CVector, int> IndicesIndex;
+            GLTF::CMesh GLTFMesh;
+            Nodes.push_back(GLTF::CNode(GLTFMeshes.size(), m_Settings->WorldSpace ? mesh->ModelMatrix : CMat4x4()));
 
-            CVector Max, Min(10000, 10000, 10000);
-
-            GLTF::CMaterial Mat;
-            Mat.Name = "Mat" + std::to_string(GLTFMesh.Primitives.size());
-            Mat.Metallic = f->FaceMaterial->Metallic;
-            Mat.Roughness = f->FaceMaterial->Roughness;
-            Mat.Emissive = f->FaceMaterial->Power;
-            Mat.Transparency = f->FaceMaterial->Transparency;
-            Materials.push_back(Mat);
-
-            for (size_t i = 0; i < f->Indices.size(); i += 3)
+            for (auto &&f : mesh->Faces)
             {
-                for (size_t j = 0; j < 3; j++)
+                std::vector<CVector> Vertices, Normals, UVs;
+                std::vector<int> Indices;
+                std::map<CVector, int> IndicesIndex;
+
+                CVector Max, Min(10000, 10000, 10000);
+
+                // Add only "new" materials.
+                if(processedMaterials.find(f->MaterialIndex) == processedMaterials.end())
                 {
-                    CVector vec = f->Indices[i + j];
+                    processedMaterials.insert({f->MaterialIndex, true});
 
-                    int Index = 0;
-
-                    auto IT = IndicesIndex.find(vec);
-                    if(IT == IndicesIndex.end())
-                    {
-                        Vertices.push_back(Mesh->Vertices[(size_t)vec.x - 1]);
-                        Normals.push_back(Mesh->Normals[(size_t)vec.y - 1]);
-                        UVs.push_back(Mesh->UVs[(size_t)vec.z - 1]);
-
-                        Min = Min.Min(Mesh->Vertices[(size_t)vec.x - 1]);
-                        Max = Max.Max(Mesh->Vertices[(size_t)vec.x - 1]);
-
-                        Index = Vertices.size() - 1;
-                        IndicesIndex.insert({vec, Index});
-                    }
-                    else
-                        Index = IT->second;
-
-                    Indices.push_back(Index);
+                    GLTF::CMaterial Mat;
+                    Mat.Name = "Mat" + std::to_string(GLTFMesh.Primitives.size());
+                    Mat.Metallic = f->FaceMaterial->Metallic;
+                    Mat.Roughness = f->FaceMaterial->Roughness;
+                    Mat.Emissive = f->FaceMaterial->Power;
+                    Mat.Transparency = f->FaceMaterial->Transparency;
+                    Materials.push_back(Mat);
                 }
+
+                for (size_t i = 0; i < f->Indices.size(); i += 3)
+                {
+                    for (size_t j = 0; j < 3; j++)
+                    {
+                        CVector vec = f->Indices[i + j];
+
+                        int Index = 0;
+
+                        auto IT = IndicesIndex.find(vec);
+                        if(IT == IndicesIndex.end())
+                        {
+                            Vertices.push_back(mesh->Vertices[(size_t)vec.x - 1]);
+                            Normals.push_back(mesh->Normals[(size_t)vec.y - 1]);
+                            UVs.push_back(mesh->UVs[(size_t)vec.z - 1]);
+
+                            Min = Min.Min(mesh->Vertices[(size_t)vec.x - 1]);
+                            Max = Max.Max(mesh->Vertices[(size_t)vec.x - 1]);
+
+                            Index = Vertices.size() - 1;
+                            IndicesIndex.insert({vec, Index});
+                        }
+                        else
+                            Index = IT->second;
+
+                        Indices.push_back(Index);
+                    }
+                }
+
+                GLTF::CBufferView Position, Normal, UV, IndexView;
+
+                Position.Offset = Binary.size();
+                Position.Size = Vertices.size() * sizeof(CVector);
+
+                Normal.Offset = Position.Offset + Position.Size;
+                Normal.Size = Normals.size() * sizeof(CVector);
+
+                UV.Offset = Normal.Offset + Normal.Size;
+                UV.Size = UVs.size() * (sizeof(float) * 2);
+
+                IndexView.Offset = UV.Offset + UV.Size;
+                IndexView.Size = Indices.size() * sizeof(int);
+
+                GLTF::CAccessor PositionAccessor, NormalAccessor, UVAccessor, IndexAccessor;
+                PositionAccessor.BufferView = BufferViews.size();
+                PositionAccessor.ComponentType = GLTF::GLTFTypes::FLOAT;
+                PositionAccessor.Count = Vertices.size();
+                PositionAccessor.Type = "VEC3";
+                PositionAccessor.SetMin(Min);
+                PositionAccessor.SetMax(Max);
+
+                NormalAccessor.BufferView = BufferViews.size() + 1;
+                NormalAccessor.ComponentType = GLTF::GLTFTypes::FLOAT;
+                NormalAccessor.Count = Normals.size();
+                NormalAccessor.Type = "VEC3";
+
+                UVAccessor.BufferView = BufferViews.size() + 2;
+                UVAccessor.ComponentType = GLTF::GLTFTypes::FLOAT;
+                UVAccessor.Count = UVs.size();
+                UVAccessor.Type = "VEC2";
+
+                IndexAccessor.BufferView = BufferViews.size() + 3;
+                IndexAccessor.ComponentType = GLTF::GLTFTypes::INT;
+                IndexAccessor.Count = Indices.size();
+                IndexAccessor.Type = "SCALAR";
+
+                GLTF::CPrimitive Primitive;
+                Primitive.PositionAccessor = Accessors.size();
+                Primitive.NormalAccessor = Accessors.size() + 1;
+                Primitive.TextCoordAccessor = Accessors.size() + 2;
+                Primitive.IndicesAccessor = Accessors.size() + 3;
+                Primitive.Material = GLTFMesh.Primitives.size();
+
+                GLTFMesh.Primitives.push_back(Primitive);
+
+                BufferViews.push_back(Position);
+                BufferViews.push_back(Normal);
+                BufferViews.push_back(UV);
+                BufferViews.push_back(IndexView);
+
+                Accessors.push_back(PositionAccessor);
+                Accessors.push_back(NormalAccessor);
+                Accessors.push_back(UVAccessor);
+                Accessors.push_back(IndexAccessor);
+
+                size_t Pos = Binary.size();
+
+                Binary.resize(Binary.size() + Position.Size + Normal.Size + UV.Size + IndexView.Size);
+
+                memcpy(Binary.data() + Pos, Vertices.data(), Position.Size);
+                Pos += Position.Size;
+
+                memcpy(Binary.data() + Pos, Normals.data(), Normal.Size);
+                Pos += Normal.Size;
+
+                for (auto &&uv : UVs)
+                {
+                    memcpy(Binary.data() + Pos, &uv, sizeof(float) * 2);
+                    Pos += sizeof(float) * 2;
+                }
+
+                memcpy(Binary.data() + Pos, Indices.data(), IndexView.Size);
             }
-
-            GLTF::CBufferView Position, Normal, UV, IndexView;
-
-            Position.Offset = Binary.size();
-            Position.Size = Vertices.size() * sizeof(CVector);
-
-            Normal.Offset = Position.Offset + Position.Size;
-            Normal.Size = Normals.size() * sizeof(CVector);
-
-            UV.Offset = Normal.Offset + Normal.Size;
-            UV.Size = UVs.size() * (sizeof(float) * 2);
-
-            IndexView.Offset = UV.Offset + UV.Size;
-            IndexView.Size = Indices.size() * sizeof(int);
-
-            GLTF::CAccessor PositionAccessor, NormalAccessor, UVAccessor, IndexAccessor;
-            PositionAccessor.BufferView = BufferViews.size();
-            PositionAccessor.ComponentType = GLTF::GLTFTypes::FLOAT;
-            PositionAccessor.Count = Vertices.size();
-            PositionAccessor.Type = "VEC3";
-            PositionAccessor.SetMin(Min);
-            PositionAccessor.SetMax(Max);
-
-            NormalAccessor.BufferView = BufferViews.size() + 1;
-            NormalAccessor.ComponentType = GLTF::GLTFTypes::FLOAT;
-            NormalAccessor.Count = Normals.size();
-            NormalAccessor.Type = "VEC3";
-
-            UVAccessor.BufferView = BufferViews.size() + 2;
-            UVAccessor.ComponentType = GLTF::GLTFTypes::FLOAT;
-            UVAccessor.Count = UVs.size();
-            UVAccessor.Type = "VEC2";
-
-            IndexAccessor.BufferView = BufferViews.size() + 3;
-            IndexAccessor.ComponentType = GLTF::GLTFTypes::INT;
-            IndexAccessor.Count = Indices.size();
-            IndexAccessor.Type = "SCALAR";
-
-            GLTF::CPrimitive Primitive;
-            Primitive.PositionAccessor = Accessors.size();
-            Primitive.NormalAccessor = Accessors.size() + 1;
-            Primitive.TextCoordAccessor = Accessors.size() + 2;
-            Primitive.IndicesAccessor = Accessors.size() + 3;
-            Primitive.Material = GLTFMesh.Primitives.size();
-
-            GLTFMesh.Primitives.push_back(Primitive);
-
-            BufferViews.push_back(Position);
-            BufferViews.push_back(Normal);
-            BufferViews.push_back(UV);
-            BufferViews.push_back(IndexView);
-
-            Accessors.push_back(PositionAccessor);
-            Accessors.push_back(NormalAccessor);
-            Accessors.push_back(UVAccessor);
-            Accessors.push_back(IndexAccessor);
-
-            size_t Pos = Binary.size();
-
-            Binary.resize(Binary.size() + Position.Size + Normal.Size + UV.Size + IndexView.Size);
-
-            memcpy(Binary.data() + Pos, Vertices.data(), Position.Size);
-            Pos += Position.Size;
-
-            memcpy(Binary.data() + Pos, Normals.data(), Normal.Size);
-            Pos += Normal.Size;
-
-            for (auto &&uv : UVs)
-            {
-                memcpy(Binary.data() + Pos, &uv, sizeof(float) * 2);
-                Pos += sizeof(float) * 2;
-            }
-
-            memcpy(Binary.data() + Pos, Indices.data(), IndexView.Size);
+        
+            GLTFMeshes.push_back(GLTFMesh);
         }
-
+        
         GLTF::CImage Image;
         GLTF::CBuffer Buffer;
 
@@ -174,10 +184,10 @@ namespace VoxelOptimizer
         stbi_write_png_to_func([](void *context, void *data, int size){
             std::vector<char> *InnerTexture = (std::vector<char>*)context;
             InnerTexture->insert(InnerTexture->end(), (char*)data, ((char*)data) + size);
-        }, &Texture, Mesh->Texture.size(), 1, 4, Mesh->Texture.data(), 4 * Mesh->Texture.size());
+        }, &Texture, Meshes[0]->Texture.size(), 1, 4, Meshes[0]->Texture.data(), 4 * Meshes[0]->Texture.size());
 
         // For glb add padding to satify the 4 Byte boundary.
-        if(m_Binary)
+        if(m_Settings->Binary)
         {            
             size_t Size = Binary.size();
             int Padding = (Binary.size() + Texture.size()) % 4;
@@ -206,10 +216,10 @@ namespace VoxelOptimizer
         CJSON json;
         json.AddPair("asset", GLTF::CAsset());
         json.AddPair("scene", 0);
-        json.AddPair("scenes", std::vector<GLTF::CScene>() = { GLTF::CScene() });
-        json.AddPair("nodes", std::vector<GLTF::CNode>() = { GLTF::CNode() });
+        json.AddPair("scenes", std::vector<GLTF::CScene>() = { GLTF::CScene(Nodes.size()) }); // Erweitern um nodes
+        json.AddPair("nodes", Nodes);
 
-        json.AddPair("meshes", std::vector<GLTF::CMesh>() = { GLTFMesh });
+        json.AddPair("meshes", GLTFMeshes);
         json.AddPair("accessors", Accessors);
         json.AddPair("bufferViews", BufferViews);
         json.AddPair("materials", Materials);        
@@ -219,14 +229,16 @@ namespace VoxelOptimizer
         json.AddPair("buffers", std::vector<GLTF::CBuffer>() = { Buffer });
         
         std::string JS = json.Serialize();
-        if(m_Binary)
+
+        // Padding for the binary format
+        if(m_Settings->Binary)
         {
             int Padding = JS.size() % 4;
             for (int i = 0; i < Padding; i++)
                 JS += ' ';
         }
 
-        if(!m_Binary)
+        if(!m_Settings->Binary)
         {
             std::vector<char> GLTF(JS.begin(), JS.end());
             return {

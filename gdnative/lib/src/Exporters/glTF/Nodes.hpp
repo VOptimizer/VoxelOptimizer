@@ -27,6 +27,7 @@
 
 #include <CJSON/JSON.hpp>
 #include <string.h>
+#include <VoxelOptimizer/Mat4x4.hpp>
 #include <VoxelOptimizer/Vector.hpp>
 #include <cstdint>
 
@@ -53,19 +54,41 @@ namespace VoxelOptimizer
         class CScene
         {
             public:
+                CScene(int nodes) : m_Nodes(nodes) {}
+
                 void Serialize(CJSON &json) const
                 {
-                    json.AddPair("nodes", std::vector<int>(1));
+                    std::vector<int> nodeIds(m_Nodes);
+                    for (int i = 0; i < m_Nodes; i++)
+                        nodeIds[i] = i;
+
+                    json.AddPair("nodes", nodeIds);
                 }    
+            private:
+                int m_Nodes;
         };
 
         class CNode
         {
             public:
+                CNode(int meshId, const CMat4x4 &mat) : m_MeshId(meshId), m_Matrix(mat) {}
+
                 void Serialize(CJSON &json) const
                 {
-                    json.AddPair("mesh", 0);
+                    json.AddPair("mesh", m_MeshId);
+                    std::vector<float> matrix = {
+                        m_Matrix.x.x, m_Matrix.y.x, m_Matrix.z.x, m_Matrix.w.x,
+                        m_Matrix.x.y, m_Matrix.y.y, m_Matrix.z.y, m_Matrix.w.y,
+                        m_Matrix.x.z, m_Matrix.y.z, m_Matrix.z.z, m_Matrix.w.z,
+                        m_Matrix.x.w, m_Matrix.y.w, m_Matrix.z.w, m_Matrix.w.w
+                    };
+
+                    json.AddPair("matrix", matrix);
                 }    
+
+            private:
+                int m_MeshId;
+                CMat4x4 m_Matrix;
         };
 
         class CBuffer

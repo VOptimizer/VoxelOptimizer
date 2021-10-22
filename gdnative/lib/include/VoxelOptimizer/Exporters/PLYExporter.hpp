@@ -22,21 +22,23 @@
  * SOFTWARE.
  */
 
-#ifndef GLTFEXPORTER_HPP
-#define GLTFEXPORTER_HPP
+#ifndef PLYEXPORTER_HPP
+#define PLYEXPORTER_HPP
 
 #include <VoxelOptimizer/Exporters/IExporter.hpp>
+
 namespace VoxelOptimizer
 {
-    class CGLTFExporter : public IExporter
+    class CPLYExporter : public IExporter
     {
         public:
-            CGLTFExporter() = default;
+            CPLYExporter() = default;
 
             std::map<std::string, std::vector<char>> Generate(std::vector<Mesh> Meshes) override;
 
-            virtual ~CGLTFExporter() = default;
+            ~CPLYExporter() = default;
     };
 } // namespace VoxelOptimizer
 
-#endif //GLTFEXPORTER_HPP
+
+#endif //PLYEXPORTER_HPP

@@ -25,6 +25,7 @@
 #ifndef IEXPORTER_HPP
 #define IEXPORTER_HPP
 
+#include <VoxelOptimizer/Exporters/ExportSettings.hpp>
 #include <map>
 #include <memory>
 #include <VoxelOptimizer/Mesh.hpp>
@@ -36,8 +37,10 @@ namespace VoxelOptimizer
     class IExporter
     {
         public:
+            IExporter();
+
             /**
-             * @brief Generates and saves the mesh.
+             * @brief Generates and saves a mesh.
              * 
              * @param Path: Path of the file.
              * @param Mesh: Mesh to save.
@@ -45,13 +48,30 @@ namespace VoxelOptimizer
             virtual void Save(const std::string &Path, Mesh Mesh);
 
             /**
-             * @brief Generates the file streams.
+             * @brief Generates and saves a list of meshes.
+             * 
+             * @param Path: Path of the file.
+             * @param Meshes: Meshes to save.
+             */
+            virtual void Save(const std::string &Path, std::vector<Mesh> Meshes);
+
+            /**
+             * @brief Generates a file stream.
              * 
              * @param Mesh: Mesh to save.
              * 
              * @return Returns a map where the key is the type and the std::vector<char> is the data.
              */
-            virtual std::map<std::string, std::vector<char>> Generate(Mesh Mesh) = 0;
+            virtual std::map<std::string, std::vector<char>> Generate(Mesh Mesh);
+
+            /**
+             * @brief Generates a file stream.
+             * 
+             * @param Meshes: Meshes to save.
+             * 
+             * @return Returns a map where the key is the type and the std::vector<char> is the data.
+             */
+            virtual std::map<std::string, std::vector<char>> Generate(std::vector<Mesh> Meshes) = 0;
 
             /**
              * @brief Sets the name for the all the external files. Only needed for memory generation.
@@ -60,12 +80,23 @@ namespace VoxelOptimizer
             {
                 m_ExternalFilenames = ExternalFilenames;
             }
+
+            inline ExportSettings Settings() const
+            {
+                return m_Settings;
+            }
+            
+            inline void Settings(ExportSettings Settings)
+            {
+                m_Settings = Settings;
+            }
         
         protected:
             std::string GetPathWithoutExt(std::string Path);
             std::string GetFilenameWithoutExt(std::string Path);
 
             std::string m_ExternalFilenames;
+            ExportSettings m_Settings;
     };
 
     using Exporter = std::shared_ptr<IExporter>;
