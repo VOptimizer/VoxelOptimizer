@@ -168,6 +168,7 @@ namespace VoxelOptimizer
             }
 
             ClearCache();
+            RetMesh->ModelMatrix = m->GetModelMatrix();
             Ret[c.Beg] = RetMesh;
         }
         

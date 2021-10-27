@@ -52,6 +52,7 @@ namespace VoxelOptimizer
             void ClearCache();
 
             void AddFace(Mesh Mesh, CVector v1, CVector v2, CVector v3, CVector v4, CVector Normal, int Color, int Material);
+            void AddFace(Mesh Mesh, CVector v1, CVector v2, CVector v3, CVector Normal, int Color, int Material);
 
             int AddVertex(Mesh Mesh, CVector Vertex);
             int AddNormal(Mesh Mesh, CVector Normal);

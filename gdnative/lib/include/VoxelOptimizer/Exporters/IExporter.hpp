@@ -45,7 +45,7 @@ namespace VoxelOptimizer
              * @param Path: Path of the file.
              * @param Mesh: Mesh to save.
              */
-            virtual void Save(const std::string &Path, Mesh Mesh);
+            virtual void Save(const std::string &Path, Mesh mesh);
 
             /**
              * @brief Generates and saves a list of meshes.

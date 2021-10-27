@@ -18,7 +18,7 @@ int main(int argc, char const *argv[])
     VoxelOptimizer::Loader loader(new VoxelOptimizer::CMagicaVoxelLoader());
 
     auto start = chrono::system_clock::now();
-    loader->Load("objects_rot.vox");
+    loader->Load("windmill.vox");
     auto end = chrono::system_clock::now();
     auto LoadTime = end - start;
 
@@ -81,6 +81,10 @@ int main(int argc, char const *argv[])
         // exporterObj.Save(std::to_string(counter) + ".glb", Mesh);
         // counter++;
     }
+
+    VoxelOptimizer::CMarchingCubesMesher mc;
+
+    auto mcMesh = mc.GenerateMeshes(voxels.front(), loader);
     
     end = chrono::system_clock::now();
     auto RealTime = end - start;
@@ -99,6 +103,9 @@ int main(int argc, char const *argv[])
     gltfExporter.Save("object_rot.gltf", meshes);
     escnExporter.Save("object_rot.esn", meshes);
     plyExporter.Save("object_rot.ply", meshes);
+
+    objExporter.Settings()->WorldSpace = false;
+    objExporter.Save("mc.obj", mcMesh.begin()->second);
 
     cout << "Load: " << std::chrono::duration_cast<std::chrono::milliseconds>(LoadTime).count() << endl;
     // cout << "Dummy: " << std::chrono::duration_cast<std::chrono::milliseconds>(DummyTime).count() << endl;

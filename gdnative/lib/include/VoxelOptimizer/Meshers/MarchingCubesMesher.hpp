@@ -22,29 +22,26 @@
  * SOFTWARE.
  */
 
-#ifndef VOXELOPTIMIZER_HPP
-#define VOXELOPTIMIZER_HPP
+#ifndef MARCHINGCUBESMESHER_HPP
+#define MARCHINGCUBESMESHER_HPP
 
-#include <VoxelOptimizer/BBox.hpp>
-#include <VoxelOptimizer/Color.hpp>
-#include <VoxelOptimizer/Exceptions.hpp>
-#include <VoxelOptimizer/Material.hpp>
-#include <VoxelOptimizer/Mesh.hpp>
-#include <VoxelOptimizer/Vector.hpp>
+#include <VoxelOptimizer/Meshers/IMesher.hpp>
 
-#include <VoxelOptimizer/Exporters/IExporter.hpp>
-#include <VoxelOptimizer/Exporters/SpriteStackingExporter.hpp>
-#include <VoxelOptimizer/Exporters/WavefrontObjExporter.hpp>
-#include <VoxelOptimizer/Exporters/GLTFExporter.hpp>
-#include <VoxelOptimizer/Exporters/GodotSceneExporter.hpp>
-#include <VoxelOptimizer/Exporters/PLYExporter.hpp>
-#include <VoxelOptimizer/Loaders/ILoader.hpp>
-#include <VoxelOptimizer/Loaders/GoxelLoader.hpp>
-#include <VoxelOptimizer/Loaders/MagicaVoxelLoader.hpp>
-#include <VoxelOptimizer/Loaders/VoxelMesh.hpp>
-#include <VoxelOptimizer/Loaders/KenshapeLoader.hpp>
-#include <VoxelOptimizer/Meshers/GreedyMesher.hpp>
-#include <VoxelOptimizer/Meshers/SimpleMesher.hpp>
-#include <VoxelOptimizer/Meshers/MarchingCubesMesher.hpp>
+namespace VoxelOptimizer
+{
+    class CMarchingCubesMesher : public IMesher
+    {
+        public:
+            CMarchingCubesMesher() = default;
 
-#endif //VOXELOPTIMIZER_HPP
+            std::map<CVector, Mesh> GenerateMeshes(VoxelMesh m, Loader Loader) override;
+
+            ~CMarchingCubesMesher() = default;
+
+        private:
+            void CreateFaces(Mesh m, CVector pos, CVector center, short *edges);
+    };
+} // namespace VoxelOptimizer
+
+
+#endif //MARCHINGCUBESMESHER_HPP

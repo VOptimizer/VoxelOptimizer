@@ -33,9 +33,9 @@ namespace VoxelOptimizer
 
     }
 
-    void IExporter::Save(const std::string &Path, Mesh Mesh)
+    void IExporter::Save(const std::string &Path, Mesh mesh)
     {
-        Save(Path, { Mesh });
+        Save(Path, std::vector<Mesh>() = { mesh });
     }
 
     void IExporter::Save(const std::string &Path, std::vector<Mesh> Meshes)
