@@ -39,15 +39,39 @@
 
 namespace VoxelOptimizer
 {
+    class ILoader;
+    using Loader = std::shared_ptr<ILoader>;
+
+    enum class LoaderTypes
+    {
+        UNKNOWN = -1,
+        MAGICAVOXEL,
+        GOXEL,
+        KENSHAPE
+    };
+
     class ILoader
     {
         public:
             using ColorPalette = std::vector<CColor>;
 
             /**
-             * @brief Loads a .vox file from disk.
+             * @brief Creates an instance of a loader, which then loads the given file.
+             * 
+             * @throws CVoxelLoaderException If there is no loader for the given file or the file couldn't be load.
+             */
+            static Loader CreateAndLoad(const std::string &filename);
+
+            /**
+             * @brief Creates an instance of a the given loader;
+             */
+            static Loader Create(LoaderTypes type);
+
+            /**
+             * @brief Loads a voxel file from disk.
              * 
              * @param File: Path to the voxel file.
+             * @throws CVoxelLoaderException If the file couldn't be load.
              */
             virtual void Load(const std::string &File);
 
@@ -56,6 +80,8 @@ namespace VoxelOptimizer
              * 
              * @param Data: Data of the file.
              * @param Lenght: Data size.
+             * 
+             * @throws CVoxelLoaderException If the file couldn't be load.
              */
             virtual void Load(const char *Data, size_t Length);
 
@@ -104,8 +130,6 @@ namespace VoxelOptimizer
             std::vector<char> m_Data;
             size_t m_Pos;
     };
-
-    using Loader = std::shared_ptr<ILoader>;
 } // namespace VoxelOptimizer
 
 #endif //ILOADER_HPP

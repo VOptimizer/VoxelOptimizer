@@ -22,13 +22,47 @@
  * SOFTWARE.
  */
 
+#include "../FileUtils.hpp"
 #include <VoxelOptimizer/Exceptions.hpp>
 #include <fstream>
+#include <VoxelOptimizer/Loaders/GoxelLoader.hpp>
 #include <VoxelOptimizer/Loaders/ILoader.hpp>
+#include <VoxelOptimizer/Loaders/KenshapeLoader.hpp>
+#include <VoxelOptimizer/Loaders/MagicaVoxelLoader.hpp>
 #include <string.h>
 
 namespace VoxelOptimizer
 {
+    Loader ILoader::CreateAndLoad(const std::string &filename)
+    {
+        std::string ext = GetFileExt(filename);
+        LoaderTypes type = LoaderTypes::UNKNOWN;
+        
+        if(ext == "vox")
+            type = LoaderTypes::MAGICAVOXEL;
+        else if(ext == "gox")
+            type = LoaderTypes::GOXEL;
+        else if(ext == "kenshape")
+            type = LoaderTypes::KENSHAPE;
+
+        auto loader = Create(type);
+        loader->Load(filename);
+
+        return loader;
+    }
+
+    Loader ILoader::Create(LoaderTypes type)
+    {
+        switch (type)
+        {
+            case LoaderTypes::MAGICAVOXEL: return Loader(new CMagicaVoxelLoader());
+            case LoaderTypes::GOXEL: return Loader(new CGoxelLoader());
+            case LoaderTypes::KENSHAPE: return Loader(new CKenshapeLoader());
+
+            default: throw CVoxelLoaderException("Unknown file type!");
+        }
+    }
+
     void ILoader::Load(const std::string &File)
     {
         std::ifstream in(File, std::ios::binary);

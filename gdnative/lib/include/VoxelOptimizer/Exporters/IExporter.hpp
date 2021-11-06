@@ -34,10 +34,27 @@
 
 namespace VoxelOptimizer
 {
+    class IExporter;
+    using Exporter = std::shared_ptr<IExporter>;
+
+    enum class ExporterTypes
+    {
+        OBJ,
+        GLTF,
+        GLB,
+        ESCN,
+        PLY
+    };
+
     class IExporter
     {
         public:
             IExporter();
+
+            /**
+             * @brief Creates a new exporter instance.
+             */
+            static Exporter Create(ExporterTypes type);
 
             /**
              * @brief Generates and saves a mesh.
@@ -92,14 +109,9 @@ namespace VoxelOptimizer
             }
         
         protected:
-            std::string GetPathWithoutExt(std::string Path);
-            std::string GetFilenameWithoutExt(std::string Path);
-
             std::string m_ExternalFilenames;
             ExportSettings m_Settings;
     };
-
-    using Exporter = std::shared_ptr<IExporter>;
 } // namespace VoxelOptimizer
 
 

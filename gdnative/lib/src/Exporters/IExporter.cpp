@@ -22,12 +22,37 @@
  * SOFTWARE.
  */
 
+#include "../FileUtils.hpp"
 #include <algorithm>
 #include <fstream>
+#include <VoxelOptimizer/Exporters/GLTFExporter.hpp>
+#include <VoxelOptimizer/Exporters/GodotSceneExporter.hpp>
 #include <VoxelOptimizer/Exporters/IExporter.hpp>
+#include <VoxelOptimizer/Exporters/WavefrontObjExporter.hpp>
+#include <VoxelOptimizer/Exporters/PLYExporter.hpp>
 
 namespace VoxelOptimizer
 {
+    Exporter IExporter::Create(ExporterTypes type)
+    {
+        switch (type)
+        {
+            case ExporterTypes::OBJ: return Exporter(new CWavefrontObjExporter());
+
+            case ExporterTypes::GLTF: 
+            case ExporterTypes::GLB:
+            {
+                auto tmp = Exporter(new CGLTFExporter());
+                tmp->Settings()->Binary = type == ExporterTypes::GLB;
+
+                return tmp;
+            } 
+
+            case ExporterTypes::PLY: return Exporter(new CPLYExporter());
+            case ExporterTypes::ESCN: return Exporter(new CGodotSceneExporter());
+        }
+    }
+
     IExporter::IExporter() : m_Settings(new CExportSettings())
     {
 
@@ -56,33 +81,8 @@ namespace VoxelOptimizer
         }
     }
 
-    std::map<std::string, std::vector<char>> IExporter::Generate(Mesh Mesh)
+    std::map<std::string, std::vector<char>> IExporter::Generate(Mesh mesh)
     {
-        return Generate({ Mesh });
-    }
-
-    std::string IExporter::GetPathWithoutExt(std::string Path)
-    {
-        // Removes the file extension.
-        size_t Pos = Path.find_last_of(".");
-        if(Pos != std::string::npos)
-            Path = Path.erase(Pos);
-
-        return Path;
-    }
-
-    std::string IExporter::GetFilenameWithoutExt(std::string Path)
-    {
-        Path = GetPathWithoutExt(Path);
-
-        // Replaces all '\' to '/'
-        std::replace(Path.begin(), Path.end(), '\\', '/');
-
-        // Deletes the path.
-        size_t Pos = Path.find_last_of("/");
-        if(Pos != std::string::npos)
-            Path = Path.substr(Pos);
-
-        return Path;
+        return Generate(std::vector<Mesh>() = { mesh });
     }
 } // namespace VoxelOptimizer

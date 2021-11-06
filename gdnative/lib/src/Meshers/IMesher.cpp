@@ -22,10 +22,22 @@
  * SOFTWARE.
  */
 
+#include <VoxelOptimizer/Meshers/GreedyMesher.hpp>
 #include <VoxelOptimizer/Meshers/IMesher.hpp>
-
+#include <VoxelOptimizer/Meshers/MarchingCubesMesher.hpp>
+#include <VoxelOptimizer/Meshers/SimpleMesher.hpp>
 namespace VoxelOptimizer
 {
+    Mesher IMesher::Create(MesherTypes type)
+    {
+        switch (type)
+        {
+            case MesherTypes::SIMPLE: return Mesher(new CSimpleMesher());
+            case MesherTypes::GREEDY: return Mesher(new CGreedyMesher());
+            case MesherTypes::MARCHING_CUBES: return Mesher(new CMarchingCubesMesher());
+        }
+    }
+
     void IMesher::ClearCache()
     {
         m_Index.clear();

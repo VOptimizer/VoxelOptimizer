@@ -35,10 +35,25 @@
 
 namespace VoxelOptimizer
 {
+    class IMesher;
+    using Mesher = std::shared_ptr<IMesher>;
+
+    enum class MesherTypes
+    {
+        SIMPLE,
+        GREEDY,
+        MARCHING_CUBES
+    };
+
     class IMesher
     {
         public:
             IMesher() = default;
+
+            /**
+             * @brief Creates a new mesher instance.
+             */
+            static Mesher Create(MesherTypes type);
 
             /**
              * @brief Generates list of meshed chunks.
@@ -73,8 +88,6 @@ namespace VoxelOptimizer
 
             Loader m_Loader;
     };
-
-    using Mesher = std::shared_ptr<IMesher>;
 } // namespace VoxelOptimizer
 
 

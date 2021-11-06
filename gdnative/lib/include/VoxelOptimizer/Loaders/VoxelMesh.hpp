@@ -90,7 +90,7 @@ namespace VoxelOptimizer
     class CVoxelMesh
     {
         public:
-            CVoxelMesh() : m_RemeshAll(false), m_BlockCount(0) { }
+            CVoxelMesh() : m_RemeshAll(true), m_BlockCount(0) { }
 
             /**
              * @brief Sets the size of the voxel space.

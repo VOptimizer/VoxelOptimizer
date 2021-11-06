@@ -29,6 +29,7 @@
 #include <Godot.hpp>
 #include <Reference.hpp>
 #include <VoxelOptimizer/VoxelOptimizer.hpp>
+#include <vector>
 
 using namespace godot;
 
@@ -44,14 +45,16 @@ class CGodotVoxelOptimizer : public Reference
         godot_error Load(String Path);
         godot_error Save(String Path);
         godot_error SaveSlices(String Path);
-        Ref<ArrayMesh> GetMesh(bool Optimized);
+        Array GetMeshes(int mesherType);
         Dictionary GetStatistics();
 
         virtual ~CGodotVoxelOptimizer() = default;
     private:
         VoxelOptimizer::Loader m_Loader;
-        VoxelOptimizer::Mesh m_Mesh;
+        std::vector<VoxelOptimizer::Mesh> m_Meshes;
         int m_BlockCount;
+        int m_VerticesCount;
+        int m_FacesCount;
 };
 
 #endif //GODOTVOXELOPTIMIZER_HPP
