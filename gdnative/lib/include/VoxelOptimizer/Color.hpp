@@ -54,6 +54,11 @@ namespace VoxelOptimizer
                 return (uint32_t)R | (uint32_t)(G << 8) | (uint32_t)(B << 16) | (uint32_t)(A << 24);
             }
 
+            inline bool operator!=(const CColor &c)
+            {
+                return R != c.R || G != c.G || B != c.B || A != c.A;
+            }
+
             ~CColor() = default;
     };
 } // namespace VoxelOptimizer

@@ -34,44 +34,50 @@ namespace VoxelOptimizer
         m_FacesIndex.clear();
     }
 
-    void IMesher::AddFace(Mesh Mesh, CVector v1, CVector v2, CVector v3, CVector Normal, int Color, int Material)
+    void IMesher::AddFace(Mesh Mesh, SVertex v1, SVertex v2, SVertex v3)
     {
         int I1, I2, I3;
-        I1 = AddVertex(Mesh, v1);
-        I2 = AddVertex(Mesh, v2);
-        I3 = AddVertex(Mesh, v3);
+        I1 = AddVertex(Mesh, v1.Pos);
+        I2 = AddVertex(Mesh, v2.Pos);
+        I3 = AddVertex(Mesh, v3.Pos);
 
         GroupedFaces Faces;
 
-        auto ITFaces = m_FacesIndex.find(Material);
+        auto ITFaces = m_FacesIndex.find(v1.Material);
         if(ITFaces == m_FacesIndex.end())
         {
             Faces = GroupedFaces(new SGroupedFaces());
             Mesh->Faces.push_back(Faces);
 
-            Faces->MaterialIndex = Material;
-            Faces->FaceMaterial = m_Loader->GetMaterials()[Material];
-            m_FacesIndex.insert({Material, Faces});
+            Faces->MaterialIndex = v1.Material;
+            Faces->FaceMaterial = m_Loader->GetMaterials()[v1.Material];
+            m_FacesIndex.insert({v1.Material, Faces});
         }
         else
             Faces = ITFaces->second;
             
-        CVector FaceNormal = (v2 - v1).Cross(v3 - v1).Normalize(); 
-        int NormalIdx = AddNormal(Mesh, Normal);
-        int UVIdx = AddUV(Mesh, CVector(((float)(Color + 0.5f)) / Mesh->Texture.size(), 0.5f, 0));
+        // CVector FaceNormal = (v2 - v1).Cross(v3 - v1).Normalize(); 
+        int NormalIdx = AddNormal(Mesh, v1.Normal);
+        int UVIdx1 = AddUV(Mesh, v1.UV);
+        int UVIdx2 = AddUV(Mesh, v2.UV);
+        int UVIdx3 = AddUV(Mesh, v3.UV);
 
-        if(FaceNormal == Normal)
-        {
-            Faces->Indices.push_back(CVector(I1, NormalIdx, UVIdx));
-            Faces->Indices.push_back(CVector(I2, NormalIdx, UVIdx));
-            Faces->Indices.push_back(CVector(I3, NormalIdx, UVIdx));
-        }
-        else
-        {
-            Faces->Indices.push_back(CVector(I3, NormalIdx, UVIdx));
-            Faces->Indices.push_back(CVector(I2, NormalIdx, UVIdx));
-            Faces->Indices.push_back(CVector(I1, NormalIdx, UVIdx));
-        }
+        Faces->Indices.push_back(CVector(I1, NormalIdx, UVIdx1));
+        Faces->Indices.push_back(CVector(I2, NormalIdx, UVIdx2));
+        Faces->Indices.push_back(CVector(I3, NormalIdx, UVIdx3));
+
+        // if(FaceNormal == Normal)
+        // {
+        //     Faces->Indices.push_back(CVector(I1, NormalIdx, UVIdx));
+        //     Faces->Indices.push_back(CVector(I2, NormalIdx, UVIdx));
+        //     Faces->Indices.push_back(CVector(I3, NormalIdx, UVIdx));
+        // }
+        // else
+        // {
+        //     Faces->Indices.push_back(CVector(I3, NormalIdx, UVIdx));
+        //     Faces->Indices.push_back(CVector(I2, NormalIdx, UVIdx));
+        //     Faces->Indices.push_back(CVector(I1, NormalIdx, UVIdx));
+        // }
     }
 
     void IMesher::AddFace(Mesh Mesh, CVector v1, CVector v2, CVector v3, CVector v4, CVector Normal, int Color, int Material)

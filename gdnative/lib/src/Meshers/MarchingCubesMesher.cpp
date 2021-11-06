@@ -288,19 +288,51 @@ namespace VoxelOptimizer
 
     CVector positionTable[] = {
         CVector(0, -0.5, -0.5),
-        CVector(0.5, -0.5, 0),
-        CVector(0, -0.5, 0.5),
-        CVector(-0.5, -0.5, 0),
-
+        CVector(0.5, 0, -0.5),
         CVector(0, 0.5, -0.5),
-        CVector(0.5, 0.5, 0),
+        CVector(-0.5, 0, -0.5),
+
+        CVector(0, -0.5, 0.5),
+        CVector(0.5, 0, 0.5),
         CVector(0, 0.5, 0.5),
+        CVector(-0.5, 0, 0.5),
+
+        CVector(-0.5, -0.5, 0),
+        CVector(0.5, -0.5, 0),
+        CVector(0.5, 0.5, 0),
         CVector(-0.5, 0.5, 0),
 
-        CVector(-0.5, 0, -0.5),
-        CVector(0.5, 0, -0.5),
-        CVector(0.5, 0, 0.5),
-        CVector(-0.5, 0, 0.5),
+        // CVector(0, 0, 0),
+        // CVector(1, 0, 0),
+        // CVector(0, 0, 1),
+        // CVector(0, 0, 0),
+
+        // CVector(0, 1, 0),
+        // CVector(1, 1, 0),
+        // CVector(0, 1, 1),
+        // CVector(0, 1, 0),
+
+        // CVector(0, 0, 0),
+        // CVector(1, 0, 0),
+        // CVector(1, 0, 1),
+        // CVector(0, 0, 1),
+    };
+
+    std::vector<std::pair<CVector, CVector>> Corners = {
+      {CVector(0, 0, 0), CVector(1, 0, 0)}, 
+      {CVector(1, 0, 0), CVector(1, 1, 0)},  
+      {CVector(1, 1, 0), CVector(0, 1, 0)},  
+      {CVector(0, 1, 0), CVector(0, 0, 0)}, 
+
+      {CVector(0, 0, 1), CVector(1, 0, 1)},  
+      {CVector(1, 0, 1), CVector(1, 1, 1)},  
+      {CVector(1, 1, 1), CVector(0, 1, 1)},  
+      {CVector(0, 1, 1), CVector(0, 0, 1)}, 
+
+      {CVector(0, 0, 1), CVector(0, 0, 0)},  
+      {CVector(1, 0, 1), CVector(1, 0, 0)},  
+      {CVector(1, 1, 1), CVector(1, 1, 0)},  
+      {CVector(0, 1, 1), CVector(0, 1, 0)}
     };
 
     uint8_t GetTableIndex(VoxelMesh m, CVector pos)
@@ -356,7 +388,6 @@ namespace VoxelOptimizer
     std::map<CVector, Mesh> CMarchingCubesMesher::GenerateMeshes(VoxelMesh m, Loader Loader)
     {
         std::map<CVector, Mesh> Ret;
-
         m_Loader = Loader;
 
         auto Chunks = m->GetChunksToRemesh();
@@ -368,6 +399,7 @@ namespace VoxelOptimizer
         CVector BoxCenter = BBox.GetSize() / 2;
         std::swap(BoxCenter.y, BoxCenter.z);
         BoxCenter.z *= -1;
+        m_Mesh = m;
 
         for (auto &&c : Chunks)
         {
@@ -380,18 +412,10 @@ namespace VoxelOptimizer
                 {
                     for(float z = c.Beg.z - 1; z < c.End.z + 1; z++)
                     {
-                        CVector tmp1 = c.Beg;
-                        std::swap(tmp1.y, tmp1.z);
-                        tmp1.z *= -1;
-
-                        CVector tmp2 = c.End;
-                        std::swap(tmp2.y, tmp2.z);
-                        tmp2.z *= -1;
-
                         uint8_t idx = GetTableIndex(m, CVector(x, y, z));
                         auto edges = triangleConnectionTable[idx];
 
-                        CreateFaces(M, CVector(x, z, y), BoxCenter, edges);
+                        CreateFaces(M, CVector(x, y, z), Beg, BoxCenter, edges);
                     }
                 }
             }
@@ -400,12 +424,74 @@ namespace VoxelOptimizer
             Ret.insert({c.Beg, M});
         }
 
+        for (auto &&pair : Ret)
+        {
+            auto mesh = pair.second;
+            for (auto &&uv : mesh->UVs)
+                uv = CVector(((float)(uv.x + 0.5f)) / mesh->Texture.size(), 0.5f, 0);
+        }
+
         return Ret;
     }
 
-    void CMarchingCubesMesher::CreateFaces(Mesh m, CVector pos, CVector center, short *edges)
+    int CMarchingCubesMesher::GetColorIdx(CVector pos, int edge)
     {
-        // center.z *= -1;
+        auto corners = Corners[edge];
+        auto voxel = m_Mesh->GetVoxel(pos + corners.first);
+        if(!voxel)
+            voxel = m_Mesh->GetVoxel(pos + corners.second);
+
+        return voxel->Color;
+    }
+
+    int CMarchingCubesMesher::GetMaterialIdx(CVector pos, int edge)
+    {
+        auto corners = Corners[edge];
+        auto voxel = m_Mesh->GetVoxel(pos + corners.first);
+        if(!voxel)
+            voxel = m_Mesh->GetVoxel(pos + corners.second);
+
+        return voxel->Material;
+    }
+
+    CVector GetSolidIndex(int &oldidx, CVector idxs)
+    {
+        CVector4 tmpIdxs(oldidx, idxs.x, idxs.y, idxs.z);
+        std::map<int, int> counter;
+
+        for (char i = 0; i < 4; i++)
+        {
+            auto IT = counter.find(tmpIdxs.v[i]);
+            if(IT != counter.end())
+                IT->second++;
+            else
+                counter[tmpIdxs.v[i]] = 1;
+        }
+        
+        int maxCount = -1;
+        int idx = -1;
+
+        for (auto &&c : counter)
+        {
+            if(c.second > maxCount)
+            {
+                maxCount = c.second;
+                idx = c.first;
+            }
+        }
+
+        if(maxCount > 1)
+        {
+            idxs = CVector(idx, idx, idx);
+            oldidx = idx;
+        }   
+
+        return idxs;     
+    }
+
+    void CMarchingCubesMesher::CreateFaces(Mesh m, CVector pos, CVector beg, CVector center, short *edges)
+    {
+        int cidxtmp = -1;
 
         for (size_t i = 0; i < 15; i += 3)
         {
@@ -416,17 +502,46 @@ namespace VoxelOptimizer
             if(e1 == -1)
                 break;
 
-            auto v1 = pos + positionTable[e1];
-            auto v2 = pos + positionTable[e2];
-            auto v3 = pos + positionTable[e3];
+            SVertex v1, v2, v3;
 
-            // std::swap(v1.y, v1.z);
-            // std::swap(v2.y, v2.z);
-            // std::swap(v3.y, v3.z);
+            v1.Pos = pos + positionTable[e1] + CVector(1, 1, 1);
+            v2.Pos = pos + positionTable[e2] + CVector(1, 1, 1);
+            v3.Pos = pos + positionTable[e3] + CVector(1, 1, 1);
 
-            CVector FaceNormal = (v2 - v1).Cross(v3 - v1).Normalize(); 
+            std::swap(v1.Pos.y, v1.Pos.z);
+            std::swap(v2.Pos.y, v2.Pos.z);
+            std::swap(v3.Pos.y, v3.Pos.z);
 
-            AddFace(m, v1 - center, v2 - center, v3 - center, FaceNormal, 0, 0);
+            v1.Pos = v1.Pos * CVector(1, 1, -1) - beg - center;
+            v2.Pos = v2.Pos * CVector(1, 1, -1) - beg - center;
+            v3.Pos = v3.Pos * CVector(1, 1, -1) - beg - center;
+
+            int cidx1 = GetColorIdx(pos, e1);
+            int cidx2 = GetColorIdx(pos, e2);
+            int cidx3 = GetColorIdx(pos, e3);
+
+            CVector color(cidx1, cidx2, cidx3);
+            color = GetSolidIndex(cidxtmp, color);
+
+            v1.UV.x = color.x;
+            v2.UV.x = color.y; 
+            v3.UV.x = color.z;
+
+            int midx1 = GetMaterialIdx(pos, e1);
+            int midx2 = GetMaterialIdx(pos, e2);
+            int midx3 = GetMaterialIdx(pos, e3);
+
+            if(midx1 == midx2 || midx1 == midx3)
+                v1.Material = v2.Material = v3.Material = midx1;
+            else if(midx2 == midx3)
+                v1.Material = v2.Material = v3.Material = midx2;
+            else
+                v1.Material = v2.Material = v3.Material = midx1;
+
+            CVector FaceNormal = (v2.Pos - v1.Pos).Cross(v3.Pos - v1.Pos).Normalize(); 
+            v1.Normal = v2.Normal = v3.Normal = FaceNormal;
+
+            AddFace(m, v1, v2, v3);
         }
     }
 } // namespace VoxelOptimizer

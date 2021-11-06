@@ -94,7 +94,7 @@ int main(int argc, char const *argv[])
     VoxelOptimizer::CGLTFExporter gltfExporter;
     VoxelOptimizer::CGodotSceneExporter escnExporter;
 
-    objExporter.Settings()->WorldSpace = true;
+    objExporter.Settings()->WorldSpace = false;
     gltfExporter.Settings()->WorldSpace = true;
     escnExporter.Settings()->WorldSpace = true;
     plyExporter.Settings()->WorldSpace = true;
@@ -106,6 +106,9 @@ int main(int argc, char const *argv[])
 
     objExporter.Settings()->WorldSpace = false;
     objExporter.Save("mc.obj", mcMesh.begin()->second);
+
+    gltfExporter.Settings()->WorldSpace = false;
+    gltfExporter.Save("mc.gltf", mcMesh.begin()->second);
 
     cout << "Load: " << std::chrono::duration_cast<std::chrono::milliseconds>(LoadTime).count() << endl;
     // cout << "Dummy: " << std::chrono::duration_cast<std::chrono::milliseconds>(DummyTime).count() << endl;

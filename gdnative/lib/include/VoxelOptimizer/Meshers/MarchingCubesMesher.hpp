@@ -39,7 +39,11 @@ namespace VoxelOptimizer
             ~CMarchingCubesMesher() = default;
 
         private:
-            void CreateFaces(Mesh m, CVector pos, CVector center, short *edges);
+            VoxelMesh m_Mesh;
+
+            void CreateFaces(Mesh m, CVector pos, CVector beg, CVector center, short *edges);
+            int GetColorIdx(CVector pos, int edge);
+            int GetMaterialIdx(CVector pos, int edge);
     };
 } // namespace VoxelOptimizer
 
