@@ -29,6 +29,12 @@ border_width_left = 2
 border_width_top = 2
 border_color = Color( 0.0941176, 0.0901961, 0.121569, 1 )
 
+[sub_resource type="StyleBoxFlat" id=17]
+bg_color = Color( 0.145098, 0.156863, 0.211765, 1 )
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color( 0.0941176, 0.0901961, 0.121569, 1 )
+
 [sub_resource type="StyleBoxFlat" id=6]
 draw_center = false
 border_width_bottom = 2
@@ -54,14 +60,11 @@ corner_radius_bottom_right = 20
 shadow_size = 10
 shadow_offset = Vector2( 5, 5 )
 
-[sub_resource type="StyleBoxFlat" id=10]
+[sub_resource type="StyleBoxFlat" id=18]
 bg_color = Color( 0.145098, 0.156863, 0.211765, 1 )
 border_width_right = 2
 border_width_bottom = 2
 border_color = Color( 0.0941176, 0.0901961, 0.121569, 1 )
-
-[sub_resource type="StyleBoxFlat" id=11]
-draw_center = false
 
 [sub_resource type="StyleBoxFlat" id=12]
 bg_color = Color( 0.145098, 0.156863, 0.211765, 1 )
@@ -127,7 +130,21 @@ Button/styles/focus = SubResource( 2 )
 Button/styles/hover = SubResource( 3 )
 Button/styles/normal = SubResource( 4 )
 Button/styles/pressed = SubResource( 5 )
-Label/colors/font_color = Color( 0.88, 0.88, 0.88, 1 )
+ItemList/colors/font_color = Color( 0.878431, 0.878431, 0.878431, 1 )
+ItemList/colors/font_color_selected = Color( 1, 1, 1, 1 )
+ItemList/colors/guide_color = Color( 0, 0, 0, 0.1 )
+ItemList/constants/hseparation = 4
+ItemList/constants/icon_margin = 4
+ItemList/constants/line_separation = 2
+ItemList/constants/vseparation = 2
+ItemList/fonts/font = null
+ItemList/styles/bg = SubResource( 17 )
+ItemList/styles/bg_focus = null
+ItemList/styles/cursor = null
+ItemList/styles/cursor_unfocused = null
+ItemList/styles/selected = null
+ItemList/styles/selected_focus = null
+Label/colors/font_color = Color( 0.878431, 0.878431, 0.878431, 1 )
 Label/colors/font_color_shadow = Color( 0, 0, 0, 0 )
 Label/colors/font_outline_modulate = Color( 1, 1, 1, 1 )
 Label/constants/line_spacing = 3
@@ -170,7 +187,7 @@ PopupMenu/styles/panel_disabled = null
 PopupMenu/styles/separator = null
 Tree/colors/custom_button_font_highlight = Color( 0.94, 0.94, 0.94, 1 )
 Tree/colors/drop_position_color = Color( 1, 0.3, 0.2, 1 )
-Tree/colors/font_color = Color( 0.69, 0.69, 0.69, 1 )
+Tree/colors/font_color = Color( 0.878431, 0.878431, 0.878431, 1 )
 Tree/colors/font_color_selected = Color( 1, 1, 1, 1 )
 Tree/colors/guide_color = Color( 0, 0, 0, 0.1 )
 Tree/colors/relationship_line_color = Color( 0.27, 0.27, 0.27, 1 )
@@ -191,8 +208,8 @@ Tree/icons/checked = null
 Tree/icons/select_arrow = null
 Tree/icons/unchecked = null
 Tree/icons/updown = null
-Tree/styles/bg = SubResource( 10 )
-Tree/styles/bg_focus = SubResource( 11 )
+Tree/styles/bg = SubResource( 18 )
+Tree/styles/bg_focus = null
 Tree/styles/button_pressed = null
 Tree/styles/cursor = null
 Tree/styles/cursor_unfocused = null
@@ -201,9 +218,9 @@ Tree/styles/custom_button_hover = null
 Tree/styles/custom_button_pressed = null
 Tree/styles/selected = null
 Tree/styles/selected_focus = null
-Tree/styles/title_button_hover = null
-Tree/styles/title_button_normal = null
-Tree/styles/title_button_pressed = null
+Tree/styles/title_button_hover = SubResource( 3 )
+Tree/styles/title_button_normal = SubResource( 4 )
+Tree/styles/title_button_pressed = SubResource( 5 )
 VScrollBar/icons/decrement = null
 VScrollBar/icons/decrement_highlight = null
 VScrollBar/icons/increment = null

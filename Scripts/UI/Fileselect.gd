@@ -10,11 +10,11 @@ export(String) var FilePath = "" setget set_filepath
 export(PoolStringArray) var Filters 
 export(bool) var SaveDialog = false 
 
-onready var PopupFileDialogScene = preload("res://Scenes/UI/PopupFileDialog.tscn")
+onready var PopupFileDialogScene = preload("res://Scenes/UI/CustomFileDialog.tscn") #preload("res://Scenes/UI/PopupFileDialog.tscn")
 
 onready var _Caption : = $Caption
 onready var _Path : = $HBoxContainer/Path
-onready var _CurrentFileDlg : PopupFileDialog = null
+onready var _CurrentFileDlg : CustomFileDialog = null
 
 var _LastPath : String = ""
 
@@ -47,13 +47,20 @@ func _popup_hide():
 
 func _on_select_pressed():
 	_CurrentFileDlg = PopupFileDialogScene.instance()
-	_CurrentFileDlg.connect("file_selected", self, "_file_selected")
+	_CurrentFileDlg.popup_exclusive = true
+	_CurrentFileDlg.connect("on_file_selected", self, "_file_selected")
 	_CurrentFileDlg.connect("popup_hide", self, "_popup_hide")
 	
 	add_child(_CurrentFileDlg)
-	_CurrentFileDlg.Filters = Filters
-	_CurrentFileDlg.SaveDialog = SaveDialog
-	_CurrentFileDlg.Path = _LastPath
+	_CurrentFileDlg.filters = Filters
+	_CurrentFileDlg.access = CustomFileDialog.Access.ACCESS_FILESYSTEM
+	
+	if SaveDialog:
+		_CurrentFileDlg.mode = FileDialog.MODE_SAVE_FILE
+	else:
+		_CurrentFileDlg.mode = FileDialog.MODE_OPEN_FILE
+	
+	_CurrentFileDlg.current_dir = _LastPath
 	_CurrentFileDlg.popup()
 
 

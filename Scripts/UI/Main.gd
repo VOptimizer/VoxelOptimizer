@@ -1,15 +1,19 @@
 extends Control
 
 onready var _VoxelOptimizer : = CGodotVoxelOptimizer.new()
-onready var _MeshInstance : = $HBoxContainer/ViewportContainer/Viewport/Spatial/MeshInstance
-onready var _Wireframe : = $HBoxContainer/ViewportContainer/Viewport/Spatial/Wireframe
 onready var _OutputFile : = $HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Outputfile
 onready var _InputFile : = $HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Inputfile
 onready var _Statistics : = $HBoxContainer/ViewportContainer/Statistics
 onready var _StatisticsLabel : = $HBoxContainer/ViewportContainer/Statistics/MarginContainer/VBoxContainer/StatisticsLabel
 onready var _AboutDialog : = $AboutDialog
+onready var _Spatial : = $HBoxContainer/ViewportContainer/Viewport/Spatial
+onready var _WireframeButton : = $HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/Wireframe
+
+onready var _UnshadedMaterial = preload("res://Assets/Unshaded.material")
 
 var _Selected = 0
+var _Meshes = []
+var _Wireframes = []
 
 func _on_Fileselect_load_file(file : String):
 	var f = File.new()
@@ -21,14 +25,30 @@ func _on_Fileselect_load_file(file : String):
 	_OutputFile.FilePath = file.replace(file.get_extension(), "obj")
 
 func _generate_mesh():
-	var mesh : ArrayMesh = _VoxelOptimizer.get_mesh(_Selected)
-	var mesh2 : ArrayMesh = ArrayMesh.new()
+	for m in _Meshes:
+		m.queue_free()
+		
+	for w in _Wireframes:
+		w.queue_free()
+	_Wireframes.clear()
 	
-	for i in mesh.get_surface_count():
-		mesh2.add_surface_from_arrays(Mesh.PRIMITIVE_LINES, mesh.surface_get_arrays(i))
+	_Meshes = _VoxelOptimizer.get_meshes(_Selected)
+	for m in _Meshes:
+		_Spatial.add_child(m)
+		
+		var instance : = MeshInstance.new()
+		_Spatial.add_child(instance)
+		
+		var mesh : ArrayMesh = ArrayMesh.new()
+		for i in m.mesh.get_surface_count():
+			mesh.add_surface_from_arrays(Mesh.PRIMITIVE_LINES, m.mesh.surface_get_arrays(i))
 	
-	_MeshInstance.mesh = mesh#_VoxelOptimizer.get_mesh(_Selected)
-	_Wireframe.mesh = mesh2
+		instance.mesh = mesh
+		instance.transform = m.transform
+		instance.visible = _WireframeButton.pressed
+		instance.material_override = _UnshadedMaterial
+		_Wireframes.append(instance)
+	
 	_set_statistics()
 
 func _on_Button_pressed():
@@ -50,7 +70,8 @@ func _set_statistics():
 	_StatisticsLabel.text += "\nFaces: " + str(stats.faces)
 
 func _on_Button_toggled(button_pressed):
-	_Wireframe.visible = button_pressed
+	for w in _Wireframes:
+		w.visible = button_pressed
 	
 func _on_Button2_toggled(button_pressed):
 	_set_statistics()
