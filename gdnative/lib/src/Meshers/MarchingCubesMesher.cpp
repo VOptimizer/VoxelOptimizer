@@ -422,6 +422,7 @@ namespace VoxelOptimizer
 
             M->ModelMatrix = m->GetModelMatrix();
             Ret.insert({c.Beg, M});
+            ClearCache();
         }
 
         for (auto &&pair : Ret)

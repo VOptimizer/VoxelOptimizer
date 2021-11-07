@@ -85,7 +85,7 @@ godot_error CGodotVoxelOptimizer::Load(String Path)
     return (godot_error)Error::OK;
 }
 
-godot_error CGodotVoxelOptimizer::Save(String Path)
+godot_error CGodotVoxelOptimizer::Save(String Path, bool exportWorldspace)
 {
     if(m_Meshes.empty())
     {
@@ -113,6 +113,7 @@ godot_error CGodotVoxelOptimizer::Save(String Path)
         return (godot_error)Error::ERR_FILE_UNRECOGNIZED;
 
     Exporter = VoxelOptimizer::IExporter::Create(type);
+    Exporter->Settings()->WorldSpace = exportWorldspace;
 
     Path = Path.get_basename();
     Exporter->SetExternaFilenames(std::string(Path.get_file().utf8().get_data()));
@@ -120,7 +121,8 @@ godot_error CGodotVoxelOptimizer::Save(String Path)
 
     for (auto &&f : Files)
     {
-        VFile->open(Path + String(".") + String(f.first.c_str()), File::WRITE);
+        auto err = VFile->open(Path + String(".") + String(f.first.c_str()), File::WRITE);
+        
         if(!VFile->is_open())
         {
             ERR_PRINT("Couldn't open file: " + Path);
@@ -198,9 +200,12 @@ Array CGodotVoxelOptimizer::GetMeshes(int mesherType)
     m_BlockCount = 0;
     m_VerticesCount = 0;
     m_FacesCount = 0;
+    m_Meshes.clear();
     for (auto &&m : meshes)
     {
         auto mesh = Mesher->GenerateMeshes(m, m_Loader).begin()->second;
+        m_Meshes.push_back(mesh);
+
         m_BlockCount += m->GetBlockCount();
         m_VerticesCount += mesh->Vertices.size();
         

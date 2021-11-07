@@ -118,7 +118,11 @@ namespace VoxelOptimizer
             
             std::string fileStr = file.str();
 
-            ret.insert({std::to_string(counter) + ".ply", std::vector<char>(fileStr.begin(), fileStr.end())});
+            std::string ext = "ply";
+            if(Meshes.size() > 1)
+                ext = std::to_string(counter) + ".ply";
+
+            ret.insert({ext, std::vector<char>(fileStr.begin(), fileStr.end())});
             counter++;
         }
 

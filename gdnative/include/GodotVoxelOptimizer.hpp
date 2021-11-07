@@ -43,7 +43,7 @@ class CGodotVoxelOptimizer : public Reference
 
         static void _register_methods();
         godot_error Load(String Path);
-        godot_error Save(String Path);
+        godot_error Save(String Path, bool exportWorldspace);
         godot_error SaveSlices(String Path);
         Array GetMeshes(int mesherType);
         Dictionary GetStatistics();

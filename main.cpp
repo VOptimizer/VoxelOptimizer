@@ -18,7 +18,7 @@ int main(int argc, char const *argv[])
     VoxelOptimizer::Loader loader(new VoxelOptimizer::CMagicaVoxelLoader());
 
     auto start = chrono::system_clock::now();
-    loader->Load("windmill.vox");
+    loader->Load("3x3x3.vox");
     auto end = chrono::system_clock::now();
     auto LoadTime = end - start;
 
