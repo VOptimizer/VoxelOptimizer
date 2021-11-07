@@ -37,10 +37,28 @@ func set_filepath(filepath : String):
 		_Path.caret_position = filepath.length()
 
 func _file_selected(file):
+	var recent = _CurrentFileDlg.recent
+	var found : bool = false
+	
+	for r in recent:
+		if r == file:
+			found = true
+			break
+	
+	if !found:
+		recent.append(file)
+		
+		if SaveDialog:
+			SettingManager.set_recent_output(recent)
+		else:
+			SettingManager.set_recent_input(recent)
+	
 	set_filepath(file)
 	emit_signal("load_file", file)
 	
 func _popup_hide():
+	SettingManager.set_favourites(_CurrentFileDlg.favourites)
+	
 	remove_child(_CurrentFileDlg)
 	_CurrentFileDlg.queue_free()
 	_CurrentFileDlg = null
@@ -54,15 +72,17 @@ func _on_select_pressed():
 	add_child(_CurrentFileDlg)
 	_CurrentFileDlg.filters = Filters
 	_CurrentFileDlg.access = CustomFileDialog.Access.ACCESS_FILESYSTEM
+	_CurrentFileDlg.favourites = SettingManager.get_favourites()
 	
 	if SaveDialog:
 		_CurrentFileDlg.mode = FileDialog.MODE_SAVE_FILE
+		_CurrentFileDlg.recent = SettingManager.get_recent_output()
 	else:
 		_CurrentFileDlg.mode = FileDialog.MODE_OPEN_FILE
+		_CurrentFileDlg.recent = SettingManager.get_recent_input()
 	
 	_CurrentFileDlg.current_dir = _LastPath
-	_CurrentFileDlg.popup()
-
+	_CurrentFileDlg.popup_centered()
 
 func _on_Path_text_changed(new_text):
 	FilePath = new_text

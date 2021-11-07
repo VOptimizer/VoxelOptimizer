@@ -51,9 +51,9 @@ size_flags_vertical = 3
 
 [node name="PanelContainer" type="PanelContainer" parent="HBoxContainer/VBoxContainer/CenterContainer"]
 margin_left = 38.0
-margin_top = 161.0
+margin_top = 135.0
 margin_right = 378.0
-margin_bottom = 407.0
+margin_bottom = 433.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
@@ -61,7 +61,7 @@ size_flags_vertical = 3
 
 [node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer"]
 margin_right = 340.0
-margin_bottom = 246.0
+margin_bottom = 298.0
 custom_constants/margin_right = 20
 custom_constants/margin_top = 20
 custom_constants/margin_left = 20
@@ -71,7 +71,7 @@ custom_constants/margin_bottom = 20
 margin_left = 20.0
 margin_top = 20.0
 margin_right = 320.0
-margin_bottom = 226.0
+margin_bottom = 278.0
 custom_constants/separation = 20
 
 [node name="Inputfile" parent="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer" instance=ExtResource( 3 )]
@@ -132,10 +132,17 @@ margin_top = 22.0
 margin_right = 300.0
 margin_bottom = 42.0
 
-[node name="Button" type="Button" parent="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="CheckButton" type="CheckButton" parent="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
 margin_top = 186.0
 margin_right = 300.0
-margin_bottom = 206.0
+margin_bottom = 218.0
+pressed = true
+text = "Objects in worldspace"
+
+[node name="Button" type="Button" parent="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+margin_top = 238.0
+margin_right = 300.0
+margin_bottom = 258.0
 text = "Save"
 
 [node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/VBoxContainer"]
@@ -259,6 +266,7 @@ visible = false
 
 [connection signal="load_file" from="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Inputfile" to="." method="_on_Fileselect_load_file"]
 [connection signal="item_selected" from="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/OptionButton" to="." method="_on_OptionButton_item_selected"]
+[connection signal="toggled" from="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/CheckButton" to="." method="_on_worldspace_toggled"]
 [connection signal="pressed" from="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Button" to="." method="_on_Button_pressed"]
 [connection signal="resized" from="HBoxContainer/ViewportContainer" to="HBoxContainer/ViewportContainer" method="_on_ViewportContainer_resized"]
 [connection signal="toggled" from="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/Wireframe" to="." method="_on_Button_toggled"]
