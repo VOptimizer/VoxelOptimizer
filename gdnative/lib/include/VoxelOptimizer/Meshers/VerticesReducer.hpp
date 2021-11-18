@@ -22,30 +22,23 @@
  * SOFTWARE.
  */
 
-#ifndef VOXELOPTIMIZER_HPP
-#define VOXELOPTIMIZER_HPP
+#ifndef VERTICESREDUCER_HPP
+#define VERTICESREDUCER_HPP
 
-#include <VoxelOptimizer/BBox.hpp>
-#include <VoxelOptimizer/Color.hpp>
-#include <VoxelOptimizer/Exceptions.hpp>
-#include <VoxelOptimizer/Material.hpp>
 #include <VoxelOptimizer/Mesh.hpp>
-#include <VoxelOptimizer/Vector.hpp>
 
-#include <VoxelOptimizer/Exporters/IExporter.hpp>
-#include <VoxelOptimizer/Exporters/SpriteStackingExporter.hpp>
-#include <VoxelOptimizer/Exporters/WavefrontObjExporter.hpp>
-#include <VoxelOptimizer/Exporters/GLTFExporter.hpp>
-#include <VoxelOptimizer/Exporters/GodotSceneExporter.hpp>
-#include <VoxelOptimizer/Exporters/PLYExporter.hpp>
-#include <VoxelOptimizer/Loaders/ILoader.hpp>
-#include <VoxelOptimizer/Loaders/GoxelLoader.hpp>
-#include <VoxelOptimizer/Loaders/MagicaVoxelLoader.hpp>
-#include <VoxelOptimizer/Loaders/VoxelMesh.hpp>
-#include <VoxelOptimizer/Loaders/KenshapeLoader.hpp>
-#include <VoxelOptimizer/Meshers/GreedyMesher.hpp>
-#include <VoxelOptimizer/Meshers/SimpleMesher.hpp>
-#include <VoxelOptimizer/Meshers/MarchingCubesMesher.hpp>
-#include <VoxelOptimizer/Meshers/VerticesReducer.hpp>
+namespace VoxelOptimizer 
+{
+    class CVerticesReducer
+    {
+        public:
+            CVerticesReducer(/* args */) {}
 
-#endif //VOXELOPTIMIZER_HPP
+            Mesh Reduce(Mesh mesh);
+
+            ~CVerticesReducer() {}
+    };
+} // namespace VoxelOptimizer
+
+
+#endif //VERTICESREDUCER_HPP

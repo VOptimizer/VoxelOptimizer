@@ -18,7 +18,7 @@ int main(int argc, char const *argv[])
     VoxelOptimizer::Loader loader(new VoxelOptimizer::CMagicaVoxelLoader());
 
     auto start = chrono::system_clock::now();
-    loader->Load("3x3x3.vox");
+    loader->Load("2x1x2.vox");
     auto end = chrono::system_clock::now();
     auto LoadTime = end - start;
 
@@ -83,7 +83,6 @@ int main(int argc, char const *argv[])
     }
 
     VoxelOptimizer::CMarchingCubesMesher mc;
-
     auto mcMesh = mc.GenerateMeshes(voxels.front(), loader);
     
     end = chrono::system_clock::now();
@@ -109,6 +108,80 @@ int main(int argc, char const *argv[])
 
     gltfExporter.Settings()->WorldSpace = false;
     gltfExporter.Save("mc.gltf", mcMesh.begin()->second);
+
+    auto mesh = VoxelOptimizer::Mesh(new VoxelOptimizer::SMesh());
+
+
+// [0]:1
+// [1]:3
+// [2]:2
+// [3]:3
+// [4]:6
+// [5]:3
+// [6]:2
+// [7]:3
+// [8]:1
+
+
+    mesh->Vertices.push_back(VoxelOptimizer::CVector(-0.5, 0.5, 0));
+    mesh->Vertices.push_back(VoxelOptimizer::CVector(0, 0.5, 0));
+    mesh->Vertices.push_back(VoxelOptimizer::CVector(0.5, 0.5, 0));
+
+    mesh->Vertices.push_back(VoxelOptimizer::CVector(-0.5, 0, 0));
+    mesh->Vertices.push_back(VoxelOptimizer::CVector(0, 0, 0));
+    mesh->Vertices.push_back(VoxelOptimizer::CVector(0.5, 0, 0));
+
+    mesh->Vertices.push_back(VoxelOptimizer::CVector(-0.5, -0.5, 0));
+    mesh->Vertices.push_back(VoxelOptimizer::CVector(0, -0.5, 0));
+    mesh->Vertices.push_back(VoxelOptimizer::CVector(0.5, -0.5, 0));
+
+    mesh->UVs.push_back(VoxelOptimizer::CVector(0, 0, 0));
+    mesh->Normals.push_back(VoxelOptimizer::CVector(0, 0, 1));
+    mesh->Texture.push_back(VoxelOptimizer::CColor(1, 0, 0, 0));
+    mesh->Faces.push_back(VoxelOptimizer::GroupedFaces(new VoxelOptimizer::SGroupedFaces()));
+
+    mesh->Faces[0]->FaceMaterial = 0;
+    mesh->Faces[0]->FaceMaterial = VoxelOptimizer::Material(new VoxelOptimizer::CMaterial());
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(1, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(2, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(4, 1, 1));
+
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(2, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(5, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(4, 1, 1));
+
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(2, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(3, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(5, 1, 1));
+
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(3, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(6, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(5, 1, 1));
+
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(4, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(5, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(7, 1, 1));
+
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(5, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(8, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(7, 1, 1));
+
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(5, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(6, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(8, 1, 1));
+
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(6, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(9, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(8, 1, 1));
+
+    gltfExporter.Settings()->WorldSpace = false;
+    gltfExporter.Save("face.gltf", mesh);
+
+    VoxelOptimizer::CVerticesReducer reducer;
+    auto reducedMesh = reducer.Reduce(meshes.front());
+
+    gltfExporter.Settings()->WorldSpace = false;
+    gltfExporter.Save("reduced.gltf", reducedMesh);
 
     cout << "Load: " << std::chrono::duration_cast<std::chrono::milliseconds>(LoadTime).count() << endl;
     // cout << "Dummy: " << std::chrono::duration_cast<std::chrono::milliseconds>(DummyTime).count() << endl;
