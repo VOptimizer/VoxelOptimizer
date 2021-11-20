@@ -41,12 +41,46 @@ namespace VoxelOptimizer
     class Point
     {
         public:
-            Point(const CVector& position, const CVector &index, const CVector& center) : Position(position), Index(index)
+            Point(const CVector& position, const CVector &index) : Position(position), Index(index)
             {
-                if(position.x == center.x)
-                    m_Angle = 0;
-                else
-                    m_Angle = atan(double(position.z - center.z) / double(position.y - center.y) / double(position.x - center.x));
+                // m_Angle = center.Dot(position);
+
+                // if(position.x == center.x)
+                //     m_Angle = 0;
+                // else
+                //     m_Angle = atan(double(position.z - center.z) / double(position.y - center.y) / double(position.x - center.x));
+            }
+
+            void CalcAngle(const CVector& center, const CVector& normal)
+            {
+                // auto a = Position.Dot(normal) * normal;
+                // auto p = Position - a;
+
+                // a = center.Dot(normal) * normal;
+                // auto pc = center - a;
+
+//  If (Mathf.Abs(Vector3.Dot(Vector3.forward, normal)) < 0.2f)
+//      u = Vector3.ProjectOnPlane(Vector3.right, normal);
+//  else
+//      u = Vector3.ProjectOnPlane(Vector3.forward, normal);
+
+                CVector n = center.Normalize();//(1, 0, 1);
+                // if(fabs(n.Dot(normal)) < 0.2f)
+                //     n = CVector(-1, 0, 0);
+
+                auto a = n.Dot(normal) * normal;
+                auto xaxis = (n - a).Normalize();
+                auto yaxis = normal.Cross(xaxis);
+
+                CVector p(xaxis.Dot(Position), yaxis.Dot(Position), 0);
+                CVector pc(xaxis.Dot(center), yaxis.Dot(center), 0);
+
+                m_Angle = atan2(p.y - pc.y, p.x - pc.x);
+
+                // if(p.x == pc.x)
+                //     m_Angle = 0;
+                // else
+                //     m_Angle = atan(double(p.y - pc.y) / double(p.x - pc.x));
             }
 
             CVector Position;
@@ -96,10 +130,13 @@ namespace VoxelOptimizer
 
         while (trianglesIt != triangles.end())
         {
-            if (initTriangles[trianglesIt->first] > 2)
+            if (initTriangles[trianglesIt->first] == 3 || initTriangles[trianglesIt->first] == 6)
             {
                 // Stores a polygon
                 std::vector<Point> points;
+                CVector center;
+
+                float dotTotal = 0;
 
                 for (auto &&triangle : trianglesIt->second)
                 {
@@ -112,7 +149,10 @@ namespace VoxelOptimizer
                         {
                             //Obtain all remaining indices
                             if(points.empty())
-                                points.push_back(Point(mesh->Vertices[i.x - 1], i, mesh->Vertices[trianglesIt->first.x - 1]));
+                            {
+                                center += mesh->Vertices[trianglesIt->first.x - 1];
+                                points.push_back(Point(mesh->Vertices[i.x - 1], i));
+                            }
                             else
                             {
                                 bool found = false;
@@ -127,7 +167,12 @@ namespace VoxelOptimizer
                                 }    
 
                                 if(!found)
-                                    points.push_back(Point(mesh->Vertices[i.x - 1], i, mesh->Vertices[trianglesIt->first.x - 1]));
+                                {
+                                    dotTotal += mesh->Vertices[trianglesIt->first.x - 1].Dot(mesh->Vertices[i.x - 1]);
+
+                                    center += mesh->Vertices[trianglesIt->first.x - 1];
+                                    points.push_back(Point(mesh->Vertices[i.x - 1], i));
+                                }
                             }
                             
                             //Delete this triangle from all shared indices
@@ -136,6 +181,12 @@ namespace VoxelOptimizer
                                 it->second.remove(triangle);
                         }
                     }
+                }
+
+                center = center / points.size();
+                for (auto &&i : points)
+                {
+                    i.CalcAngle(center, mesh->Normals[trianglesIt->first.y - 1]);
                 }
 
                 std::vector<CVector> indices;
