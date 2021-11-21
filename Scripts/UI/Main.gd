@@ -37,6 +37,7 @@ func _generate_mesh():
 	_Wireframes.clear()
 	
 	_Meshes = _VoxelOptimizer.get_meshes(_Selected)
+	_Transforms.clear()
 	for m in _Meshes:
 		_Spatial.add_child(m)
 		
@@ -54,9 +55,12 @@ func _generate_mesh():
 	
 		instance.mesh = mesh
 		instance.transform = m.transform
+		_Transforms.append(m.transform)
 		instance.visible = _WireframeButton.pressed
 		instance.material_override = _UnshadedMaterial
 		_Wireframes.append(instance)
+	
+	_on_worldspace_toggled(_WorldspaceToggle.pressed)
 	
 	_set_statistics()
 
@@ -101,3 +105,7 @@ func _on_worldspace_toggled(button_pressed: bool) -> void:
 			
 			_Meshes[i].transform = Transform()
 			_Wireframes[i].transform = Transform()
+
+
+func _on_twitter_pressed() -> void:
+	OS.shell_open("https://twitter.com/Vailor11")

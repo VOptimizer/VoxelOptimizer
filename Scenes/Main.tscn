@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=2]
+[gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://Scripts/UI/ViewportContainer.gd" type="Script" id=1]
 [ext_resource path="res://Scenes/GimbleCam.tscn" type="PackedScene" id=2]
@@ -11,6 +11,7 @@
 [ext_resource path="res://Assets/Icons/chart.svg" type="Texture" id=9]
 [ext_resource path="res://Assets/Icons/info.svg" type="Texture" id=10]
 [ext_resource path="res://Scenes/UI/AboutDialog.tscn" type="PackedScene" id=11]
+[ext_resource path="res://Assets/Icons/Logo white.svg" type="Texture" id=12]
 
 [sub_resource type="Environment" id=2]
 ambient_light_color = Color( 0.44, 0.44, 0.44, 1 )
@@ -251,8 +252,18 @@ icon = ExtResource( 9 )
 [node name="Control" type="Control" parent="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer"]
 margin_top = 76.0
 margin_right = 34.0
-margin_bottom = 552.0
+margin_bottom = 514.0
 size_flags_vertical = 3
+
+[node name="Button" type="Button" parent="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer"]
+margin_top = 518.0
+margin_right = 34.0
+margin_bottom = 552.0
+hint_tooltip = "Follow me on Twitter @Vailor11"
+icon = ExtResource( 12 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="Button3" type="Button" parent="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer"]
 margin_top = 556.0
@@ -262,7 +273,6 @@ hint_tooltip = "About this tool"
 icon = ExtResource( 10 )
 
 [node name="AboutDialog" parent="." instance=ExtResource( 11 )]
-visible = false
 
 [connection signal="load_file" from="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Inputfile" to="." method="_on_Fileselect_load_file"]
 [connection signal="item_selected" from="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/OptionButton" to="." method="_on_OptionButton_item_selected"]
@@ -271,6 +281,7 @@ visible = false
 [connection signal="resized" from="HBoxContainer/ViewportContainer" to="HBoxContainer/ViewportContainer" method="_on_ViewportContainer_resized"]
 [connection signal="toggled" from="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/Wireframe" to="." method="_on_Button_toggled"]
 [connection signal="toggled" from="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/Button2" to="." method="_on_Button2_toggled"]
+[connection signal="pressed" from="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/Button" to="." method="_on_twitter_pressed"]
 [connection signal="pressed" from="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/Button3" to="." method="_on_Button3_pressed"]
 
 [editable path="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Inputfile"]

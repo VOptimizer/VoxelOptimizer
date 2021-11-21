@@ -9,6 +9,7 @@ The cli application helps you to use the voxeloptimizer more efficiently in your
 | -h, --help   | Show the help dialog  |
 | -m, --mesher | Sets the mesher to meshify the voxel mesh. Default: simple. (simple, greedy) |
 | -o, --output | Output path. If the output path doesn't exist it will be created |
+| -w, --worldspace | Transforms all vertices to worldspace |
 
 # Usage
 
