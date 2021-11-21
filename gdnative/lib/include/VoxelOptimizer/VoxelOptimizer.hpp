@@ -46,6 +46,6 @@
 #include <VoxelOptimizer/Meshers/GreedyMesher.hpp>
 #include <VoxelOptimizer/Meshers/SimpleMesher.hpp>
 #include <VoxelOptimizer/Meshers/MarchingCubesMesher.hpp>
-#include <VoxelOptimizer/Meshers/VerticesReducer.hpp>
+// #include <VoxelOptimizer/Meshers/VerticesReducer.hpp>
 
 #endif //VOXELOPTIMIZER_HPP

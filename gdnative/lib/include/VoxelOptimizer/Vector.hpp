@@ -181,19 +181,19 @@ namespace VoxelOptimizer
                 return x * vr.x + y * vr.y + z * vr.z;
             }
 
-            inline CVector Cross(const CVector &vr)
+            inline CVector Cross(const CVector &vr) const
             {
                 return CVector(y * vr.z - z * vr.y, 
                                z * vr.x - x * vr.z, 
                                x * vr.y - y * vr.x);
             }
 
-            inline float Length()
+            inline float Length() const
             {
                 return sqrt((x * x) + (y * y) + (z * z));
             }
 
-            inline CVector Normalize()
+            inline CVector Normalize() const
             {
                 float v = Length();
                 return CVector(x / v, y / v, z / v);
@@ -228,6 +228,11 @@ namespace VoxelOptimizer
                 return v == 0 ? 0 : v < 0 ? -1 : 1;
             }
     };
+
+    inline CVector operator*(float scalar, const CVector &vr)
+    {
+        return vr * scalar;
+    }
 
     class CVector4
     {

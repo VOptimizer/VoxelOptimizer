@@ -28,6 +28,10 @@
 #include <map>
 #include <vector>
 
+#include <iostream>
+
+using namespace std;
+
 namespace VoxelOptimizer
 {
     class CTriangle
@@ -64,18 +68,59 @@ namespace VoxelOptimizer
 //  else
 //      u = Vector3.ProjectOnPlane(Vector3.forward, normal);
 
-                CVector n = center.Normalize();//(1, 0, 1);
-                // if(fabs(n.Dot(normal)) < 0.2f)
-                //     n = CVector(-1, 0, 0);
+                // CVector n = center.Normalize(); //CVector(1, 0, 0);//Position.Normalize(); //center.Normalize();//(1, 0, 1);
+                // // if(n == normal) //fabs(n.Dot(normal)) < 0.2f)
+                // //     n = CVector(0, 0, 1);
 
-                auto a = n.Dot(normal) * normal;
-                auto xaxis = (n - a).Normalize();
-                auto yaxis = normal.Cross(xaxis);
+                // auto a = n.Dot(normal) * normal;
+                // auto xaxis = (n - a).Normalize();
+                // auto yaxis = normal.Cross(xaxis);
 
-                CVector p(xaxis.Dot(Position), yaxis.Dot(Position), 0);
-                CVector pc(xaxis.Dot(center), yaxis.Dot(center), 0);
+                // CVector p(xaxis.Dot(Position), yaxis.Dot(Position), 0);
+                // CVector pc(xaxis.Dot(center), yaxis.Dot(center), 0);
 
-                m_Angle = atan2(p.y - pc.y, p.x - pc.x);
+                // CVector n = normal;//CVector(0, 0, 1);
+                // CVector vPQ = Position - center;
+                // float dot = vPQ.Dot(n);
+                // CVector p = Position - dot * n;
+
+                // vPQ = center - center;
+                // dot = vPQ.Dot(n);
+                // CVector pc = center - dot * n;
+
+                // auto p = Position - Position.Dot(normal) * normal;
+                // auto pc = center - center.Dot(normal) * normal;
+
+                // auto forward = CVector(0, 0, 1);
+                // float dot = normal.Dot(forward);
+
+                // float phi = acos(dot / (normal.Length() * forward.Length()));
+
+                // CMat4x4 rot = CMat4x4::Rotation((forward - normal).Normalize() * phi);
+                // p = rot * p;
+
+                CVector forward(0, 0, 1);
+                CVector right(1, 0, 0);
+                CVector u;
+
+                CVector n = normal;
+
+                // Projects the 3D point onto a 2D plane
+                //https://answers.unity.com/questions/1522620/converting-a-3d-polygon-into-a-2d-polygon.html
+                if(fabs(n.Dot(forward)) == 1.0f)
+                    u = right - right.Dot(n) * n;
+                else
+                    u = forward - forward.Dot(n) * n;
+
+                CVector v = n.Cross(u).Normalize();
+
+                CVector p(u.Dot(Position), v.Dot(Position), 0);
+                CVector pc(u.Dot(center), v.Dot(center), 0);
+
+                if(p.x == pc.x && p.y > pc.y)
+                    m_Angle = 0;
+                else
+                    m_Angle = fabs(atan2(p.y - pc.y, p.x - pc.x));
 
                 // if(p.x == pc.x)
                 //     m_Angle = 0;
@@ -192,8 +237,12 @@ namespace VoxelOptimizer
                 std::vector<CVector> indices;
                 std::sort(points.begin(), points.end());
 
+                cout << "\n\n\n\n\nRemove Index: " << trianglesIt->first << " Remove Position: " << mesh->Vertices[trianglesIt->first.x - 1] << endl;
+
                 for (auto &&p : points)
                 {
+                    cout << "Index: " << p.Index << " Position: " << p.Position << endl;
+
                     indices.push_back(p.Index);
                 }               
 
