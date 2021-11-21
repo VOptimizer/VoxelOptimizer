@@ -60,7 +60,7 @@ namespace VoxelOptimizer
         // Deletes the path.
         size_t Pos = Path.find_last_of("/");
         if(Pos != std::string::npos)
-            Path = Path.substr(Pos);
+            Path = Path.substr(Pos + 1);
 
         return Path;
     }

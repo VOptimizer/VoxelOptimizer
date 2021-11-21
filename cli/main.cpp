@@ -91,6 +91,7 @@ File CreateFile(const fs::path &Input, const fs::path &OutputPattern)
         {"glb", VoxelOptimizer::ExporterTypes::GLB},
         {"obj", VoxelOptimizer::ExporterTypes::OBJ},
         {"escn", VoxelOptimizer::ExporterTypes::ESCN},
+        {"ply", VoxelOptimizer::ExporterTypes::PLY}
         // {"png", VoxelOptimizer::ExporterTypes::PNG},
     };
 
@@ -107,14 +108,9 @@ File CreateFile(const fs::path &Input, const fs::path &OutputPattern)
     string Filename = OutputPattern.stem().string();
     string Ext = OutputPattern.extension().string().substr(1);
 
-    if(ToLower(Ext) != "png" && std::find(SUPPORTED_OUT_EXTS.begin(), SUPPORTED_OUT_EXTS.end(), ToLower(Ext)) == SUPPORTED_OUT_EXTS.end())
-    {
-        cerr << "Unsupported file format: " << Ext << endl;
-        exit(-1);
-    }
-    else if(ToLower(Ext) != "png")
+    if(ToLower(Ext) == "png")
         Ret->IsPNG = true;
-    else
+    else if(std::find(SUPPORTED_OUT_EXTS.begin(), SUPPORTED_OUT_EXTS.end(), ToLower(Ext)) == SUPPORTED_OUT_EXTS.end())
     {
         cerr << "Unsupported file format: " << Ext << endl;
         exit(-1);
