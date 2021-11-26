@@ -175,300 +175,301 @@ int main(int argc, char const *argv[])
 
 
 
-    // mesh->Vertices.push_back(VoxelOptimizer::CVector(-0.5, 0.5, 0));
-    // mesh->Vertices.push_back(VoxelOptimizer::CVector(0, 0.5, 0));
-    // mesh->Vertices.push_back(VoxelOptimizer::CVector(0.5, 0.5, 0));
-    // mesh->Vertices.push_back(VoxelOptimizer::CVector(1, 0.5, 0));
+    mesh->Vertices.push_back(VoxelOptimizer::CVector(-0.5, 0.5, 0));
+    mesh->Vertices.push_back(VoxelOptimizer::CVector(0, 0.5, 0));
+    mesh->Vertices.push_back(VoxelOptimizer::CVector(0.5, 0.5, 0));
+    mesh->Vertices.push_back(VoxelOptimizer::CVector(1, 0.5, 0));
 
-    // mesh->Vertices.push_back(VoxelOptimizer::CVector(-0.5, 0, 0));
-    // mesh->Vertices.push_back(VoxelOptimizer::CVector(0, 0, 0));
-    // mesh->Vertices.push_back(VoxelOptimizer::CVector(0.5, 0, 0));
-    // mesh->Vertices.push_back(VoxelOptimizer::CVector(1, 0, 0));
+    mesh->Vertices.push_back(VoxelOptimizer::CVector(-0.5, 0, 0));
+    mesh->Vertices.push_back(VoxelOptimizer::CVector(0, 0, 0));
+    mesh->Vertices.push_back(VoxelOptimizer::CVector(0.5, 0, 0));
+    mesh->Vertices.push_back(VoxelOptimizer::CVector(1, 0, 0));
 
-    // mesh->Vertices.push_back(VoxelOptimizer::CVector(-0.5, -0.5, 0));
-    // mesh->Vertices.push_back(VoxelOptimizer::CVector(0, -0.5, 0));
-    // mesh->Vertices.push_back(VoxelOptimizer::CVector(0.5, -0.5, 0));
-    // mesh->Vertices.push_back(VoxelOptimizer::CVector(1, -0.5, 0));
+    mesh->Vertices.push_back(VoxelOptimizer::CVector(-0.5, -0.5, 0));
+    mesh->Vertices.push_back(VoxelOptimizer::CVector(0, -0.5, 0));
+    mesh->Vertices.push_back(VoxelOptimizer::CVector(0.5, -0.5, 0));
+    mesh->Vertices.push_back(VoxelOptimizer::CVector(1, -0.5, 0));
 
-    // mesh->Vertices.push_back(VoxelOptimizer::CVector(-0.5, -1, 0));
-    // mesh->Vertices.push_back(VoxelOptimizer::CVector(0, -1, 0));
-    // mesh->Vertices.push_back(VoxelOptimizer::CVector(0.5, -1, 0));
-    // mesh->Vertices.push_back(VoxelOptimizer::CVector(1, -1, 0));
+    mesh->Vertices.push_back(VoxelOptimizer::CVector(-0.5, -1, 0));
+    mesh->Vertices.push_back(VoxelOptimizer::CVector(0, -1, 0));
+    mesh->Vertices.push_back(VoxelOptimizer::CVector(0.5, -1, 0));
+    mesh->Vertices.push_back(VoxelOptimizer::CVector(1, -1, 0));
 
-    // mesh->UVs.push_back(VoxelOptimizer::CVector(0, 0, 0));
-    // mesh->Normals.push_back(VoxelOptimizer::CVector(0, 0, 1));
-    // mesh->Texture.push_back(VoxelOptimizer::CColor(1, 0, 0, 0));
-    // mesh->Faces.push_back(VoxelOptimizer::GroupedFaces(new VoxelOptimizer::SGroupedFaces()));
-
-    // mesh->Faces[0]->FaceMaterial = 0;
-    // mesh->Faces[0]->FaceMaterial = VoxelOptimizer::Material(new VoxelOptimizer::CMaterial());
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(1, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(2, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(5, 1, 1));
-
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(2, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(6, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(5, 1, 1));
-
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(2, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(3, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(6, 1, 1));
-
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(3, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(7, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(6, 1, 1));
-
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(3, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(4, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(7, 1, 1));
-
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(4, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(8, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(7, 1, 1));
-
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(5, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(6, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(9, 1, 1));
-
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(6, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(10, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(9, 1, 1));
-
-    // //6
-    // //10
-    // //7
-    // //11
-
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(7, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(8, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(11, 1, 1));
-
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(8, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(12, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(11, 1, 1));
-
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(9, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(10, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(13, 1, 1));
-
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(10, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(14, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(13, 1, 1));
-
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(10, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(11, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(14, 1, 1));
-
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(11, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(15, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(14, 1, 1));
-
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(11, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(12, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(15, 1, 1));
-
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(12, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(16, 1, 1));
-    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(15, 1, 1));
-
-
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(-3.000000, 0.000000, 0.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(-3.000000, 0.000000, 1.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(-2.000000, 0.000000, 1.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(-2.000000, 0.000000, 0.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(-3.000000, 0.000000, -1.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(-2.000000, 0.000000, -1.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(-2.000000, 0.000000, 2.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(-1.000000, 0.000000, 2.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(-1.000000, 0.000000, 1.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(-1.000000, 0.000000, 0.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(-1.000000, 0.000000, -1.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(-2.000000, 0.000000, -2.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(-1.000000, 0.000000, -2.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(-1.000000, 0.000000, 3.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(0.000000, 0.000000, 3.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(0.000000, 0.000000, 2.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(0.000000, 0.000000, 1.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(0.000000, 0.000000, 0.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(0.000000, 0.000000, -1.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(0.000000, 0.000000, -2.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(-1.000000, 0.000000, -3.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(0.000000, 0.000000, -3.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(1.000000, 0.000000, 3.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(1.000000, 0.000000, 2.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(1.000000, 0.000000, 1.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(1.000000, 0.000000, 0.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(1.000000, 0.000000, -1.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(1.000000, 0.000000, -2.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(1.000000, 0.000000, -3.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(2.000000, 0.000000, 2.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(2.000000, 0.000000, 1.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(2.000000, 0.000000, 0.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(2.000000, 0.000000, -1.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(2.000000, 0.000000, -2.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(3.000000, 0.000000, 1.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(3.000000, 0.000000, 0.000000));
-    mesh->Vertices.push_back(VoxelOptimizer::CVector(3.000000, 0.000000, -1.000000));
-
-    mesh->UVs.push_back(VoxelOptimizer::CVector(0.500000, 0.500000, 0));
-    mesh->Normals.push_back(VoxelOptimizer::CVector(0, 1, 0));
+    mesh->UVs.push_back(VoxelOptimizer::CVector(0, 0, 0));
+    mesh->Normals.push_back(VoxelOptimizer::CVector(0, 0, 1));
     mesh->Texture.push_back(VoxelOptimizer::CColor(1, 0, 0, 0));
     mesh->Faces.push_back(VoxelOptimizer::GroupedFaces(new VoxelOptimizer::SGroupedFaces()));
 
     mesh->Faces[0]->FaceMaterial = 0;
     mesh->Faces[0]->FaceMaterial = VoxelOptimizer::Material(new VoxelOptimizer::CMaterial());
-
     mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(1, 1, 1));
     mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(2, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(3, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(1, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(3, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(4, 1, 1));
     mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(5, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(1, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(4, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(5, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(4, 1, 1));
+
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(2, 1, 1));
     mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(6, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(5, 1, 1));
+
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(2, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(3, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(6, 1, 1));
+
     mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(3, 1, 1));
     mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(7, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(8, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(6, 1, 1));
+
     mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(3, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(4, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(7, 1, 1));
+
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(4, 1, 1));
     mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(8, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(9, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(4, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(3, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(9, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(4, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(9, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(10, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(7, 1, 1));
+
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(5, 1, 1));
     mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(6, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(4, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(10, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(9, 1, 1));
+
     mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(6, 1, 1));
     mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(10, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(9, 1, 1));
+
+    //6
+    //10
+    //7
+    //11
+
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(7, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(8, 1, 1));
     mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(11, 1, 1));
+
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(8, 1, 1));
     mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(12, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(6, 1, 1));
     mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(11, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(12, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(11, 1, 1));
+
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(9, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(10, 1, 1));
     mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(13, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(8, 1, 1));
+
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(10, 1, 1));
     mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(14, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(13, 1, 1));
+
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(10, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(11, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(14, 1, 1));
+
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(11, 1, 1));
     mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(15, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(8, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(14, 1, 1));
+
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(11, 1, 1));
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(12, 1, 1));
     mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(15, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(16, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(9, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(8, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(16, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(9, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(16, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(17, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(10, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(9, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(17, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(10, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(17, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(18, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(11, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(10, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(18, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(11, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(18, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(19, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(13, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(11, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(19, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(13, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(19, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(20, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(21, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(13, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(20, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(21, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(20, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(22, 1, 1));
+
+    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(12, 1, 1));
     mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(16, 1, 1));
     mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(15, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(23, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(16, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(23, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(24, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(17, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(16, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(24, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(17, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(24, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(25, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(18, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(17, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(25, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(18, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(25, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(26, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(19, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(18, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(26, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(19, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(26, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(27, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(20, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(19, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(27, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(20, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(27, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(28, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(22, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(20, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(28, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(22, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(28, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(29, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(25, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(24, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(30, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(25, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(30, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(31, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(26, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(25, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(31, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(26, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(31, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(32, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(27, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(26, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(32, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(27, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(32, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(33, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(28, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(27, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(33, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(28, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(33, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(34, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(32, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(31, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(35, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(32, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(35, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(36, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(33, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(32, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(36, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(33, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(36, 1, 1));
-    mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(37, 1, 1));
+
+
+
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(-3.000000, 0.000000, 0.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(-3.000000, 0.000000, 1.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(-2.000000, 0.000000, 1.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(-2.000000, 0.000000, 0.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(-3.000000, 0.000000, -1.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(-2.000000, 0.000000, -1.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(-2.000000, 0.000000, 2.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(-1.000000, 0.000000, 2.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(-1.000000, 0.000000, 1.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(-1.000000, 0.000000, 0.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(-1.000000, 0.000000, -1.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(-2.000000, 0.000000, -2.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(-1.000000, 0.000000, -2.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(-1.000000, 0.000000, 3.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(0.000000, 0.000000, 3.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(0.000000, 0.000000, 2.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(0.000000, 0.000000, 1.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(0.000000, 0.000000, 0.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(0.000000, 0.000000, -1.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(0.000000, 0.000000, -2.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(-1.000000, 0.000000, -3.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(0.000000, 0.000000, -3.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(1.000000, 0.000000, 3.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(1.000000, 0.000000, 2.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(1.000000, 0.000000, 1.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(1.000000, 0.000000, 0.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(1.000000, 0.000000, -1.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(1.000000, 0.000000, -2.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(1.000000, 0.000000, -3.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(2.000000, 0.000000, 2.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(2.000000, 0.000000, 1.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(2.000000, 0.000000, 0.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(2.000000, 0.000000, -1.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(2.000000, 0.000000, -2.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(3.000000, 0.000000, 1.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(3.000000, 0.000000, 0.000000));
+    // mesh->Vertices.push_back(VoxelOptimizer::CVector(3.000000, 0.000000, -1.000000));
+
+    // mesh->UVs.push_back(VoxelOptimizer::CVector(0.500000, 0.500000, 0));
+    // mesh->Normals.push_back(VoxelOptimizer::CVector(0, 1, 0));
+    // mesh->Texture.push_back(VoxelOptimizer::CColor(1, 0, 0, 0));
+    // mesh->Faces.push_back(VoxelOptimizer::GroupedFaces(new VoxelOptimizer::SGroupedFaces()));
+
+    // mesh->Faces[0]->FaceMaterial = 0;
+    // mesh->Faces[0]->FaceMaterial = VoxelOptimizer::Material(new VoxelOptimizer::CMaterial());
+
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(1, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(2, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(3, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(1, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(3, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(4, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(5, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(1, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(4, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(5, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(4, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(6, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(3, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(7, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(8, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(3, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(8, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(9, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(4, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(3, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(9, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(4, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(9, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(10, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(6, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(4, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(10, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(6, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(10, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(11, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(12, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(6, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(11, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(12, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(11, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(13, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(8, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(14, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(15, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(8, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(15, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(16, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(9, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(8, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(16, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(9, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(16, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(17, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(10, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(9, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(17, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(10, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(17, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(18, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(11, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(10, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(18, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(11, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(18, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(19, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(13, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(11, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(19, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(13, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(19, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(20, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(21, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(13, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(20, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(21, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(20, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(22, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(16, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(15, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(23, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(16, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(23, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(24, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(17, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(16, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(24, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(17, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(24, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(25, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(18, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(17, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(25, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(18, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(25, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(26, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(19, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(18, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(26, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(19, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(26, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(27, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(20, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(19, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(27, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(20, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(27, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(28, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(22, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(20, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(28, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(22, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(28, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(29, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(25, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(24, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(30, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(25, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(30, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(31, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(26, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(25, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(31, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(26, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(31, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(32, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(27, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(26, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(32, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(27, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(32, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(33, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(28, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(27, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(33, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(28, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(33, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(34, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(32, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(31, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(35, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(32, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(35, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(36, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(33, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(32, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(36, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(33, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(36, 1, 1));
+    // mesh->Faces[0]->Indices.push_back(VoxelOptimizer::CVector(37, 1, 1));
 
 
     gltfExporter.Settings()->WorldSpace = false;
     gltfExporter.Save("face.gltf", mesh);
 
     VoxelOptimizer::CVerticesReducer reducer;
-    auto reducedMesh = reducer.Reduce(mcMesh.begin()->second); //meshes.front()); //mcMesh.begin()->second);//meshes.front()); //mesh);//
+    auto reducedMesh = reducer.Reduce(mcMesh.begin()->second);//mcMesh.begin()->second); //meshes.front()); //mcMesh.begin()->second);//meshes.front()); //mesh);//
 
     gltfExporter.Settings()->WorldSpace = false;
     gltfExporter.Save("reduced.gltf", reducedMesh);

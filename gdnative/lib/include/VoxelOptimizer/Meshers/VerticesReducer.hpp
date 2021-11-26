@@ -26,6 +26,7 @@
 #define VERTICESREDUCER_HPP
 
 #include <VoxelOptimizer/Mesh.hpp>
+#include <list>
 
 namespace VoxelOptimizer 
 {
@@ -37,6 +38,57 @@ namespace VoxelOptimizer
             Mesh Reduce(Mesh mesh);
 
             ~CVerticesReducer() {}
+
+        private:
+            class Point
+            {
+                public:
+                    Point(const CVector& position, const CVector &index) : Position(position), Index(index) {}
+
+                    inline void CalcAngle(const CVector& center, const CVector& normal)
+                    {
+                        CVector forward(0, 0, 1);
+                        CVector right(1, 0, 0);
+                        CVector u;
+
+                        CVector n = normal;
+
+                        // Projects the 3D point onto a 2D plane
+                        //https://answers.unity.com/questions/1522620/converting-a-3d-polygon-into-a-2d-polygon.html
+                        if(fabs(n.Dot(forward)) < 0.2f)
+                            u = right - right.Dot(n) * n;
+                        else
+                            u = forward - forward.Dot(n) * n;
+
+                        CVector v = n.Cross(u).Normalize();
+
+                        CVector p(u.Dot(Position), v.Dot(Position), 0);
+                        CVector pc(u.Dot(center), v.Dot(center), 0);
+
+                        Position2D = p;
+                        m_Angle = atan2(p.y - pc.y, p.x - pc.x);
+                    }
+
+                    CVector Position;
+                    CVector Position2D;
+                    CVector Index;
+                    
+                    bool operator<(const Point &p) const {
+                        return m_Angle < p.m_Angle;
+                    }
+
+                private:
+                    double m_Angle;
+            };
+
+            std::vector<Point> m_Points;
+
+            float Cross2D(CVector a, CVector b);
+            bool PointInTriangle(CVector p, CVector a, CVector b, CVector c);
+            bool IsEar(CVector a, CVector b, CVector c);
+            bool Has180DegreeAngle();
+
+            Point GetPoint(int index);
     };
 } // namespace VoxelOptimizer
 

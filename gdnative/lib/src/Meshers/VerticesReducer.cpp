@@ -42,102 +42,69 @@ namespace VoxelOptimizer
     };
     using Triangle = std::shared_ptr<CTriangle>;
 
-    class Point
+    float CVerticesReducer::Cross2D(CVector a, CVector b)
     {
-        public:
-            Point(const CVector& position, const CVector &index) : Position(position), Index(index)
-            {
-                // m_Angle = center.Dot(position);
+        return a.x * b.y - a.y * b.x;
+    }
 
-                // if(position.x == center.x)
-                //     m_Angle = 0;
-                // else
-                //     m_Angle = atan(double(position.z - center.z) / double(position.y - center.y) / double(position.x - center.x));
-            }
+    bool CVerticesReducer::PointInTriangle(CVector p, CVector a, CVector b, CVector c)
+    {
+        float d1 = Cross2D(p - a, b - a);
+        float d2 = Cross2D(p - b, c - b);
+        float d3 = Cross2D(p - c, a - c);
 
-            void CalcAngle(const CVector& center, const CVector& normal)
-            {
-                // auto a = Position.Dot(normal) * normal;
-                // auto p = Position - a;
+        return (d1 >= 0 && d2 >= 0 && d3 >= 0) || (d1 <= 0 && d2 <= 0 && d3 <= 0);
+    }
 
-                // a = center.Dot(normal) * normal;
-                // auto pc = center - a;
+    bool CVerticesReducer::IsEar(CVector a, CVector b, CVector c)
+    {
+        CVector ba = b - a;
+        CVector ca = c - a;
 
-//  If (Mathf.Abs(Vector3.Dot(Vector3.forward, normal)) < 0.2f)
-//      u = Vector3.ProjectOnPlane(Vector3.right, normal);
-//  else
-//      u = Vector3.ProjectOnPlane(Vector3.forward, normal);
+        float cross = Cross2D(ba, ca);
+        if(cross >= 0)
+            return false;
 
-                // CVector n = center.Normalize(); //CVector(1, 0, 0);//Position.Normalize(); //center.Normalize();//(1, 0, 1);
-                // // if(n == normal) //fabs(n.Dot(normal)) < 0.2f)
-                // //     n = CVector(0, 0, 1);
+        for (auto& point : m_Points)
+        {
+            if (point.Position2D == a || point.Position2D == b || point.Position2D == c)
+                continue;
 
-                // auto a = n.Dot(normal) * normal;
-                // auto xaxis = (n - a).Normalize();
-                // auto yaxis = normal.Cross(xaxis);
+            if (PointInTriangle(a, b, c, point.Position2D))
+                return false;
+        }
 
-                // CVector p(xaxis.Dot(Position), yaxis.Dot(Position), 0);
-                // CVector pc(xaxis.Dot(center), yaxis.Dot(center), 0);
+        return true;
+    }
 
-                // CVector n = normal;//CVector(0, 0, 1);
-                // CVector vPQ = Position - center;
-                // float dot = vPQ.Dot(n);
-                // CVector p = Position - dot * n;
+    bool CVerticesReducer::Has180DegreeAngle()
+    {
+        for(int i = 0; i < m_Points.size(); i += 2)
+        {
+            Point a = GetPoint(i);
+            Point b = GetPoint(i - 1);
+            Point c = GetPoint(i + 1);
 
-                // vPQ = center - center;
-                // dot = vPQ.Dot(n);
-                // CVector pc = center - dot * n;
+            CVector ba = b.Position2D - a.Position2D;
+            CVector ca = c.Position2D - a.Position2D;
 
-                // auto p = Position - Position.Dot(normal) * normal;
-                // auto pc = center - center.Dot(normal) * normal;
+            float cross = Cross2D(ba, ca);
+            if(cross >= 0 && cross <= 0.001)
+                return true;
+        }
 
-                // auto forward = CVector(0, 0, 1);
-                // float dot = normal.Dot(forward);
+        return false;
+    }
 
-                // float phi = acos(dot / (normal.Length() * forward.Length()));
-
-                // CMat4x4 rot = CMat4x4::Rotation((forward - normal).Normalize() * phi);
-                // p = rot * p;
-
-                CVector forward(0, 0, 1);
-                CVector right(1, 0, 0);
-                CVector u;
-
-                CVector n = normal;
-
-                // Projects the 3D point onto a 2D plane
-                //https://answers.unity.com/questions/1522620/converting-a-3d-polygon-into-a-2d-polygon.html
-                if(fabs(n.Dot(forward)) == 1.0f)
-                    u = right - right.Dot(n) * n;
-                else
-                    u = forward - forward.Dot(n) * n;
-
-                CVector v = n.Cross(u).Normalize();
-
-                CVector p(u.Dot(Position), v.Dot(Position), 0);
-                CVector pc(u.Dot(center), v.Dot(center), 0);
-
-                if(p.x == pc.x && p.y > pc.y)
-                    m_Angle = 0;
-                else
-                    m_Angle = fabs(atan2(p.y - pc.y, p.x - pc.x));
-
-                // if(p.x == pc.x)
-                //     m_Angle = 0;
-                // else
-                //     m_Angle = atan(double(p.y - pc.y) / double(p.x - pc.x));
-            }
-
-            CVector Position;
-            CVector Index;
-            
-            bool operator<(const Point &p) const {
-                return m_Angle < p.m_Angle;
-            }
-
-        private:
-            double m_Angle;
-    };
+    CVerticesReducer::Point CVerticesReducer::GetPoint(int index)
+    {
+        if(index >= ((long)m_Points.size()))
+            index = index % ((long)m_Points.size());
+        else if(index < 0)
+            index = (index % ((long)m_Points.size())) + ((long)m_Points.size());
+        
+        return m_Points[index];
+    }
 
     Mesh CVerticesReducer::Reduce(Mesh mesh)
     {
@@ -175,14 +142,8 @@ namespace VoxelOptimizer
 
         while (trianglesIt != triangles.end())
         {
-            if (initTriangles[trianglesIt->first] == 3 || initTriangles[trianglesIt->first] == 6)
+            if (initTriangles[trianglesIt->first] % 3 == 0)
             {
-                // Stores a polygon
-                std::vector<Point> points;
-                CVector center;
-
-                float dotTotal = 0;
-
                 for (auto &&triangle : trianglesIt->second)
                 {
                     for (auto &&i : triangle->Indices)
@@ -193,16 +154,16 @@ namespace VoxelOptimizer
                         if(i != trianglesIt->first)
                         {
                             //Obtain all remaining indices
-                            if(points.empty())
+                            if(m_Points.empty())
                             {
-                                center += mesh->Vertices[trianglesIt->first.x - 1];
-                                points.push_back(Point(mesh->Vertices[i.x - 1], i));
+                                m_Points.push_back(Point(mesh->Vertices[i.x - 1], i));
+                                m_Points.back().CalcAngle(mesh->Vertices[trianglesIt->first.x - 1], mesh->Normals[trianglesIt->first.y - 1]);
                             }
                             else
                             {
                                 bool found = false;
 
-                                for (auto &&p : points)
+                                for (auto &&p : m_Points)
                                 {
                                     if(p.Index == i)
                                     {
@@ -213,10 +174,8 @@ namespace VoxelOptimizer
 
                                 if(!found)
                                 {
-                                    dotTotal += mesh->Vertices[trianglesIt->first.x - 1].Dot(mesh->Vertices[i.x - 1]);
-
-                                    center += mesh->Vertices[trianglesIt->first.x - 1];
-                                    points.push_back(Point(mesh->Vertices[i.x - 1], i));
+                                    m_Points.push_back(Point(mesh->Vertices[i.x - 1], i));
+                                    m_Points.back().CalcAngle(mesh->Vertices[trianglesIt->first.x - 1], mesh->Normals[trianglesIt->first.y - 1]);
                                 }
                             }
                             
@@ -228,44 +187,120 @@ namespace VoxelOptimizer
                     }
                 }
 
-                center = center / points.size();
-                for (auto &&i : points)
+                std::sort(m_Points.begin(), m_Points.end());
+                if(m_Points.size() < 3 || Has180DegreeAngle())
                 {
-                    i.CalcAngle(center, mesh->Normals[trianglesIt->first.y - 1]);
+                    m_Points.clear();
+
+                    for (auto &&triangle : trianglesIt->second)
+                    {
+                        for (auto &&i : triangle->Indices)
+                        {
+                            //Reduce the vertex count
+                            verticesCounter[i.x - 1]++;
+
+                            if(i != trianglesIt->first)
+                            {
+                                //Delete this triangle from all shared indices
+                                auto it = triangles.find(i);
+                                if(it != triangles.end())
+                                    it->second.push_back(triangle);                               
+                            }
+                        }
+                    }
+
+                    trianglesIt++;
+                    
+                    continue;
                 }
 
-                std::vector<CVector> indices;
-                std::sort(points.begin(), points.end());
+                // std::vector<CVector> indices;
 
-                cout << "\n\n\n\n\nRemove Index: " << trianglesIt->first << " Remove Position: " << mesh->Vertices[trianglesIt->first.x - 1] << endl;
-
-                for (auto &&p : points)
+                cout << "\n\n\n\n" << endl;
+                for (auto &&p : m_Points)
                 {
-                    cout << "Index: " << p.Index << " Position: " << p.Position << endl;
+                    cout << "Position3D: " << p.Position << " Position2D: " << p.Position2D << endl;
+                }
+                
 
-                    indices.push_back(p.Index);
-                }               
+                while (m_Points.size() > 3)
+                { 
+Has180DegreeAngle();
 
+                    for(int i = 0; i < m_Points.size(); i++)
+                    {
+                        Point a = GetPoint(i);
+                        Point b = GetPoint(i - 1);
+                        Point c = GetPoint(i + 1);
+
+                        if(IsEar(a.Position2D, b.Position2D, c.Position2D))
+                        {
+                            auto triangle = Triangle(new CTriangle());
+                            triangle->Indices.push_back(a.Index);
+                            triangle->Indices.push_back(b.Index);
+                            triangle->Indices.push_back(c.Index);
+
+                            triangles[a.Index].push_back(triangle);
+                            triangles[b.Index].push_back(triangle);
+                            triangles[c.Index].push_back(triangle);
+
+                            verticesCounter[a.Index.x - 1]++;
+                            verticesCounter[b.Index.x - 1]++;
+                            verticesCounter[c.Index.x - 1]++;
+
+                            m_Points.erase(m_Points.begin() + i);
+                            break;
+                        }
+                    }
+                }
+
+                Point a = GetPoint(0);
+                Point b = GetPoint(-1);
+                Point c = GetPoint(1);
+
+                auto triangle = Triangle(new CTriangle());
+                triangle->Indices.push_back(a.Index);
+                triangle->Indices.push_back(b.Index);
+                triangle->Indices.push_back(c.Index);
+
+                triangles[a.Index].push_back(triangle);
+                triangles[b.Index].push_back(triangle);
+                triangles[c.Index].push_back(triangle);
+
+                verticesCounter[a.Index.x - 1]++;
+                verticesCounter[b.Index.x - 1]++;
+                verticesCounter[c.Index.x - 1]++;
+                
                 trianglesIt = triangles.erase(trianglesIt);
+                m_Points.clear();
 
-                int triCounter = 0;
-                for (size_t i = 2; i < indices.size(); i++)
-                {
-                    auto triangle = Triangle(new CTriangle());
-                    triangle->Indices.push_back(indices[0]);
-                    triangle->Indices.push_back(indices[i - 1]);
-                    triangle->Indices.push_back(indices[i]);
+                // cout << "\n\n\n\n\nRemove Index: " << trianglesIt->first << " Remove Position: " << mesh->Vertices[trianglesIt->first.x - 1] << endl;
 
-                    triangles[indices[0]].push_back(triangle);
-                    triangles[indices[i - 1]].push_back(triangle);
-                    triangles[indices[i]].push_back(triangle);
+                // for (auto &&p : m_Points)
+                // {
+                //     cout << "Index: " << p.Index << " Position: " << p.Position << endl;
 
-                    verticesCounter[indices[0].x - 1]++;
-                    verticesCounter[indices[i - 1].x - 1]++;
-                    verticesCounter[indices[i].x - 1]++;
+                //     indices.push_back(p.Index);
+                // }               
 
-                    triCounter++;
-                }
+                // int triCounter = 0;
+                // for (size_t i = 2; i < indices.size(); i++)
+                // {
+                //     auto triangle = Triangle(new CTriangle());
+                //     triangle->Indices.push_back(indices[0]);
+                //     triangle->Indices.push_back(indices[i - 1]);
+                //     triangle->Indices.push_back(indices[i]);
+
+                //     triangles[indices[0]].push_back(triangle);
+                //     triangles[indices[i - 1]].push_back(triangle);
+                //     triangles[indices[i]].push_back(triangle);
+
+                //     verticesCounter[indices[0].x - 1]++;
+                //     verticesCounter[indices[i - 1].x - 1]++;
+                //     verticesCounter[indices[i].x - 1]++;
+
+                //     triCounter++;
+                // }
             }
             else
                 trianglesIt++;
