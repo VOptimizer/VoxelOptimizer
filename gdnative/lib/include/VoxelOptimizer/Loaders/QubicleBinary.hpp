@@ -22,51 +22,40 @@
  * SOFTWARE.
  */
 
-#ifndef FILEUTILS_HPP
-#define FILEUTILS_HPP
+#ifndef QUBICLEBINARY_HPP
+#define QUBICLEBINARY_HPP
 
-#include <algorithm>
-#include <string>
+#include <VoxelOptimizer/Mat4x4.hpp>
+#include <VoxelOptimizer/Loaders/ILoader.hpp>
 
 namespace VoxelOptimizer
 {
-    inline std::string GetFileExt(std::string Path)
+    class CQubicleBinary : public ILoader
     {
-        // Removes the file name.
-        size_t Pos = Path.find_last_of(".");
-        if(Pos != std::string::npos)
-            Path = Path.erase(0, Pos);
+        public:
+            CQubicleBinary() = default;
+            ~CQubicleBinary() = default;
 
-        std::transform(Path.begin(), Path.end(), Path.begin(), ::tolower);
+        protected:
+            struct SQubicleBinaryHeader
+            {
+                char Version[4];        // major, minor, release, build
+                int ColorFormat;        // 0 = RGBA, 1 = BGRA
+                int ZAxisOrientation;   // 0 = Left hand, 1 = Right hand
+                int Compression;        // 1 = RLE, 0 = Uncompressed
+                int VisibilityMask;     // 0 = If Alpha is 0 means invisible 255 visible, 1 = A tells which side is visible
+                int MatrixCount;        // Number of matrices(Models) inside this file.
+            };
+            SQubicleBinaryHeader m_Header;
+            std::map<int, int> m_ColorIdx;
+            
+            void ParseFormat() override;
+            void ReadUncompressed(VoxelMesh mesh);
+            void ReadRLECompressed(VoxelMesh mesh);
+            int GetColorIdx(int color);
 
-        return Path;
-    }
-
-    inline std::string GetPathWithoutExt(std::string Path)
-    {
-        // Removes the file extension.
-        size_t Pos = Path.find_last_of(".");
-        if(Pos != std::string::npos)
-            Path = Path.erase(Pos);
-
-        return Path;
-    }
-
-    inline std::string GetFilenameWithoutExt(std::string Path)
-    {
-        Path = GetPathWithoutExt(Path);
-
-        // Replaces all '\' to '/'
-        std::replace(Path.begin(), Path.end(), '\\', '/');
-
-        // Deletes the path.
-        size_t Pos = Path.find_last_of("/");
-        if(Pos != std::string::npos)
-            Path = Path.substr(Pos + 1);
-
-        return Path;
-    }
+            CVector ReadVector();
+    };
 } // namespace VoxelOptimizer
 
-
-#endif //FILEUTILS_HPP
+#endif //QUBICLEBINARY_HPP

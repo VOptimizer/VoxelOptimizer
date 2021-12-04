@@ -43,6 +43,9 @@
 #include <VoxelOptimizer/Loaders/MagicaVoxelLoader.hpp>
 #include <VoxelOptimizer/Loaders/VoxelMesh.hpp>
 #include <VoxelOptimizer/Loaders/KenshapeLoader.hpp>
+#include <VoxelOptimizer/Loaders/QubicleBinary.hpp>
+#include <VoxelOptimizer/Loaders/QubicleBinaryTree.hpp>
+#include <VoxelOptimizer/Loaders/QubicleExchange.hpp>
 #include <VoxelOptimizer/Meshers/GreedyMesher.hpp>
 #include <VoxelOptimizer/Meshers/SimpleMesher.hpp>
 #include <VoxelOptimizer/Meshers/MarchingCubesMesher.hpp>

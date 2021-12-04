@@ -47,7 +47,10 @@ namespace VoxelOptimizer
         UNKNOWN = -1,
         MAGICAVOXEL,
         GOXEL,
-        KENSHAPE
+        KENSHAPE,
+        QUBICLE_BIN,
+        QUBICLE_BIN_TREE,
+        QUBICLE_EXCHANGE
     };
 
     class ILoader

@@ -29,6 +29,9 @@
 #include <VoxelOptimizer/Loaders/ILoader.hpp>
 #include <VoxelOptimizer/Loaders/KenshapeLoader.hpp>
 #include <VoxelOptimizer/Loaders/MagicaVoxelLoader.hpp>
+#include <VoxelOptimizer/Loaders/QubicleBinary.hpp>
+#include <VoxelOptimizer/Loaders/QubicleBinaryTree.hpp>
+#include <VoxelOptimizer/Loaders/QubicleExchange.hpp>
 #include <string.h>
 
 namespace VoxelOptimizer
@@ -44,6 +47,12 @@ namespace VoxelOptimizer
             type = LoaderTypes::GOXEL;
         else if(ext == "kenshape")
             type = LoaderTypes::KENSHAPE;
+        else if(ext == "qb")
+            type = LoaderTypes::QUBICLE_BIN;
+        else if(ext == "qbt")
+            type = LoaderTypes::QUBICLE_BIN_TREE;
+        else if(ext == "qef")
+            type = LoaderTypes::QUBICLE_EXCHANGE;
 
         auto loader = Create(type);
         loader->Load(filename);
@@ -58,6 +67,9 @@ namespace VoxelOptimizer
             case LoaderTypes::MAGICAVOXEL: return Loader(new CMagicaVoxelLoader());
             case LoaderTypes::GOXEL: return Loader(new CGoxelLoader());
             case LoaderTypes::KENSHAPE: return Loader(new CKenshapeLoader());
+            case LoaderTypes::QUBICLE_BIN: return Loader(new CQubicleBinary());
+            case LoaderTypes::QUBICLE_BIN_TREE: return Loader(new CQubicleBinaryTree());
+            case LoaderTypes::QUBICLE_EXCHANGE: return Loader(new CQubicleExchange());
 
             default: throw CVoxelLoaderException("Unknown file type!");
         }
@@ -93,7 +105,7 @@ namespace VoxelOptimizer
 
     void ILoader::ReadData(char *Buf, size_t Size)
     {
-        if(m_Pos + Size >= m_Data.size())
+        if(m_Pos + Size > m_Data.size())
             throw CVoxelLoaderException("Unexpected file ending.");
 
         memcpy(Buf, m_Data.data() + m_Pos, Size);
