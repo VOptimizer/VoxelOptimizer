@@ -22,40 +22,41 @@
  * SOFTWARE.
  */
 
-#ifndef QUBICLEBINARY_HPP
-#define QUBICLEBINARY_HPP
+#ifndef VEDITHANDLER_HPP
+#define VEDITHANDLER_HPP
 
-#include <VoxelOptimizer/Mat4x4.hpp>
 #include <VoxelOptimizer/Loaders/ILoader.hpp>
+#include <VoxelOptimizer/Loaders/ISaver.hpp>
 
 namespace VoxelOptimizer
 {
-    class CQubicleBinary : public ILoader
+    class CVEditHandler : public ILoader, ISaver
     {
         public:
-            CQubicleBinary() = default;
-            ~CQubicleBinary() = default;
+            CVEditHandler(/* args */) {}
 
-        protected:
-            struct SQubicleBinaryHeader
+            std::vector<char> Save(VoxelMesh m) override;
+
+            ~CVEditHandler() {}
+
+        private:
+            enum Types
             {
-                char Version[4];        // major, minor, release, build
-                int ColorFormat;        // 0 = RGBA, 1 = BGRA
-                int ZAxisOrientation;   // 0 = Left hand, 1 = Right hand
-                int Compression;        // 1 = RLE, 0 = Uncompressed
-                int VisibilityMask;     // 0 = If Alpha is 0 means invisible 255 visible, 1 = A tells which side is visible
-                int MatrixCount;        // Number of matrices(Models) inside this file.
+                COLORS,
+                MATERIALS,
+                VOXELS
             };
-            SQubicleBinaryHeader m_Header;
-            std::map<int, int> m_ColorIdx;
-            
-            void ParseFormat() override;
-            void ReadUncompressed(VoxelMesh mesh);
-            void ReadRLECompressed(VoxelMesh mesh);
-            int GetColorIdx(int color);
 
-            CVector ReadVector();
+            void ParseFormat() override;  
+
+            void WriteSection(Types type, std::vector<char> &Ret, const std::vector<char> &Data); 
+            
+            std::vector<char> WriteColors();
+            std::vector<char> WriteMaterials();
+            std::vector<char> WriteVoxels();
+
+            VoxelMesh m_Mesh;
     };
 } // namespace VoxelOptimizer
 
-#endif //QUBICLEBINARY_HPP
+#endif //VEDITHANDLER_HPP

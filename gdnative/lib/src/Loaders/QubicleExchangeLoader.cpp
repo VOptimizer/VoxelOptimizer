@@ -22,13 +22,13 @@
  * SOFTWARE.
  */
 
-#include <VoxelOptimizer/Loaders/QubicleExchange.hpp>
+#include <VoxelOptimizer/Loaders/QubicleExchangeLoader.hpp>
 #include <VoxelOptimizer/Exceptions.hpp>
 #include <sstream>
 
 namespace VoxelOptimizer
 {
-    void CQubicleExchange::ParseFormat()
+    void CQubicleExchangeLoader::ParseFormat()
     {
         m_Models.clear();
         m_Materials.clear();
@@ -52,7 +52,7 @@ namespace VoxelOptimizer
         m_Models.push_back(mesh);
     }
 
-    std::string CQubicleExchange::ReadLine()
+    std::string CQubicleExchangeLoader::ReadLine()
     {
         std::string ret;
 
@@ -68,7 +68,7 @@ namespace VoxelOptimizer
         return ret;
     }
 
-    CVector CQubicleExchange::ReadVector()
+    CVector CQubicleExchangeLoader::ReadVector()
     {
         std::stringstream strm;
         strm << ReadLine();
@@ -80,7 +80,7 @@ namespace VoxelOptimizer
         return ret;
     }
 
-    void CQubicleExchange::ReadColors()
+    void CQubicleExchangeLoader::ReadColors()
     {
         std::stringstream strm;
         strm << ReadLine();
@@ -101,7 +101,7 @@ namespace VoxelOptimizer
         }
     }
 
-    void CQubicleExchange::ReadVoxels(VoxelMesh mesh)
+    void CQubicleExchangeLoader::ReadVoxels(VoxelMesh mesh)
     {
         CVector Beg(1000, 1000, 1000), End;
         while (!IsEof())

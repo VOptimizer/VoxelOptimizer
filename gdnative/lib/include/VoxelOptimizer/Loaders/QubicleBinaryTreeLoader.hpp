@@ -22,51 +22,36 @@
  * SOFTWARE.
  */
 
-#ifndef FILEUTILS_HPP
-#define FILEUTILS_HPP
+#ifndef QUBICLEBINARYTREELOADER_HPP
+#define QUBICLEBINARYTREELOADER_HPP
 
-#include <algorithm>
-#include <string>
+#include <VoxelOptimizer/Mat4x4.hpp>
+#include <VoxelOptimizer/Loaders/ILoader.hpp>
 
 namespace VoxelOptimizer
 {
-    inline std::string GetFileExt(std::string Path)
+    class CQubicleBinaryTreeLoader : public ILoader
     {
-        // Removes the file name.
-        size_t Pos = Path.find_last_of(".");
-        if(Pos != std::string::npos)
-            Path = Path.erase(0, Pos + 1);
+        public:
+            CQubicleBinaryTreeLoader() = default;
+            ~CQubicleBinaryTreeLoader() = default;
 
-        std::transform(Path.begin(), Path.end(), Path.begin(), ::tolower);
+        protected:
+            std::map<int, int> m_ColorIdx;
+            bool m_HasColormap;
 
-        return Path;
-    }
+            void ParseFormat() override;
+            void ReadColors();
 
-    inline std::string GetPathWithoutExt(std::string Path)
-    {
-        // Removes the file extension.
-        size_t Pos = Path.find_last_of(".");
-        if(Pos != std::string::npos)
-            Path = Path.erase(Pos);
+            void LoadNode();
+            void LoadModel();
+            void LoadMatrix();
+            void LoadCompound();
 
-        return Path;
-    }
+            int GetColorIdx(int color);
 
-    inline std::string GetFilenameWithoutExt(std::string Path)
-    {
-        Path = GetPathWithoutExt(Path);
-
-        // Replaces all '\' to '/'
-        std::replace(Path.begin(), Path.end(), '\\', '/');
-
-        // Deletes the path.
-        size_t Pos = Path.find_last_of("/");
-        if(Pos != std::string::npos)
-            Path = Path.substr(Pos + 1);
-
-        return Path;
-    }
+            CVector ReadVector();
+    };
 } // namespace VoxelOptimizer
 
-
-#endif //FILEUTILS_HPP
+#endif //QUBICLEBINARYTREELOADER_HPP

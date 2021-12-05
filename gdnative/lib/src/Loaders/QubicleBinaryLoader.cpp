@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include <VoxelOptimizer/Loaders/QubicleBinary.hpp>
+#include <VoxelOptimizer/Loaders/QubicleBinaryLoader.hpp>
 #include <VoxelOptimizer/Exceptions.hpp>
 #include <stdint.h>
 
@@ -31,7 +31,7 @@ namespace VoxelOptimizer
     const static int CODEFLAG = 2;
 	const static int NEXTSLICEFLAG = 6;
 
-    void CQubicleBinary::ParseFormat()
+    void CQubicleBinaryLoader::ParseFormat()
     {
         m_Models.clear();
         m_Materials.clear();
@@ -75,7 +75,7 @@ namespace VoxelOptimizer
         m_ColorIdx.clear();
     }
 
-    CVector CQubicleBinary::ReadVector()
+    CVector CQubicleBinaryLoader::ReadVector()
     {
         CVector ret;
 
@@ -86,7 +86,7 @@ namespace VoxelOptimizer
         return ret;
     }
 
-    void CQubicleBinary::ReadUncompressed(VoxelMesh mesh)
+    void CQubicleBinaryLoader::ReadUncompressed(VoxelMesh mesh)
     {
         CVector Beg(1000, 1000, 1000), End;
         for (uint32_t z = 0; z < (uint32_t)mesh->GetSize().y; z++)
@@ -116,7 +116,7 @@ namespace VoxelOptimizer
         mesh->SetBBox(CBBox(Beg, End));
     }
 
-    void CQubicleBinary::ReadRLECompressed(VoxelMesh mesh)
+    void CQubicleBinaryLoader::ReadRLECompressed(VoxelMesh mesh)
     {
         CVector Beg(1000, 1000, 1000), End;
         for (uint32_t z = 0; z < (uint32_t)mesh->GetSize().y; z++)
@@ -184,7 +184,7 @@ namespace VoxelOptimizer
         mesh->SetBBox(CBBox(Beg, End));
     }
 
-    int CQubicleBinary::GetColorIdx(int color)
+    int CQubicleBinaryLoader::GetColorIdx(int color)
     {
         int ret = 0;
 

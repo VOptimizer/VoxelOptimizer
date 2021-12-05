@@ -50,7 +50,8 @@ namespace VoxelOptimizer
         KENSHAPE,
         QUBICLE_BIN,
         QUBICLE_BIN_TREE,
-        QUBICLE_EXCHANGE
+        QUBICLE_EXCHANGE,
+        QUBICLE
     };
 
     class ILoader

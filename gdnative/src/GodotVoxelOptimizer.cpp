@@ -68,11 +68,13 @@ godot_error CGodotVoxelOptimizer::Load(String Path)
     else if(Ext == "kenshape")
         m_Loader = VoxelOptimizer::Loader(new VoxelOptimizer::CKenshapeLoader());
     else if(Ext == "qb")
-        m_Loader = VoxelOptimizer::Loader(new VoxelOptimizer::CQubicleBinary());
+        m_Loader = VoxelOptimizer::Loader(new VoxelOptimizer::CQubicleBinaryLoader());
     else if(Ext == "qbt")
-        m_Loader = VoxelOptimizer::Loader(new VoxelOptimizer::CQubicleBinaryTree());
+        m_Loader = VoxelOptimizer::Loader(new VoxelOptimizer::CQubicleBinaryTreeLoader());
     else if(Ext == "qef")
-        m_Loader = VoxelOptimizer::Loader(new VoxelOptimizer::CQubicleExchange());
+        m_Loader = VoxelOptimizer::Loader(new VoxelOptimizer::CQubicleExchangeLoader());
+    else if(Ext == "qbcl")
+        m_Loader = VoxelOptimizer::Loader(new VoxelOptimizer::CQubicleLoader());
     
     try
     {

@@ -22,29 +22,34 @@
  * SOFTWARE.
  */
 
-#ifndef QUBICLEEXCHANGE_HPP
-#define QUBICLEEXCHANGE_HPP
+#ifndef QUBICLELOADER_HPP
+#define QUBICLE_HPP
 
 #include <VoxelOptimizer/Mat4x4.hpp>
 #include <VoxelOptimizer/Loaders/ILoader.hpp>
 
 namespace VoxelOptimizer
 {
-    class CQubicleExchange : public ILoader
+    class CQubicleLoader : public ILoader
     {
         public:
-            CQubicleExchange() = default;
-            ~CQubicleExchange() = default;
-
-        protected:
+            CQubicleLoader() = default;
+            ~CQubicleLoader() = default;
+        private:
+            std::map<int, int> m_ColorIdx;
             void ParseFormat() override;
 
-            CVector ReadVector();
-            void ReadColors();
-            void ReadVoxels(VoxelMesh mesh);
+            void LoadNode();
+            void LoadModel();
+            void LoadMatrix();
+            void LoadCompound();
 
-            std::string ReadLine();
+            int GetColorIdx(int color);
+            void AddVoxel(VoxelMesh mesh, int color, CVector pos, CVector &Beg, CVector &End);
+
+            CVector ReadVector();
     };
 } // namespace VoxelOptimizer
 
-#endif //QUBICLEEXCHANGE_HPP
+
+#endif //QUBICLELOADER_HPP

@@ -22,14 +22,14 @@
  * SOFTWARE.
  */
 
-#include <VoxelOptimizer/Loaders/QubicleBinaryTree.hpp>
+#include <VoxelOptimizer/Loaders/QubicleBinaryTreeLoader.hpp>
 #include <VoxelOptimizer/Exceptions.hpp>
 #include <stb_image.h>
 #include <string.h>
 
 namespace VoxelOptimizer
 {
-    void CQubicleBinaryTree::ParseFormat()
+    void CQubicleBinaryTreeLoader::ParseFormat()
     {
         m_Models.clear();
         m_Materials.clear();
@@ -57,7 +57,7 @@ namespace VoxelOptimizer
         m_ColorIdx.clear();
     }
 
-    void CQubicleBinaryTree::ReadColors()
+    void CQubicleBinaryTreeLoader::ReadColors()
     {
         int count = ReadData<int>();
         m_HasColormap = count > 0;
@@ -70,7 +70,7 @@ namespace VoxelOptimizer
         }
     }
 
-    void CQubicleBinaryTree::LoadNode()
+    void CQubicleBinaryTreeLoader::LoadNode()
     {
         uint32_t type = ReadData<uint32_t>();
         uint32_t size = ReadData<uint32_t>();
@@ -99,14 +99,14 @@ namespace VoxelOptimizer
         }
     }
 
-    void CQubicleBinaryTree::LoadModel()
+    void CQubicleBinaryTreeLoader::LoadModel()
     {
         uint32_t childCount = ReadData<uint32_t>();
         for (uint32_t i = 0; i < childCount; i++)
             LoadNode();
     }
 
-    void CQubicleBinaryTree::LoadMatrix()
+    void CQubicleBinaryTreeLoader::LoadMatrix()
     {
         int nameLen = ReadData<int>();
         Skip(nameLen);
@@ -167,7 +167,7 @@ namespace VoxelOptimizer
         m_Models.push_back(mesh);
     }
 
-    void CQubicleBinaryTree::LoadCompound()
+    void CQubicleBinaryTreeLoader::LoadCompound()
     {
         int nameLen = ReadData<int>();
         Skip(nameLen);
@@ -232,7 +232,7 @@ namespace VoxelOptimizer
             LoadNode();
     }
 
-    CVector CQubicleBinaryTree::ReadVector()
+    CVector CQubicleBinaryTreeLoader::ReadVector()
     {
         CVector ret;
 
@@ -243,7 +243,7 @@ namespace VoxelOptimizer
         return ret;
     }
 
-    int CQubicleBinaryTree::GetColorIdx(int color)
+    int CQubicleBinaryTreeLoader::GetColorIdx(int color)
     {
         int ret = 0;
 

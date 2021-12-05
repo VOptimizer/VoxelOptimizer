@@ -29,9 +29,10 @@
 #include <VoxelOptimizer/Loaders/ILoader.hpp>
 #include <VoxelOptimizer/Loaders/KenshapeLoader.hpp>
 #include <VoxelOptimizer/Loaders/MagicaVoxelLoader.hpp>
-#include <VoxelOptimizer/Loaders/QubicleBinary.hpp>
-#include <VoxelOptimizer/Loaders/QubicleBinaryTree.hpp>
-#include <VoxelOptimizer/Loaders/QubicleExchange.hpp>
+#include <VoxelOptimizer/Loaders/QubicleBinaryLoader.hpp>
+#include <VoxelOptimizer/Loaders/QubicleBinaryTreeLoader.hpp>
+#include <VoxelOptimizer/Loaders/QubicleExchangeLoader.hpp>
+#include <VoxelOptimizer/Loaders/QubicleLoader.hpp>
 #include <string.h>
 
 namespace VoxelOptimizer
@@ -53,6 +54,8 @@ namespace VoxelOptimizer
             type = LoaderTypes::QUBICLE_BIN_TREE;
         else if(ext == "qef")
             type = LoaderTypes::QUBICLE_EXCHANGE;
+        else if(ext == "qbcl")
+            type = LoaderTypes::QUBICLE;
 
         auto loader = Create(type);
         loader->Load(filename);
@@ -67,9 +70,10 @@ namespace VoxelOptimizer
             case LoaderTypes::MAGICAVOXEL: return Loader(new CMagicaVoxelLoader());
             case LoaderTypes::GOXEL: return Loader(new CGoxelLoader());
             case LoaderTypes::KENSHAPE: return Loader(new CKenshapeLoader());
-            case LoaderTypes::QUBICLE_BIN: return Loader(new CQubicleBinary());
-            case LoaderTypes::QUBICLE_BIN_TREE: return Loader(new CQubicleBinaryTree());
-            case LoaderTypes::QUBICLE_EXCHANGE: return Loader(new CQubicleExchange());
+            case LoaderTypes::QUBICLE_BIN: return Loader(new CQubicleBinaryLoader());
+            case LoaderTypes::QUBICLE_BIN_TREE: return Loader(new CQubicleBinaryTreeLoader());
+            case LoaderTypes::QUBICLE_EXCHANGE: return Loader(new CQubicleExchangeLoader());
+            case LoaderTypes::QUBICLE: return Loader(new CQubicleLoader());
 
             default: throw CVoxelLoaderException("Unknown file type!");
         }

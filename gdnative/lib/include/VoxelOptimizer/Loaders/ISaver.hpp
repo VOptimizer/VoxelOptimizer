@@ -22,51 +22,30 @@
  * SOFTWARE.
  */
 
-#ifndef FILEUTILS_HPP
-#define FILEUTILS_HPP
+#ifndef ISAVER_HPP
+#define ISAVER_HPP
 
-#include <algorithm>
 #include <string>
+#include <vector>
+#include <VoxelOptimizer/Loaders/VoxelMesh.hpp>
 
 namespace VoxelOptimizer
 {
-    inline std::string GetFileExt(std::string Path)
+    class ISaver
     {
-        // Removes the file name.
-        size_t Pos = Path.find_last_of(".");
-        if(Pos != std::string::npos)
-            Path = Path.erase(0, Pos + 1);
+        public:
+            /**
+             * @brief Saves the voxel mesh as a voxel file.
+             */         
+            void Save(const std::string &Path, VoxelMesh m);
 
-        std::transform(Path.begin(), Path.end(), Path.begin(), ::tolower);
-
-        return Path;
-    }
-
-    inline std::string GetPathWithoutExt(std::string Path)
-    {
-        // Removes the file extension.
-        size_t Pos = Path.find_last_of(".");
-        if(Pos != std::string::npos)
-            Path = Path.erase(Pos);
-
-        return Path;
-    }
-
-    inline std::string GetFilenameWithoutExt(std::string Path)
-    {
-        Path = GetPathWithoutExt(Path);
-
-        // Replaces all '\' to '/'
-        std::replace(Path.begin(), Path.end(), '\\', '/');
-
-        // Deletes the path.
-        size_t Pos = Path.find_last_of("/");
-        if(Pos != std::string::npos)
-            Path = Path.substr(Pos + 1);
-
-        return Path;
-    }
+            /**
+             * @brief Saves the voxel mesh as a voxel file.
+             * 
+             * @return Returns the file as memory stream.
+             */         
+            virtual std::vector<char> Save(VoxelMesh m) = 0;
+    };
 } // namespace VoxelOptimizer
 
-
-#endif //FILEUTILS_HPP
+#endif //ISAVER_HPP
