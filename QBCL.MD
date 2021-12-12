@@ -123,8 +123,8 @@ function loadNode(stream)
     stream.skip(4)  // Unknown value
 
     nameLen = stream.readUInt
-    Skip(nameLen) // Or save node name
-    Skip(3) // Unknown 3 bytes
+    stream.skip(nameLen) // Or save node name
+    stream.skip(3) // Unknown 3 bytes
 
     switch(type)
     {
@@ -150,6 +150,7 @@ function loadNode(stream)
 
 function loadModel(stream)
 {
+    stream.skip(36) // Unkown chunk
     childCount = stream.readUInt
     for(i = 0; i < childCount; i++)
         loadNode(stream)

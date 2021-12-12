@@ -114,7 +114,7 @@ namespace VoxelOptimizer
             CVector pos;
             strm >> pos.x >> pos.z >> pos.y >> cid >> mask;
 
-            pos.y = mesh->GetSize().y - pos.y;
+            pos.y = (mesh->GetSize().y - 1) - pos.y;
 
             if(mask == 0)
                 continue;

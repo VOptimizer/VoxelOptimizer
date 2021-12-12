@@ -286,7 +286,7 @@ namespace VoxelOptimizer
         if(cid == -1)
             return;
 
-        pos.y = (uint32_t)mesh->GetSize().y - pos.y;
+        pos.y = (uint32_t)(mesh->GetSize().y - 1) - pos.y;
 
         if(pos.y < 0)
             int i = 0;

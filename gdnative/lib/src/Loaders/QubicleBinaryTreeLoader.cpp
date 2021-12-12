@@ -152,7 +152,7 @@ namespace VoxelOptimizer
                         continue;
 
                     auto pos = CVector(x, z, y);
-                    pos.y = (uint32_t)mesh->GetSize().y - pos.y;
+                    pos.y = (uint32_t)(mesh->GetSize().y - 1) - pos.y;
 
                     Beg = Beg.Min(pos);
                     End = End.Max(pos);
@@ -213,7 +213,7 @@ namespace VoxelOptimizer
                         continue;
 
                     auto pos = CVector(x, z, y);
-                    pos.y = (uint32_t)mesh->GetSize().y - pos.y;
+                    pos.y = (uint32_t)(mesh->GetSize().y - 1) - pos.y;
 
                     Beg = Beg.Min(pos);
                     End = End.Max(pos);

@@ -103,7 +103,7 @@ namespace VoxelOptimizer
                     auto pos = CVector(x, z, y);
 
                     if(m_Header.ZAxisOrientation == 0)
-                        pos.y = (uint32_t)mesh->GetSize().z - pos.y;
+                        pos.y = (uint32_t)(mesh->GetSize().z - 1) - pos.y;
 
                     Beg = Beg.Min(pos);
                     End = End.Max(pos);
