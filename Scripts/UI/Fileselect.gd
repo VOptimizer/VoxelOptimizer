@@ -66,6 +66,7 @@ func _popup_hide():
 func _on_select_pressed():
 	_CurrentFileDlg = PopupFileDialogScene.instance()
 	_CurrentFileDlg.popup_exclusive = true
+	_CurrentFileDlg.allow_select_all_files = false
 	_CurrentFileDlg.connect("on_file_selected", self, "_file_selected")
 	_CurrentFileDlg.connect("popup_hide", self, "_popup_hide")
 	
