@@ -41,11 +41,13 @@ namespace VoxelOptimizer
     {
         m_Models.clear();
         m_Materials.clear();
-        m_UsedColorPalette.clear();
+        m_Textures.clear();
+        m_HasEmission = false;
 
         ReadFile();
         
         std::map<int, int> ColorIdx;
+        std::map<int, int> EmissionColorIdx;
         
         for (auto &&l : m_Layers)
         {
@@ -71,17 +73,52 @@ namespace VoxelOptimizer
                             if(p != 0)
                             {
                                 int IdxC = 0;
-                                if(ColorIdx.find(p) == ColorIdx.end())
-                                {
-                                    CColor c;
-                                    memcpy(c.c, &p, 4);
+                                bool found = false;
 
-                                    m_UsedColorPalette.push_back(c);
-                                    ColorIdx[p] = m_UsedColorPalette.size() - 1;
-                                    IdxC = m_UsedColorPalette.size() - 1;
+                                if(m_HasEmission)
+                                {
+                                    auto texIT = m_Textures.find(TextureType::EMISSION);
+                                    if(texIT == m_Textures.end())
+                                        m_Textures[TextureType::EMISSION] = Texture(new CTexture());
+
+                                    auto material = m_Materials[l.MatIdx];
+                                    if(material->Power > 0)
+                                    {
+                                        if(EmissionColorIdx.find(p) == EmissionColorIdx.end())
+                                        {
+                                            CColor c;
+                                            memcpy(c.c, &p, 4);
+
+                                            m_Textures[TextureType::EMISSION]->AddPixel(c);
+                                            IdxC = m_Textures[TextureType::EMISSION]->Size().x - 1;
+                                            EmissionColorIdx[p] = IdxC;
+                                        }
+                                        else
+                                            IdxC = EmissionColorIdx[p];
+
+                                        found = true;
+                                    }
                                 }
-                                else
-                                    IdxC = ColorIdx[p];
+
+                                if(!found)
+                                {
+                                    if(ColorIdx.find(p) == ColorIdx.end())
+                                    {
+                                        CColor c;
+                                        memcpy(c.c, &p, 4);
+
+                                        auto texIT = m_Textures.find(TextureType::DIFFIUSE);
+                                        if(texIT == m_Textures.end())
+                                            m_Textures[TextureType::DIFFIUSE] = Texture(new CTexture());
+
+                                        m_Textures[TextureType::DIFFIUSE]->AddPixel(c);
+                                        m_Textures[TextureType::EMISSION]->AddPixel(CColor(0, 0, 0, 255));
+                                        IdxC = m_Textures[TextureType::DIFFIUSE]->Size().x - 1;
+                                        ColorIdx[p] = IdxC;
+                                    }
+                                    else
+                                        IdxC = ColorIdx[p];
+                                }
 
                                 if(Beg.IsZero())
                                 {

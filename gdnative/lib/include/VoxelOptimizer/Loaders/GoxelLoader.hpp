@@ -83,6 +83,7 @@ namespace VoxelOptimizer
             std::vector<BL16> m_BL16s;
             std::vector<Layer> m_Layers;
             CBBox m_BBox;
+            bool m_HasEmission;
 
             void ParseFormat() override;
 

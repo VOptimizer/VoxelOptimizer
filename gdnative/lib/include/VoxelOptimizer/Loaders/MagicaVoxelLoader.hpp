@@ -118,10 +118,11 @@ namespace VoxelOptimizer
 
             std::map<int, CMat4x4> m_ModelMatrices;
 
-            ColorPalette m_ColorPalette;
+            std::vector<CColor> m_ColorPalette;
 
             size_t m_Index;
             size_t m_UsedColorsPos;
+            bool m_HasEmission;
     };
 } // namespace VoxelOptimizer
 

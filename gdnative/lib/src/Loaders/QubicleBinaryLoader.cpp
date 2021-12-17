@@ -36,7 +36,7 @@ namespace VoxelOptimizer
         m_Models.clear();
         m_Materials.clear();
         m_Materials.clear();
-        m_UsedColorPalette.clear();
+        m_Textures.clear();
 
         m_Header = ReadData<SQubicleBinaryHeader>();
         if(m_Header.Version[0] != 1 || m_Header.Version[1] != 1 || m_Header.Version[2] != 0 || m_Header.Version[3] != 0)
@@ -200,8 +200,12 @@ namespace VoxelOptimizer
             if(c.A == 0)
                 return -1;
 
-            m_UsedColorPalette.push_back(c);
-            ret = m_UsedColorPalette.size() - 1;
+            auto texIT = m_Textures.find(TextureType::DIFFIUSE);
+            if(texIT == m_Textures.end())
+                m_Textures[TextureType::DIFFIUSE] = Texture(new CTexture());
+
+            m_Textures[TextureType::DIFFIUSE]->AddPixel(c);
+            ret = m_Textures[TextureType::DIFFIUSE]->Size().x - 1;
 
             m_ColorIdx.insert({color, ret});
         }

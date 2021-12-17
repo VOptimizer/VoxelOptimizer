@@ -27,7 +27,6 @@
 #include "Nodes.hpp"
 #include <sstream>
 #include <string.h>
-#include <stb_image_write.h>
 #include <VoxelOptimizer/Exporters/GLTFExporter.hpp>
 
 namespace VoxelOptimizer
@@ -177,36 +176,61 @@ namespace VoxelOptimizer
             GLTFMeshes.push_back(GLTFMesh);
         }
         
-        GLTF::CImage Image;
+        std::vector<GLTF::CImage> Images;
         GLTF::CBuffer Buffer;
 
-        std::vector<char> Texture;
-        stbi_write_png_to_func([](void *context, void *data, int size){
-            std::vector<char> *InnerTexture = (std::vector<char>*)context;
-            InnerTexture->insert(InnerTexture->end(), (char*)data, ((char*)data) + size);
-        }, &Texture, Meshes[0]->Texture.size(), 1, 4, Meshes[0]->Texture.data(), 4 * Meshes[0]->Texture.size());
+        auto textures = Meshes[0]->Textures;
 
         // For glb add padding to satify the 4 Byte boundary.
         if(m_Settings->Binary)
-        {            
-            size_t Size = Binary.size();
-            int Padding = (Binary.size() + Texture.size()) % 4;
+        {          
+            std::vector<char> diffuse, emission;
+            diffuse = textures[TextureType::DIFFIUSE]->AsPNG();
 
-            Binary.resize(Binary.size() + Texture.size() + Padding, '\0');
-            memcpy(Binary.data() + Size, Texture.data(), Texture.size());
+            if(textures.find(TextureType::EMISSION) != textures.end())
+                emission = textures[TextureType::EMISSION]->AsPNG();
+
+            size_t Size = Binary.size();
+            int Padding = (Binary.size() + diffuse.size() + emission.size()) % 4;
+
+            Binary.resize(Binary.size() + diffuse.size() + emission.size() + Padding, '\0');
+            memcpy(Binary.data() + Size, diffuse.data(), diffuse.size());
+            memcpy(Binary.data() + Size, emission.data(), emission.size());
 
             GLTF::CBufferView ImageView;
             ImageView.Offset = Size;
-            ImageView.Size = Texture.size();
+            ImageView.Size = diffuse.size();
 
+            GLTF::CImage Image;
             Image.BufferView = BufferViews.size();
             BufferViews.push_back(ImageView);
+            Images.push_back(Image);
 
-            Texture.clear();    // Clear the memory
+            if(!emission.empty())
+            {
+                GLTF::CBufferView ImageView;
+                ImageView.Offset = Size + diffuse.size();
+                ImageView.Size = emission.size();
+
+                GLTF::CImage Image;
+                Image.BufferView = BufferViews.size();
+                BufferViews.push_back(ImageView);
+                Images.push_back(Image);
+            }
         }
         else
         {
-            Image.Uri = m_ExternalFilenames + ".png";
+            GLTF::CImage Image;
+            Image.Uri = m_ExternalFilenames + ".albedo.png";
+            Images.push_back(Image);
+
+            if(textures.find(TextureType::EMISSION) != textures.end())
+            {
+                GLTF::CImage Image;
+                Image.Uri = m_ExternalFilenames + ".emission.png";
+                Images.push_back(Image);
+            }
+
             Buffer.Uri = m_ExternalFilenames + ".bin";
         }
             
@@ -224,7 +248,7 @@ namespace VoxelOptimizer
         json.AddPair("bufferViews", BufferViews);
         json.AddPair("materials", Materials);        
 
-        json.AddPair("images", std::vector<GLTF::CImage>() = { Image });
+        json.AddPair("images", Images);
         json.AddPair("textures", std::vector<GLTF::CTexture>() = { GLTF::CTexture() });   
         json.AddPair("buffers", std::vector<GLTF::CBuffer>() = { Buffer });
         
@@ -241,11 +265,17 @@ namespace VoxelOptimizer
         if(!m_Settings->Binary)
         {
             std::vector<char> GLTF(JS.begin(), JS.end());
-            return {
+            std::map<std::string, std::vector<char>> ret = 
+            {
                 {"gltf", GLTF},
                 {"bin", Binary},
-                {"png", Texture}
+                {"albedo.png", textures[TextureType::DIFFIUSE]->AsPNG()}
             };
+
+            if(textures.find(TextureType::EMISSION) != textures.end())
+                ret["emission.png"] = textures[TextureType::EMISSION]->AsPNG();
+
+            return ret;
         }
 
         // Builds the binary buffer.

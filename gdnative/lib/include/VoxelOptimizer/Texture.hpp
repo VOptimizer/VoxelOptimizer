@@ -22,39 +22,48 @@
  * SOFTWARE.
  */
 
-#ifndef MESH_HPP
-#define MESH_HPP
+#ifndef TEXTURE_HPP
+#define TEXTURE_HPP
 
-#include <VoxelOptimizer/Mat4x4.hpp>
-#include <VoxelOptimizer/Material.hpp>
-#include <VoxelOptimizer/Loaders/ILoader.hpp>
+#include <VoxelOptimizer/Color.hpp>
 #include <memory>
+#include <stddef.h>
 #include <vector>
 #include <VoxelOptimizer/Vector.hpp>
 
 namespace VoxelOptimizer
 {
-    struct SGroupedFaces
+    class CTexture
     {
-        int MaterialIndex;             
-        Material FaceMaterial;              //!< Material which are applied to this faces.
-        std::vector<CVector> Indices;   //!< Indices of the faces. 3 indices are alway 1 triangle. One index is a tripple of x = vertex, y = normal, z = uv.
+        public:
+            CTexture() = default;
+            CTexture(const CVector &_size);
+            CTexture(const CTexture &_texture);
+
+            void AddPixel(const CColor &color, const CVector &pos);
+            void AddPixel(const CColor &color);
+
+            inline CVector Size() const
+            {
+                return m_Size;
+            }
+
+            const std::vector<uint32_t> &Pixels() const
+            {
+                return m_Pixels;
+            }
+
+            uint32_t Pixel(const CVector &pos);
+
+            std::vector<char> AsPNG();
+
+            ~CTexture() = default;
+        private:
+            CVector m_Size;
+            std::vector<uint32_t> m_Pixels;
     };
-    using GroupedFaces = std::shared_ptr<SGroupedFaces>;
 
-    struct SMesh
-    {
-        std::vector<CVector> Vertices;      //!< All vertices of this mesh.
-        std::vector<CVector> Normals;       //!< All normals of this mesh.
-        std::vector<CVector> UVs;           //!< All uvs of this mesh.
-
-        std::vector<GroupedFaces> Faces;    //!< All faces of this mesh.
-        std::map<TextureType, Texture> Textures;        //!< Texture used by this mesh.
-
-        CMat4x4 ModelMatrix;
-    };
-    using Mesh = std::shared_ptr<SMesh>;
+    using Texture = std::shared_ptr<CTexture>;
 } // namespace VoxelOptimizer
 
-
-#endif //MESH_HPP
+#endif //TEXTURE_HPP

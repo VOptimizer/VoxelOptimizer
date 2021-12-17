@@ -117,7 +117,7 @@ namespace VoxelOptimizer
             
         CVector FaceNormal = (v2 - v1).Cross(v3 - v1).Normalize(); 
         int NormalIdx = AddNormal(Mesh, Normal);
-        int UVIdx = AddUV(Mesh, CVector(((float)(Color + 0.5f)) / Mesh->Texture.size(), 0.5f, 0));
+        int UVIdx = AddUV(Mesh, CVector(((float)(Color + 0.5f)) / Mesh->Textures[TextureType::DIFFIUSE]->Size().x, 0.5f, 0));
 
         if(FaceNormal == Normal)
         {

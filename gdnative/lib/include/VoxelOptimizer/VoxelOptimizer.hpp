@@ -31,6 +31,7 @@
 #include <VoxelOptimizer/Material.hpp>
 #include <VoxelOptimizer/Mesh.hpp>
 #include <VoxelOptimizer/Vector.hpp>
+#include <VoxelOptimizer/Texture.hpp>
 
 #include <VoxelOptimizer/Exporters/IExporter.hpp>
 #include <VoxelOptimizer/Exporters/SpriteStackingExporter.hpp>

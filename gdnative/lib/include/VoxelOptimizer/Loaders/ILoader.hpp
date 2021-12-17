@@ -33,6 +33,7 @@
 #include <memory>
 #include <stdlib.h>
 #include <string>
+#include <VoxelOptimizer/Texture.hpp>
 #include <vector>
 #include <VoxelOptimizer/Vector.hpp>
 #include <VoxelOptimizer/Loaders/VoxelMesh.hpp>
@@ -54,11 +55,15 @@ namespace VoxelOptimizer
         QUBICLE
     };
 
+    enum class TextureType
+    {
+        DIFFIUSE,
+        EMISSION
+    };
+
     class ILoader
     {
         public:
-            using ColorPalette = std::vector<CColor>;
-
             /**
              * @brief Creates an instance of a loader, which then loads the given file.
              * 
@@ -97,9 +102,9 @@ namespace VoxelOptimizer
                 return m_Models;
             }
 
-            inline ColorPalette GetColorPalette() const
+            inline std::map<TextureType, Texture> GetTextures() const
             {
-                return m_UsedColorPalette;
+                return m_Textures;
             }
 
             inline std::vector<Material> GetMaterials() const
@@ -110,7 +115,7 @@ namespace VoxelOptimizer
         protected:
             std::vector<VoxelMesh> m_Models;
             std::vector<Material> m_Materials;
-            ColorPalette m_UsedColorPalette;
+            std::map<TextureType, Texture> m_Textures;
 
             virtual void ParseFormat() = 0;
 

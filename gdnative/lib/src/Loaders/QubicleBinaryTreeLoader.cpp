@@ -34,7 +34,7 @@ namespace VoxelOptimizer
         m_Models.clear();
         m_Materials.clear();
         m_Materials.clear();
-        m_UsedColorPalette.clear();
+        m_Textures.clear();
 
         if(ReadData<int>() != 0x32204251)
             throw CVoxelLoaderException("Unknown file format");
@@ -66,7 +66,11 @@ namespace VoxelOptimizer
             CColor c;
             c.FromRGBA(ReadData<uint32_t>());
 
-            m_UsedColorPalette.push_back(c);
+            auto texIT = m_Textures.find(TextureType::DIFFIUSE);
+            if(texIT == m_Textures.end())
+                m_Textures[TextureType::DIFFIUSE] = Texture(new CTexture());
+
+            m_Textures[TextureType::DIFFIUSE]->AddPixel(c);
         }
     }
 
@@ -256,8 +260,12 @@ namespace VoxelOptimizer
             if(c.A == 0)
                 return -1;
 
-            m_UsedColorPalette.push_back(c);
-            ret = m_UsedColorPalette.size() - 1;
+            auto texIT = m_Textures.find(TextureType::DIFFIUSE);
+            if(texIT == m_Textures.end())
+                m_Textures[TextureType::DIFFIUSE] = Texture(new CTexture());
+
+            m_Textures[TextureType::DIFFIUSE]->AddPixel(c);
+            ret = m_Textures[TextureType::DIFFIUSE]->Size().x - 1;
 
             m_ColorIdx.insert({color, ret});
         }

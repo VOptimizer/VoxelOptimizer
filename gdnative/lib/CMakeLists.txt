@@ -26,7 +26,8 @@ set(SRCS "${PROJECT_SOURCE_DIR}/src/Loaders/MagicaVoxelLoader.cpp"
          "${PROJECT_SOURCE_DIR}/src/Exporters/GodotSceneExporter.cpp"
          "${PROJECT_SOURCE_DIR}/src/Exporters/glTF/GLTFExporter.cpp"
          "${PROJECT_SOURCE_DIR}/src/Exporters/PLYExporter.cpp"
-         "${PROJECT_SOURCE_DIR}/src/stb_image_write.c")
+         "${PROJECT_SOURCE_DIR}/src/stb_image_write.c"
+         "${PROJECT_SOURCE_DIR}/src/Texture.cpp")
 #set(LIBS "")
 
 include_directories("${PROJECT_SOURCE_DIR}/include"

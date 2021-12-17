@@ -33,7 +33,7 @@ namespace VoxelOptimizer
     {
         m_Models.clear();
         m_Materials.clear();
-        m_UsedColorPalette.clear();
+        m_Textures.clear();
 
         // Quick'n dirty gzip check.
         if(ReadData<uint8_t>() != 0x1f || ReadData<uint8_t>() != 0x8b || ReadData<uint8_t>() != 8)
@@ -76,9 +76,13 @@ namespace VoxelOptimizer
                 int IdxC = 0;
                 if(ColorIdx.find(tile->ColorIdx) == ColorIdx.end())
                 {
-                    m_UsedColorPalette.push_back(Content->Colors[tile->ColorIdx]);
-                    ColorIdx[tile->ColorIdx] = m_UsedColorPalette.size() - 1;
-                    IdxC = m_UsedColorPalette.size() - 1;
+                    auto texIT = m_Textures.find(TextureType::DIFFIUSE);
+                    if(texIT == m_Textures.end())
+                        m_Textures[TextureType::DIFFIUSE] = Texture(new CTexture());
+
+                    m_Textures[TextureType::DIFFIUSE]->AddPixel(Content->Colors[tile->ColorIdx]);
+                    IdxC = m_Textures[TextureType::DIFFIUSE]->Size().x - 1;
+                    ColorIdx[tile->ColorIdx] = IdxC;
                 }
                 else
                     IdxC = ColorIdx[tile->ColorIdx];

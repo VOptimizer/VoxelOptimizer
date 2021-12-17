@@ -404,7 +404,7 @@ namespace VoxelOptimizer
         for (auto &&c : Chunks)
         {
             Mesh M = Mesh(new SMesh());
-            M->Texture = Loader->GetColorPalette();
+            M->Textures = Loader->GetTextures();
 
             for(float x = c.Beg.x - 1; x < c.End.x + 1; x++)
             {
@@ -429,7 +429,7 @@ namespace VoxelOptimizer
         {
             auto mesh = pair.second;
             for (auto &&uv : mesh->UVs)
-                uv = CVector(((float)(uv.x + 0.5f)) / mesh->Texture.size(), 0.5f, 0);
+                uv = CVector(((float)(uv.x + 0.5f)) / mesh->Textures[TextureType::DIFFIUSE]->Size().x, 0.5f, 0);
         }
 
         return Ret;

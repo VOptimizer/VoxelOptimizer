@@ -26,7 +26,6 @@
 #include <fstream>
 #include <sstream>
 #include <string.h>
-#include <stb_image_write.h>
 #include <VoxelOptimizer/Exporters/WavefrontObjExporter.hpp>
 
 namespace VoxelOptimizer
@@ -110,13 +109,18 @@ namespace VoxelOptimizer
                     MTLFile << "Ka " << Ambient << " " << Ambient << " " << Ambient << std::endl;
                     MTLFile << "Kd 1.0 1.0 1.0" << std::endl;
                     MTLFile << "Ks " << f->FaceMaterial->Specular << " " << f->FaceMaterial->Specular << " " << f->FaceMaterial->Specular << std::endl;
+                    
                     if(f->FaceMaterial->Power != 0.0)
+                    {
                         MTLFile << "Ke " << f->FaceMaterial->Power << " " << f->FaceMaterial->Power << " " << f->FaceMaterial->Power << std::endl;
+                        MTLFile << "map_Ke " << m_ExternalFilenames << ".emission.png" << std::endl;
+                    }
+
                     MTLFile << "Tr " << Transparency << std::endl;
                     MTLFile << "d " << Alpha << std::endl;
                     MTLFile << "Ni " << f->FaceMaterial->IOR << std::endl;
                     MTLFile << "illum " << Illum << std::endl;
-                    MTLFile << "map_Kd " << m_ExternalFilenames << ".png" << std::endl;
+                    MTLFile << "map_Kd " << m_ExternalFilenames << ".albedo.png" << std::endl;
 
 
                     MatCounter++;  
@@ -142,20 +146,22 @@ namespace VoxelOptimizer
         
             indicesOffset += CVector(mesh->Vertices.size(), mesh->Normals.size(), mesh->UVs.size());
         }
-        
-        std::vector<char> Texture;
-        stbi_write_png_to_func([](void *context, void *data, int size){
-            std::vector<char> *InnerTexture = (std::vector<char>*)context;
-            InnerTexture->insert(InnerTexture->end(), (char*)data, ((char*)data) + size);
-        }, &Texture, Meshes[0]->Texture.size(), 1, 4, Meshes[0]->Texture.data(), 4 * Meshes[0]->Texture.size());
 
         std::string ObjFileStr = ObjFile.str();
         std::string MTLFileStr = MTLFile.str();
 
-        return {
+        auto textures = Meshes[0]->Textures;
+
+        std::map<std::string, std::vector<char>> ret = 
+        {
             {"obj", std::vector<char>(ObjFileStr.begin(), ObjFileStr.end())},
             {"mtl", std::vector<char>(MTLFileStr.begin(), MTLFileStr.end())},
-            {"png", Texture}
+            {"albedo.png", textures[TextureType::DIFFIUSE]->AsPNG()}
         };
+
+        if(textures.find(TextureType::EMISSION) != textures.end())
+            ret["emission.png"] = textures[TextureType::EMISSION]->AsPNG();
+
+        return ret;
     }
 } // namespace VoxelOptimizer

@@ -49,7 +49,7 @@ namespace VoxelOptimizer
         for (auto &&c : Chunks)
         {
             Mesh RetMesh = Mesh(new SMesh());
-            RetMesh->Texture = Loader->GetColorPalette();
+            RetMesh->Textures = Loader->GetTextures();
             BBox = c;
 
             // For all 3 axis (x, y, z)

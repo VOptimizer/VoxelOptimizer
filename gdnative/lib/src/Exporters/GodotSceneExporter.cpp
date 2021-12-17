@@ -23,7 +23,6 @@
  */
 
 #include <sstream>
-#include <stb_image_write.h>
 #include <VoxelOptimizer/Exporters/GodotSceneExporter.hpp>
 
 namespace VoxelOptimizer
@@ -32,9 +31,16 @@ namespace VoxelOptimizer
     {
         std::stringstream os, nodes;
         // os << "[gd_scene load_steps=" << 3 + Mesh->Faces.size() << " format=2]\n" << std::endl;
-        os << "[ext_resource path=\"res://" << m_ExternalFilenames << ".png\" type=\"Texture\" id=1]\n" << std::endl;
-
         size_t ID = 1;
+        os << "[ext_resource path=\"res://" << m_ExternalFilenames << ".albedo.png\" type=\"Texture\" id=1]\n" << std::endl;
+
+        auto textures = Meshes[0]->Textures;
+        if(textures.find(TextureType::EMISSION) != textures.end())
+        {
+            os << "[ext_resource path=\"res://" << m_ExternalFilenames << ".emission.png\" type=\"Texture\" id=2]\n" << std::endl;
+            ID++;
+        }
+
         std::map<int, size_t> processedMaterials;
         size_t loadStepsSize = 0;
 
@@ -64,6 +70,7 @@ namespace VoxelOptimizer
                     {
                         os << "emission_enabled = true" << std::endl;
                         os << "emission_energy = " << f->FaceMaterial->Power << std::endl;
+                        os << "emission_texture = ExtResource( 2 )" << std::endl;
                     }
 
                     if(f->FaceMaterial->IOR != 0)
@@ -211,17 +218,17 @@ namespace VoxelOptimizer
 
         os << nodes.str();
         
-        std::vector<char> Texture;
-        stbi_write_png_to_func([](void *context, void *data, int size){
-            std::vector<char> *InnerTexture = (std::vector<char>*)context;
-            InnerTexture->insert(InnerTexture->end(), (char*)data, ((char*)data) + size);
-        }, &Texture, Meshes[0]->Texture.size(), 1, 4, Meshes[0]->Texture.data(), 4 * Meshes[0]->Texture.size());
-
         std::string ESCNFileStr = "[gd_scene load_steps=" + std::to_string(3 + loadStepsSize) + " format=2]\n\n" + os.str();
 
-        return {
+        std::map<std::string, std::vector<char>> ret = 
+        {
             {"escn", std::vector<char>(ESCNFileStr.begin(), ESCNFileStr.end())},
-            {"png", Texture},
+            {"albedo.png", textures[TextureType::DIFFIUSE]->AsPNG()},
         };
+
+        if(textures.find(TextureType::EMISSION) != textures.end())
+            ret["emission.png"] = textures[TextureType::EMISSION]->AsPNG();
+
+        return ret;
     }
 } // namespace VoxelOptimizer

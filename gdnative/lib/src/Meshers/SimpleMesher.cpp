@@ -46,7 +46,7 @@ namespace VoxelOptimizer
         for (auto &&c : Chunks)
         {          
             Mesh M = Mesh(new SMesh());
-            M->Texture = Loader->GetColorPalette();
+            M->Textures = Loader->GetTextures();
 
             for(float x = c.Beg.x; x < c.End.x; x++)
             {

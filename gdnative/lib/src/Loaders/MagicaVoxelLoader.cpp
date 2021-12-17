@@ -60,7 +60,8 @@ namespace VoxelOptimizer
         m_ColorMapping.clear();
         m_MaterialMapping.clear();
         m_Materials.clear();
-        m_UsedColorPalette.clear();
+        m_Textures.clear();
+        m_HasEmission = false;
        
         std::string Signature(4, '\0');
         ReadData(&Signature[0], 4);
@@ -126,10 +127,28 @@ namespace VoxelOptimizer
             }
         }
 
+        auto texIT = m_Textures.find(TextureType::DIFFIUSE);
+        if(texIT == m_Textures.end())
+            m_Textures[TextureType::DIFFIUSE] = Texture(new CTexture(CVector(m_ColorMapping.size(), 1, 0)));
+
+        if(m_HasEmission)
+        {
+            auto texIT = m_Textures.find(TextureType::EMISSION);
+            if(texIT == m_Textures.end())
+                m_Textures[TextureType::EMISSION] = Texture(new CTexture(CVector(m_ColorMapping.size(), 1, 0)));
+        }
+
         // Creates the used color palette.
-        m_UsedColorPalette.resize(m_ColorMapping.size());
         for (auto &&c : m_ColorMapping)
-            m_UsedColorPalette[c.second] = m_ColorPalette[c.first - 1];
+        {
+            m_Textures[TextureType::DIFFIUSE]->AddPixel(m_ColorPalette[c.first - 1], CVector(c.second, 0, 0));
+            if(m_HasEmission)
+            {
+                auto material = m_Materials[c.first - 1];
+                if(material->Power > 0)
+                    m_Textures[TextureType::EMISSION]->AddPixel(m_ColorPalette[c.first - 1], CVector(c.second, 0, 0));
+            }
+        }
     }
 
     void CMagicaVoxelLoader::LoadDefaultPalette()
@@ -201,7 +220,6 @@ namespace VoxelOptimizer
                     k++;
                 }
             }
-
             m->SetVoxel(vec, MatIdx, Color, Transparent);
         } 
 
@@ -258,7 +276,10 @@ namespace VoxelOptimizer
                             else if(Key == "_ior")
                                 Mat->IOR = std::stof(Value);
                             else if(Key == "_flux")
-                                Mat->Power = std::stof(Value);   
+                            {
+                                m_HasEmission = true;
+                                Mat->Power = std::stof(Value);  
+                            } 
                         }
 
                         if(MaterialType == "_diffuse" || MaterialType.empty())

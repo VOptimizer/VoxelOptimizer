@@ -33,7 +33,7 @@ namespace VoxelOptimizer
         m_Models.clear();
         m_Materials.clear();
         m_Materials.clear();
-        m_UsedColorPalette.clear();
+        m_Textures.clear();
 
         if(ReadLine() != "Qubicle Exchange Format")
             throw CVoxelLoaderException("Unknown file format");
@@ -97,7 +97,11 @@ namespace VoxelOptimizer
             strm >> r >> g >> b;
             strm.clear();
 
-            m_UsedColorPalette.push_back(CColor(r * 255.0, g * 255.0, b * 255.0, 255.0));
+            auto texIT = m_Textures.find(TextureType::DIFFIUSE);
+            if(texIT == m_Textures.end())
+                m_Textures[TextureType::DIFFIUSE] = Texture(new CTexture());
+
+            m_Textures[TextureType::DIFFIUSE]->AddPixel(CColor(r * 255.0, g * 255.0, b * 255.0, 255.0));
         }
     }
 
