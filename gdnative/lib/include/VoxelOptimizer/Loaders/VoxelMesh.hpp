@@ -27,6 +27,7 @@
 
 #include <array>
 #include <VoxelOptimizer/BBox.hpp>
+#include <list>
 #include <VoxelOptimizer/Mat4x4.hpp>
 #include <map>
 #include <memory>
@@ -87,10 +88,18 @@ namespace VoxelOptimizer
 
     using Voxel = std::shared_ptr<CVoxel>;
 
+    struct SChunk
+    {
+        CBBox BBox;
+        std::map<CVector, CBBox> Transparent;
+    };
+
+    using Chunk = std::shared_ptr<SChunk>;
+
     class CVoxelMesh
     {
         public:
-            CVoxelMesh() : m_RemeshAll(true), m_BlockCount(0) { }
+            CVoxelMesh() : m_RemeshAll(true), m_BlockCount(0), m_GlobalChunk(new SChunk()) { }
 
             /**
              * @brief Sets the size of the voxel space.
@@ -138,6 +147,7 @@ namespace VoxelOptimizer
             inline void SetBBox(CBBox BBox)
             {
                 m_BBox = BBox;
+                m_GlobalChunk->BBox = m_BBox;
             }
 
             inline void RecalcBBox()
@@ -150,6 +160,8 @@ namespace VoxelOptimizer
                     m_BBox.Beg = m_BBox.Beg.Min(v.first);
                     m_BBox.End = m_BBox.End.Max(v.first + CVector(1, 1, 1));
                 }
+
+                m_GlobalChunk->BBox = m_BBox;
             }
             
             /**
@@ -164,13 +176,13 @@ namespace VoxelOptimizer
                 return m_Voxels;
             }
 
-            inline std::vector<CBBox> GetChunksToRemesh()
+            inline std::vector<Chunk> GetChunksToRemesh()
             {
                 if(m_RemeshAll)
-                    return {m_BBox};
+                    return { m_GlobalChunk };
 
                 std::lock_guard<std::recursive_mutex> lock(m_Lock);
-                std::vector<CBBox> Ret(m_ChunksToRemesh.size(), CBBox());
+                std::vector<Chunk> Ret(m_ChunksToRemesh.size(), nullptr);
                 size_t Pos = 0;
 
                 for (auto &&c : m_ChunksToRemesh)
@@ -212,6 +224,14 @@ namespace VoxelOptimizer
             Voxel GetVoxel(const CVector &Pos);
 
             /**
+             * @brief Gets a voxel on a given position.
+             * 
+             * @param pos: Position of the voxel
+             * @param OpaqueOnly: If true than only opaque voxels are returned, otherwise all transparent one.
+             */
+            Voxel GetVoxel(const CVector &Pos, bool OpaqueOnly);
+
+            /**
              * @brief Gets the count of all setted blocks.
              */
             inline size_t GetBlockCount() const
@@ -232,16 +252,17 @@ namespace VoxelOptimizer
             const static CVector CHUNK_SIZE;
 
             void SetNormal(const CVector &Pos, const CVector &Neighbor, bool IsInvisible = true);
-            void MarkChunk(const CVector &Pos);
-            void InsertMarkedChunk(const CBBox &BBox);
+            void MarkChunk(const CVector &Pos, Voxel voxel = nullptr);
+            void InsertMarkedChunk(Chunk chunk);
 
             CMat4x4 m_ModelMatrix;
 
             CVector m_Size;
             CBBox m_BBox;
+            Chunk m_GlobalChunk;
             std::map<CVector, Voxel> m_Voxels;
-            std::map<CVector, CBBox> m_Chunks;
-            std::map<CVector, CBBox> m_ChunksToRemesh;
+            std::map<CVector, Chunk> m_Chunks;
+            std::map<CVector, Chunk> m_ChunksToRemesh;
 
             bool m_RemeshAll;
             size_t m_BlockCount;

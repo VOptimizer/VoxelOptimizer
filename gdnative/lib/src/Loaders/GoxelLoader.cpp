@@ -30,11 +30,6 @@
 #include <string.h>
 #include <VoxelOptimizer/Exceptions.hpp>
 
-#include <fstream>
-#include <string>
-
-#include <iostream>
-
 namespace VoxelOptimizer
 {
     void CGoxelLoader::ParseFormat()
@@ -51,7 +46,7 @@ namespace VoxelOptimizer
         
         for (auto &&l : m_Layers)
         {
-            CVector Beg, End, TranslationBeg;
+            CVector Beg(INFINITY, INFINITY, INFINITY), End, TranslationBeg(INFINITY, INFINITY, INFINITY);
             VoxelMesh m = VoxelMesh(new CVoxelMesh());
             m->SetSize(m_BBox.End + m_BBox.Beg.Abs());
 
@@ -69,8 +64,9 @@ namespace VoxelOptimizer
                             CVector vi(x, y, z);
                             vi += m_BBox.Beg.Abs();
 
+                            //TODO: Handle negative pos.
                             uint32_t p = tmp.GetVoxel(CVector(x - v.x, y - v.y, z - v.z));
-                            if(p != 0)
+                            if((p & 0xFF000000) != 0)
                             {
                                 int IdxC = 0;
                                 bool found = false;
@@ -112,22 +108,18 @@ namespace VoxelOptimizer
                                             m_Textures[TextureType::DIFFIUSE] = Texture(new CTexture());
 
                                         m_Textures[TextureType::DIFFIUSE]->AddPixel(c);
-                                        m_Textures[TextureType::EMISSION]->AddPixel(CColor(0, 0, 0, 255));
+
+                                        if(m_HasEmission)
+                                            m_Textures[TextureType::EMISSION]->AddPixel(CColor(0, 0, 0, 255));
+                                        
                                         IdxC = m_Textures[TextureType::DIFFIUSE]->Size().x - 1;
                                         ColorIdx[p] = IdxC;
                                     }
                                     else
                                         IdxC = ColorIdx[p];
                                 }
-
-                                if(Beg.IsZero())
-                                {
-                                    Beg = vi;
-                                    TranslationBeg = CVector(x, y, z);
-                                }
-
+                                
                                 TranslationBeg = TranslationBeg.Min(CVector(x, y, z));
-
                                 Beg = Beg.Min(vi);
                                 End = End.Max(vi);
 
@@ -195,6 +187,9 @@ namespace VoxelOptimizer
         m_Materials.back()->Metallic = *((float*)(Dict["metallic"]).data());
         m_Materials.back()->Roughness = *((float*)(Dict["roughness"]).data());
         m_Materials.back()->Power = *((float*)(Dict["emission"]).data());
+
+        if(m_Materials.back()->Power != 0.0)
+            m_HasEmission = true;
 
         Skip(sizeof(int));
     }

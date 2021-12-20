@@ -211,10 +211,16 @@ namespace VoxelOptimizer
         class CTexture
         {
             public:
+                CTexture() : m_Source(0) {}
+                CTexture(int _source) : m_Source(_source) {}
+
                 void Serialize(CJSON &json) const
                 {
-                    json.AddPair("source", 0);
+                    json.AddPair("source", m_Source);
                 }
+
+            private:
+                int m_Source;
         };
 
         class CImage
@@ -253,19 +259,31 @@ namespace VoxelOptimizer
                         {"texCoord", 0}
                     };
 
+                    if(Emissive != 0)
+                    {
+                        std::map<std::string, int> EmissiveTexture = {
+                            {"index", 1},
+                            {"texCoord", 0}
+                        };
+
+                        json.AddPair("emissiveTexture", EmissiveTexture);
+                    }
+
                     PBRMetallicRoughness.AddPair("baseColorTexture", BaseColorTexture);
                     PBRMetallicRoughness.AddPair("roughnessFactor", Roughness);
                     PBRMetallicRoughness.AddPair("metallicFactor", Metallic);
 
+                    if(Transparency != 0)
+                    {
+                        json.AddPair("alphaMode", std::string("BLEND"));
+
+                        std::vector<float> baseColorFactor = { 1.f, 1.f, 1.f, 1.f - Transparency };
+                        PBRMetallicRoughness.AddPair("baseColorFactor", baseColorFactor);
+                    }
+
                     json.AddPair("name", Name);
                     json.AddJSON("pbrMetallicRoughness", PBRMetallicRoughness.Serialize());
                     json.AddPair("emissiveFactor", std::vector<float>(3, Emissive));
-
-                    if(Transparency != 0)
-                    {
-                        json.AddPair("alphaMode", std::string("MASK"));
-                        json.AddPair("alphaCutoff", Transparency);
-                    }
                 }
         };
     } // namespace GLTF

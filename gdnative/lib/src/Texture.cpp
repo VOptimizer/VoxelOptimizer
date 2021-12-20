@@ -47,7 +47,7 @@ namespace VoxelOptimizer
         if(pos >= m_Size)
             return;
 
-        m_Pixels[m_Size.x * m_Size.y] = color.AsRGBA();
+        m_Pixels[pos.x + m_Size.x * pos.y] = color.AsRGBA();
     }
 
     void CTexture::AddPixel(const CColor &color)
@@ -63,7 +63,7 @@ namespace VoxelOptimizer
 
     uint32_t CTexture::Pixel(const CVector &pos)
     {
-        return m_Pixels[pos.x * pos.y];
+        return m_Pixels[pos.x + m_Size.x * pos.y];
     }
 
     std::vector<char> CTexture::AsPNG()

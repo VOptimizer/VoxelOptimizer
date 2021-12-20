@@ -37,6 +37,9 @@ namespace VoxelOptimizer
             std::map<CVector, Mesh> GenerateMeshes(VoxelMesh m, Loader Loader) override;
 
             ~CGreedyMesher() = default;
+
+        private:
+            void GenerateMesh(Mesh RetMesh, VoxelMesh m, const CBBox &BBox, bool Opaque);
     };
 } // namespace VoxelOptimizer
 

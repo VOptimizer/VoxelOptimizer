@@ -236,14 +236,20 @@ Array CGodotVoxelOptimizer::GetMeshes(int mesherType)
         int VertexCounter = 0;
 
         Ref<Image> Img = Image::_new();
-        Img->create(mesh->Texture.size(), 1, false, Image::Format::FORMAT_RGBA8);
+        auto albedo = mesh->Textures[VoxelOptimizer::TextureType::DIFFIUSE];
+
+        Img->create(albedo->Size().x, albedo->Size().y, false, Image::Format::FORMAT_RGBA8);
         Img->lock();
 
-        int x = 0;
-        for (auto &&c : mesh->Texture)
+        for (size_t x = 0; x < albedo->Size().x; x++)
         {
-            Img->set_pixel(x, 0, Color(c.R / 255.f, c.G / 255.f, c.B / 255.f, c.A / 255.f));
-            x++;
+            for (size_t y = 0; y < albedo->Size().y; y++)
+            {
+                VoxelOptimizer::CColor c;
+                c.FromRGBA(albedo->Pixel(VoxelOptimizer::CVector(x, y, 0)));
+
+                Img->set_pixel(x, 0, Color(c.R / 255.f, c.G / 255.f, c.B / 255.f, c.A / 255.f));
+            }
         }
 
         Img->unlock();
@@ -294,12 +300,16 @@ Array CGodotVoxelOptimizer::GetMeshes(int mesherType)
 
             Ref<SpatialMaterial> Mat = SpatialMaterial::_new();
 
-            Mat->set_metallic(f->FaceMaterial->Metallic);
-            Mat->set_roughness(f->FaceMaterial->Roughness);
-            Mat->set_emission_energy(f->FaceMaterial->Power);
-            Mat->set_specular(f->FaceMaterial->Specular);
-            Mat->set_refraction(f->FaceMaterial->IOR);
             Mat->set_texture(SpatialMaterial::TextureParam::TEXTURE_ALBEDO, Tex);
+            Mat->set_metallic(f->FaceMaterial->Metallic);
+            Mat->set_specular(f->FaceMaterial->Specular);
+            Mat->set_roughness(f->FaceMaterial->Roughness);
+
+            // if(f->FaceMaterial->IOR != 0.0)
+            // {
+            //     Mat->set_feature(SpatialMaterial::Feature::FEATURE_REFRACTION, true);
+            //     Mat->set_refraction(f->FaceMaterial->IOR);
+            // }        
 
             if(f->FaceMaterial->Transparency != 0.0)
             {
@@ -310,6 +320,31 @@ Array CGodotVoxelOptimizer::GetMeshes(int mesherType)
             if(f->FaceMaterial->Power != 0.0)
             {
                 Mat->set_feature(SpatialMaterial::Feature::FEATURE_EMISSION, true);
+                Mat->set_emission_energy(f->FaceMaterial->Power);
+
+                Ref<Image> Img = Image::_new();
+                auto emission = mesh->Textures[VoxelOptimizer::TextureType::EMISSION];
+
+                Img->create(emission->Size().x, emission->Size().y, false, Image::Format::FORMAT_RGBA8);
+                Img->lock();
+
+                for (size_t x = 0; x < emission->Size().x; x++)
+                {
+                    for (size_t y = 0; y < emission->Size().y; y++)
+                    {
+                        VoxelOptimizer::CColor c;
+                        c.FromRGBA(emission->Pixel(VoxelOptimizer::CVector(x, y, 0)));
+
+                        Img->set_pixel(x, 0, Color(c.R / 255.f, c.G / 255.f, c.B / 255.f, c.A / 255.f));
+                    }
+                }
+
+                Img->unlock();
+
+                Ref<ImageTexture> Tex = ImageTexture::_new();
+                Tex->create_from_image(Img);
+
+                Mat->set_texture(SpatialMaterial::TextureParam::TEXTURE_EMISSION, Tex);
             }
 
             tmpMesh->surface_set_material(Surface, Mat);
@@ -325,6 +360,7 @@ Array CGodotVoxelOptimizer::GetMeshes(int mesherType)
 
         auto instance = MeshInstance::_new();
         instance->set_mesh(tmpMesh);
+        instance->set_flag(GeometryInstance::Flags::FLAG_USE_BAKED_LIGHT, true);
 
         // Worldspace
         if(meshes.size() > 1)

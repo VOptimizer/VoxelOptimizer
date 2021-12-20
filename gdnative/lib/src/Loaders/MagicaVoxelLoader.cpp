@@ -144,7 +144,12 @@ namespace VoxelOptimizer
             m_Textures[TextureType::DIFFIUSE]->AddPixel(m_ColorPalette[c.first - 1], CVector(c.second, 0, 0));
             if(m_HasEmission)
             {
-                auto material = m_Materials[c.first - 1];
+                int MatIdx = 0;
+                auto IT = m_MaterialMapping.find(c.first);
+                if(IT != m_MaterialMapping.end())
+                    MatIdx = IT->second;
+
+                auto material = m_Materials[MatIdx];
                 if(material->Power > 0)
                     m_Textures[TextureType::EMISSION]->AddPixel(m_ColorPalette[c.first - 1], CVector(c.second, 0, 0));
             }

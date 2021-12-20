@@ -1,9 +1,11 @@
 # Bugs
 
-- [ ] Filedialog: Missing "Create Folder"
-- [ ] Filedialog: Supported formats to long.
-- [ ] Filedialog: Remove all files
-- [ ] Library: Generate proper emission Material (Texture)
+- [x] Filedialog: Missing "Create Folder"
+- [x] Filedialog: Supported formats to long.
+- [x] Filedialog: Remove all files
+- [x] Library: Generate proper emission Material (Texture)
+- [x] Library: ALpha faces missing
+- [x] Library: Goxel wrong bounding box
 
 
 # Improvements

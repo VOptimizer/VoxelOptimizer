@@ -62,7 +62,7 @@ namespace VoxelOptimizer
                     processedMaterials.insert({f->MaterialIndex, true});
 
                     GLTF::CMaterial Mat;
-                    Mat.Name = "Mat" + std::to_string(GLTFMesh.Primitives.size());
+                    Mat.Name = "Mat" + std::to_string(f->MaterialIndex);
                     Mat.Metallic = f->FaceMaterial->Metallic;
                     Mat.Roughness = f->FaceMaterial->Roughness;
                     Mat.Emissive = f->FaceMaterial->Power;
@@ -140,7 +140,7 @@ namespace VoxelOptimizer
                 Primitive.NormalAccessor = Accessors.size() + 1;
                 Primitive.TextCoordAccessor = Accessors.size() + 2;
                 Primitive.IndicesAccessor = Accessors.size() + 3;
-                Primitive.Material = GLTFMesh.Primitives.size();
+                Primitive.Material = f->MaterialIndex; //GLTFMesh.Primitives.size();
 
                 GLTFMesh.Primitives.push_back(Primitive);
 
@@ -195,7 +195,7 @@ namespace VoxelOptimizer
 
             Binary.resize(Binary.size() + diffuse.size() + emission.size() + Padding, '\0');
             memcpy(Binary.data() + Size, diffuse.data(), diffuse.size());
-            memcpy(Binary.data() + Size, emission.data(), emission.size());
+            memcpy(Binary.data() + Size + diffuse.size(), emission.data(), emission.size());
 
             GLTF::CBufferView ImageView;
             ImageView.Offset = Size;
@@ -249,7 +249,12 @@ namespace VoxelOptimizer
         json.AddPair("materials", Materials);        
 
         json.AddPair("images", Images);
-        json.AddPair("textures", std::vector<GLTF::CTexture>() = { GLTF::CTexture() });   
+
+        std::vector<GLTF::CTexture> gltfTextures = { GLTF::CTexture() };
+        if(textures.find(TextureType::EMISSION) != textures.end())
+            gltfTextures.push_back(GLTF::CTexture(1));
+
+        json.AddPair("textures", gltfTextures);   
         json.AddPair("buffers", std::vector<GLTF::CBuffer>() = { Buffer });
         
         std::string JS = json.Serialize();

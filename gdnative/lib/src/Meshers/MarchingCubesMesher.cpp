@@ -406,11 +406,11 @@ namespace VoxelOptimizer
             Mesh M = Mesh(new SMesh());
             M->Textures = Loader->GetTextures();
 
-            for(float x = c.Beg.x - 1; x < c.End.x + 1; x++)
+            for(float x = c->BBox.Beg.x - 1; x < c->BBox.End.x + 1; x++)
             {
-                for(float y = c.Beg.y - 1; y < c.End.y + 1; y++)
+                for(float y = c->BBox.Beg.y - 1; y < c->BBox.End.y + 1; y++)
                 {
-                    for(float z = c.Beg.z - 1; z < c.End.z + 1; z++)
+                    for(float z = c->BBox.Beg.z - 1; z < c->BBox.End.z + 1; z++)
                     {
                         uint8_t idx = GetTableIndex(m, CVector(x, y, z));
                         auto edges = triangleConnectionTable[idx];
@@ -421,7 +421,7 @@ namespace VoxelOptimizer
             }
 
             M->ModelMatrix = m->GetModelMatrix();
-            Ret.insert({c.Beg, M});
+            Ret.insert({c->BBox.Beg, M});
             ClearCache();
         }
 

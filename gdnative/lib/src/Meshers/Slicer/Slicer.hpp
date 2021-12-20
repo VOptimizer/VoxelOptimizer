@@ -36,7 +36,7 @@ namespace VoxelOptimizer
     class CSlicer
     {
         public:
-            CSlicer(VoxelMesh Mesh) : m_Mesh(Mesh) {}
+            CSlicer(VoxelMesh Mesh, bool Opaque) : m_Mesh(Mesh), m_Opaque(Opaque) {}
 
             /**
              * @brief Sets the axis which is currently the main axis.
@@ -80,6 +80,7 @@ namespace VoxelOptimizer
             CVector m_Normal;
             int m_Material;
             int m_Color;
+            bool m_Opaque;
 
             std::vector<std::pair<CVector, CVector>> m_ProcessedQuads;
     };

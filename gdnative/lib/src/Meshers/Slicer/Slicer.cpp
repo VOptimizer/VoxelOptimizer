@@ -58,8 +58,18 @@ namespace VoxelOptimizer
         Voxel V1, V2;
         CVector Size = m_Mesh->GetSize();
 
-        V1 = m_Mesh->GetVoxel(Pos);
-        V2 = m_Mesh->GetVoxel(Pos + m_Neighbour);
+        V1 = m_Mesh->GetVoxel(Pos, m_Opaque);
+        V2 = m_Mesh->GetVoxel(Pos + m_Neighbour, m_Opaque);
+
+        if(!m_Opaque)
+        {
+            // Check if neighbour is same as current
+            if(V1 && V2)
+            {
+                if(V1->Color != V2->Color || V1->Material != V2->Material)
+                    V2 = nullptr;
+            }
+        }
         
         bool BlockCurrent = 0 <= Pos.v[m_Axis] ? ((bool)V1) : false;
         bool BlockCompare = Pos.v[m_Axis] < Size.v[m_Axis] - 1 ? ((bool)V2) : false;

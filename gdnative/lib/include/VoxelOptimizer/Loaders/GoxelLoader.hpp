@@ -56,7 +56,7 @@ namespace VoxelOptimizer
 
                     inline void SetData(uint32_t *Data)
                     {
-                        memcpy(&m_Data[0], Data, m_Data.size() * sizeof(*Data));
+                        memcpy(&m_Data[0], Data, m_Data.size() * sizeof(uint32_t));
                     }
 
                     inline uint32_t GetVoxel(CVector v)
@@ -64,7 +64,7 @@ namespace VoxelOptimizer
                         return m_Data[(size_t)v.x + 16 * (size_t)v.y + 16 * 16 * (size_t)v.z];
                     }
 
-                // private:
+                private:
                     std::vector<uint32_t> m_Data;
             }; 
 

@@ -48,11 +48,11 @@ namespace VoxelOptimizer
             Mesh M = Mesh(new SMesh());
             M->Textures = Loader->GetTextures();
 
-            for(float x = c.Beg.x; x < c.End.x; x++)
+            for(float x = c->BBox.Beg.x; x < c->BBox.End.x; x++)
             {
-                for(float y = c.Beg.y; y < c.End.y; y++)
+                for(float y = c->BBox.Beg.y; y < c->BBox.End.y; y++)
                 {
-                    for(float z = c.Beg.z; z < c.End.z; z++)
+                    for(float z = c->BBox.Beg.z; z < c->BBox.End.z; z++)
                     {
                         Voxel v = m->GetVoxel(CVector(x, y, z));
 
@@ -112,7 +112,7 @@ namespace VoxelOptimizer
             }
 
             M->ModelMatrix = m->GetModelMatrix();
-            Ret[c.Beg] = M;
+            Ret[c->BBox.Beg] = M;
             ClearCache();
         }
 

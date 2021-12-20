@@ -68,7 +68,7 @@ namespace VoxelOptimizer
 
         m_BlockCount++;
 
-        MarkChunk(Pos);
+        MarkChunk(Pos, Transparent ? Tmp : nullptr);
     }
 
     void CVoxelMesh::RemoveVoxel(const CVector &Pos)
@@ -94,15 +94,16 @@ namespace VoxelOptimizer
     void CVoxelMesh::Clear()
     {
         std::lock_guard<std::recursive_mutex> lock(m_Lock);
-        m_Voxels.clear();
+        //TODO: Fix for V-Edit
+        // m_Voxels.clear();
 
-        if(m_RemeshAll)
-            InsertMarkedChunk(m_BBox);
-        else
-        {
-            for (auto &&c : m_Chunks)
-                InsertMarkedChunk(c.second);
-        }
+        // if(m_RemeshAll)
+        //     InsertMarkedChunk(m_BBox);
+        // else
+        // {
+        //     for (auto &&c : m_Chunks)
+        //         InsertMarkedChunk(c.second);
+        // }
     }
 
     Voxel CVoxelMesh::GetVoxel(const CVector &Pos)
@@ -113,6 +114,20 @@ namespace VoxelOptimizer
             return nullptr;
 
         return IT->second;
+    }
+
+    Voxel CVoxelMesh::GetVoxel(const CVector &Pos, bool OpaqueOnly)
+    {
+        auto voxel = GetVoxel(Pos);
+        if(voxel)
+        {
+            if(OpaqueOnly && voxel->Transparent)
+                voxel = nullptr;
+            else if(!OpaqueOnly && !voxel->Transparent)
+                voxel = nullptr;
+        }
+
+        return voxel;
     }
 
     void CVoxelMesh::SetNormal(const CVector &Pos, const CVector &Neighbor, bool IsInvisible)
@@ -134,39 +149,89 @@ namespace VoxelOptimizer
 
         Voxel neighbor = GetVoxel(Pos + Neighbor);
         auto directions = NEIGHBOR_INDEX.at(Neighbor);
-        if(neighbor && !neighbor->Transparent && !cur->Transparent)
+
+        // 1. Both opaque touching faces invisible
+        // 2. One transparent touching faces visible
+        // 3. Both transparent different transparency faces visible
+        // 4. Both transparent same transparency and color faces invisible
+        // 5. Both transparent different transparency and same color faces visible
+
+        if(neighbor)
         {
-            neighbor->Normals[directions.second] = IsInvisible ? CVoxel::FACE_ZERO : (Neighbor * -1.f);
-            cur->Normals[directions.first] = IsInvisible ? CVoxel::FACE_ZERO : Neighbor;
+            bool hideFaces = false;
+
+            if(!neighbor->Transparent && !cur->Transparent)
+                hideFaces = true;
+            else if(neighbor->Transparent && !cur->Transparent || !neighbor->Transparent && cur->Transparent)
+                hideFaces = false;
+            else if(neighbor->Transparent && cur->Transparent)
+            {
+                if(neighbor->Material != cur->Material)
+                    hideFaces = false;
+                else if(neighbor->Color != cur->Color)
+                    hideFaces = false;
+                else
+                    hideFaces = true;
+            }
+
+            if(hideFaces)
+            {
+                neighbor->Normals[directions.second] = IsInvisible ? CVoxel::FACE_ZERO : (Neighbor * -1.f);
+                cur->Normals[directions.first] = IsInvisible ? CVoxel::FACE_ZERO : Neighbor;
+            }
+            else
+                cur->Normals[directions.first] = Neighbor;
         }
         else
             cur->Normals[directions.first] = Neighbor;
     }
 
-    void CVoxelMesh::MarkChunk(const CVector &Pos)
+    void CVoxelMesh::MarkChunk(const CVector &Pos, Voxel voxel)
     {
         auto ChunkPos = (Pos / CHUNK_SIZE).Floor() * CHUNK_SIZE;
-        CBBox BBox;
+        Chunk chunk;
 
+        // Search for chunk to mark for remeshing.
         auto IT = m_Chunks.find(ChunkPos);
         if(IT != m_Chunks.end())
-            BBox = IT->second;
+            chunk = IT->second;
         else
         {
-            BBox = CBBox(ChunkPos, ChunkPos + CHUNK_SIZE);
-            m_Chunks[ChunkPos] = BBox;
+            //Create new chunk
+            CBBox BBox = CBBox(ChunkPos, ChunkPos + CHUNK_SIZE);
+            chunk = Chunk(new SChunk());
+            chunk->BBox = BBox;
+
+            m_Chunks[ChunkPos] = chunk;
+        }
+
+        if(voxel)
+        {
+            std::vector<Chunk> chunks = {chunk, m_GlobalChunk};
+            for (auto &&c : chunks)
+            {         
+                auto matColorVec = CVector(voxel->Color, voxel->Material, 0);
+                auto tIT = c->Transparent.find(matColorVec);
+                if(tIT != c->Transparent.end())
+                {
+                    tIT->second.Beg = tIT->second.Beg.Min(Pos);
+                    tIT->second.End = tIT->second.End.Max(Pos + CVector(1, 1, 1));
+                }
+                else
+                    c->Transparent[matColorVec] = CBBox(Pos, Pos);
+            }
         }
 
         if(m_RemeshAll)
-            BBox = m_BBox;
+            chunk = m_GlobalChunk;
 
-        InsertMarkedChunk(BBox);
+        InsertMarkedChunk(chunk);
     }
 
-    void CVoxelMesh::InsertMarkedChunk(const CBBox &BBox)
+    void CVoxelMesh::InsertMarkedChunk(Chunk chunk)
     {
-        auto IT = m_ChunksToRemesh.find(BBox.Beg);
+        auto IT = m_ChunksToRemesh.find(chunk->BBox.Beg);
         if(IT == m_ChunksToRemesh.end())
-            m_ChunksToRemesh[BBox.Beg] = BBox;
+            m_ChunksToRemesh[chunk->BBox.Beg] = chunk;
     }
 } // namespace VoxelOptimizer
