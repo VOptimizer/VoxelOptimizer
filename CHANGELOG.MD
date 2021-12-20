@@ -1,3 +1,15 @@
+# Version 0.0.5-Alpha (20.12.2021)
+- Added QBCL importer
+- Added QB importer
+- Added QBT importer
+- Added QEF importer
+- Bugfix: Weird alpha voxels
+- Bugfix: Proper support for emission material
+- Bugfix: Wrong bounding box of goxel files
+- Bugfix: File dialog contains now a "Create Folder" button
+- Bugfix: Extensionbox is now shorter
+- Bugfix: Removed option to select all files, including none voxel files.
+
 # Version 0.0.4-Alpha (21.11.2021)
 - Added marching cubes meshder
 - Added Stanford exporter (*.ply)

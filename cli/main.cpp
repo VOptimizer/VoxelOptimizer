@@ -35,7 +35,7 @@
 using namespace std;
 namespace fs = std::filesystem;
 
-const vector<string> SUPPORTED_EXTS({"gox", "vox", "kenshape"});
+const vector<string> SUPPORTED_EXTS({"gox", "vox", "kenshape", "qbcl", "qb", "qbt", "qef"});
 const vector<string> SUPPORTED_OUT_EXTS({"gltf", "glb", "obj", "escn", "ply", "png"});
 
 struct SFile
@@ -83,7 +83,11 @@ File CreateFile(const fs::path &Input, const fs::path &OutputPattern)
     static map<string, VoxelOptimizer::LoaderTypes> TYPE_MATCHER = {
         {"gox", VoxelOptimizer::LoaderTypes::GOXEL},
         {"vox", VoxelOptimizer::LoaderTypes::MAGICAVOXEL},
-        {"kenshape", VoxelOptimizer::LoaderTypes::KENSHAPE}
+        {"kenshape", VoxelOptimizer::LoaderTypes::KENSHAPE},
+        {"qbcl", VoxelOptimizer::LoaderTypes::QUBICLE},
+        {"qb", VoxelOptimizer::LoaderTypes::QUBICLE_BIN},
+        {"qbt", VoxelOptimizer::LoaderTypes::QUBICLE_BIN_TREE},
+        {"qef", VoxelOptimizer::LoaderTypes::QUBICLE_EXCHANGE},
     };
 
     static map<string, VoxelOptimizer::ExporterTypes> OUT_TYPE_MATCHER = {
