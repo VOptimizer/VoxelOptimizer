@@ -303,6 +303,7 @@ margin_bottom = 84.0
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/VBoxContainer2/HBoxContainer2/Positive" to="." method="_on_positive_pressed"]
 [connection signal="confirmed" from="OverrideDLG" to="." method="_on_override_confirmed"]
 [connection signal="confirmed" from="DeleteFavDLG" to="." method="_on_delete_fav_confirmed"]
+[connection signal="text_entered" from="NewFolderDLG/MarginContainer/VBoxContainer/FolderName" to="." method="_on_foldername_text_entered"]
 [connection signal="pressed" from="NewFolderDLG/MarginContainer/VBoxContainer/HBoxContainer/Cancel" to="." method="_on_new_folder_cancel_pressed"]
 [connection signal="pressed" from="NewFolderDLG/MarginContainer/VBoxContainer/HBoxContainer/Ok" to="." method="_on_new_folde_ok_pressed"]
 [connection signal="id_pressed" from="PopupMenu" to="." method="_on_addfolder_pressed"]

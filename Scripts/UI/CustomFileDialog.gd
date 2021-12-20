@@ -510,3 +510,6 @@ func _on_files_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and mode == Mode.MODE_SAVE_FILE:
 		if event.button_index == BUTTON_RIGHT and event.pressed:
 			_Popup.popup(Rect2(event.global_position, Vector2(120, 20)))
+
+func _on_foldername_text_entered(new_text: String) -> void:
+	_on_new_folde_ok_pressed()
