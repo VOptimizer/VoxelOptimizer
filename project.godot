@@ -49,7 +49,7 @@ run/main_scene="res://Scenes/Main.tscn"
 boot_splash/image="res://Assets/Icons/icon.png"
 config/icon="res://icon.png"
 config/windows_native_icon="res://Assets/Icons/icon.ico"
-config/version="0.0.4-Alpha"
+config/version="0.0.5-Alpha"
 
 [autoload]
 
