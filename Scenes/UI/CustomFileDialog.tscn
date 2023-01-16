@@ -1,19 +1,15 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://Scripts/UI/CustomFileDialog.gd" type="Script" id=1]
-[ext_resource path="res://Assets/star.svg" type="Texture" id=2]
-[ext_resource path="res://Assets/forward_arrow.svg" type="Texture" id=3]
-[ext_resource path="res://Assets/back_arrow.svg" type="Texture" id=4]
 [ext_resource path="res://Assets/add_folder.svg" type="Texture" id=5]
 
 [sub_resource type="Theme" id=1]
 CustomFileDialog/icons/add_folder_icon = ExtResource( 5 )
-CustomFileDialog/icons/back_icon = ExtResource( 4 )
-CustomFileDialog/icons/fav_icon = ExtResource( 2 )
-CustomFileDialog/icons/forward_icon = ExtResource( 3 )
+CustomFileDialog/icons/back_icon = null
+CustomFileDialog/icons/fav_icon = null
+CustomFileDialog/icons/forward_icon = null
 
 [node name="CustomFileDialog" type="WindowDialog"]
-visible = true
 margin_right = -214.0
 margin_bottom = -100.0
 rect_min_size = Vector2( 810, 500 )
