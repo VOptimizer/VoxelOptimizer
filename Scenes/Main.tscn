@@ -157,7 +157,7 @@ custom_constants/margin_bottom = 10
 margin_left = 10.0
 margin_right = 416.0
 margin_bottom = 18.0
-text = "Version: 0.0.5-Alpha"
+text = "Version: 0.0.7-Alpha"
 script = ExtResource( 5 )
 
 [node name="ViewportContainer" type="ViewportContainer" parent="HBoxContainer"]
@@ -179,7 +179,7 @@ render_target_update_mode = 3
 [node name="Spatial" type="Spatial" parent="HBoxContainer/ViewportContainer/Viewport"]
 
 [node name="GimbleCam" parent="HBoxContainer/ViewportContainer/Viewport/Spatial" instance=ExtResource( 2 )]
-MaxZoom = 50
+MaxZoom = 200
 
 [node name="DirectionalLight" type="DirectionalLight" parent="HBoxContainer/ViewportContainer/Viewport/Spatial"]
 transform = Transform( 8.74228e-08, 0.5, 0.866025, -7.57103e-08, -0.866025, 0.5, 1, -1.09278e-07, -3.78552e-08, 0, 8, 0 )
