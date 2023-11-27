@@ -9,6 +9,7 @@ onready var _AboutDialog : = $AboutDialog
 onready var _Spatial : = $HBoxContainer/ViewportContainer/Viewport/Spatial
 onready var _WireframeButton : = $HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/Wireframe
 onready var _WorldspaceToggle : = $HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/CheckButton
+onready var _AnimationPlayer := $HBoxContainer/ViewportContainer/Viewport/Spatial/AnimationPlayer
 
 onready var _UnshadedMaterial = preload("res://Assets/Unshaded.material")
 onready var _FileDialogConfig : FileDialogConfig = FileDialogConfig.new()
@@ -30,7 +31,8 @@ func _on_Fileselect_load_file(file : String):
 
 func _generate_mesh():
 	for m in _Meshes:
-		m.queue_free()
+		if m is Node:
+			m.queue_free()
 		
 	for w in _Wireframes:
 		w.queue_free()
@@ -38,32 +40,62 @@ func _generate_mesh():
 	
 	_Meshes = _VoxelOptimizer.get_meshes(_Selected)
 	_Transforms.clear()
+	for anim in _AnimationPlayer.get_animation_list():
+		_AnimationPlayer.remove_animation(anim)
+		
+	var animation_counter = 0
 	for m in _Meshes:
-		_Spatial.add_child(m)
-		
-		var instance : = MeshInstance.new()
-		_Spatial.add_child(instance)
-		
-		var mesh : ArrayMesh = ArrayMesh.new()
-		
-		var tmp = m.mesh.get_surface_count()
-		
-		for i in m.mesh.get_surface_count():
-			var tmp1 = m.mesh.surface_get_arrays(i)[0].size()
+		if m is MeshInstance:
+			_add_mesh(m)
+		else:
+			var firstOne = true
 			
-			mesh.add_surface_from_arrays(Mesh.PRIMITIVE_LINES, m.mesh.surface_get_arrays(i))
-	
-		instance.mesh = mesh
-		instance.transform = m.transform
-		_Transforms.append(m.transform)
-		instance.visible = _WireframeButton.pressed
-		instance.material_override = _UnshadedMaterial
-		_Wireframes.append(instance)
+			var anim : Animation = Animation.new()
+			var length : float = 0
+			for dict in m:
+				dict["mesh"].visible = firstOne
+				
+				var track_id = anim.add_track(Animation.TYPE_VALUE)
+				anim.track_set_path(track_id, str(dict["mesh"].get_path()) + ":visible")
+				anim.track_insert_key(track_id, length / 1000.0, true)
+				anim.track_insert_key(track_id, (length + dict["frameTime"]) / 1000.0, false)
+				
+				length += dict["frameTime"]
+				
+				firstOne = false
+			anim.length = length / 1000.0
+			anim.loop = true
+			
+			_AnimationPlayer.add_animation("Anim" + str(animation_counter), anim)
+			_AnimationPlayer.play("Anim" + str(animation_counter))
+			
+			animation_counter += 1
 	
 	_on_worldspace_toggled(_WorldspaceToggle.pressed)
 	
 	_set_statistics()
 
+func _add_mesh(m : MeshInstance):
+	_Spatial.add_child(m)
+	
+	# Generates the wireframe view.
+	var instance : = MeshInstance.new()
+	_Spatial.add_child(instance)
+	
+	var mesh : ArrayMesh = ArrayMesh.new()
+	var tmp = m.mesh.get_surface_count()
+	for i in m.mesh.get_surface_count():
+		var tmp1 = m.mesh.surface_get_arrays(i)[0].size()
+		
+		mesh.add_surface_from_arrays(Mesh.PRIMITIVE_LINES, m.mesh.surface_get_arrays(i))
+
+	instance.mesh = mesh
+	instance.transform = m.transform
+	_Transforms.append(m.transform)
+	instance.visible = _WireframeButton.pressed
+	instance.material_override = _UnshadedMaterial
+	_Wireframes.append(instance)
+		
 func _on_Button_pressed():
 	if _OutputFile.FilePath.get_extension() != "png":
 		_VoxelOptimizer.save(_OutputFile.FilePath, _WorldspaceToggle.pressed)
@@ -109,3 +141,6 @@ func _on_worldspace_toggled(button_pressed: bool) -> void:
 
 func _on_twitter_pressed() -> void:
 	OS.shell_open("https://twitter.com/Vailor11")
+
+func _on_Github_pressed():
+	OS.shell_open("https://github.com/VOptimizer")
