@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://Scripts/UI/ViewportContainer.gd" type="Script" id=1]
 [ext_resource path="res://Scenes/GimbleCam.tscn" type="PackedScene" id=2]
@@ -6,13 +6,10 @@
 [ext_resource path="res://Scripts/UI/Main.gd" type="Script" id=4]
 [ext_resource path="res://Scripts/UI/VersionLabel.gd" type="Script" id=5]
 [ext_resource path="res://Scripts/UI/SelectBox.gd" type="Script" id=6]
-[ext_resource path="res://Assets/ui_theme_dark.tres" type="Theme" id=7]
 [ext_resource path="res://Assets/Icons/wireframe.svg" type="Texture" id=8]
 [ext_resource path="res://Assets/Icons/chart.svg" type="Texture" id=9]
-[ext_resource path="res://Assets/Icons/info.svg" type="Texture" id=10]
-[ext_resource path="res://Scenes/UI/AboutDialog.tscn" type="PackedScene" id=11]
-[ext_resource path="res://Assets/Icons/Logo white.svg" type="Texture" id=12]
-[ext_resource path="res://Assets/Icons/github-mark-white.svg" type="Texture" id=13]
+[ext_resource path="res://Assets/Icons/Presskits/Logo white.svg" type="Texture" id=12]
+[ext_resource path="res://Assets/Icons/Presskits/github-mark-white.svg" type="Texture" id=13]
 
 [sub_resource type="Environment" id=2]
 ambient_light_color = Color( 0.44, 0.44, 0.44, 1 )
@@ -23,7 +20,6 @@ bg_color = Color( 0.145098, 0.156863, 0.211765, 1 )
 [node name="Main" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-theme = ExtResource( 7 )
 script = ExtResource( 4 )
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
@@ -42,7 +38,7 @@ size_flags_stretch_ratio = 1.5
 
 [node name="CenterContainer" type="CenterContainer" parent="HBoxContainer/VBoxContainer"]
 margin_right = 416.0
-margin_bottom = 568.0
+margin_bottom = 562.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
@@ -50,9 +46,9 @@ size_flags_vertical = 3
 
 [node name="PanelContainer" type="PanelContainer" parent="HBoxContainer/VBoxContainer/CenterContainer"]
 margin_left = 38.0
-margin_top = 135.0
+margin_top = 111.0
 margin_right = 378.0
-margin_bottom = 433.0
+margin_bottom = 451.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
@@ -60,7 +56,7 @@ size_flags_vertical = 3
 
 [node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer"]
 margin_right = 340.0
-margin_bottom = 298.0
+margin_bottom = 340.0
 custom_constants/margin_right = 20
 custom_constants/margin_top = 20
 custom_constants/margin_left = 20
@@ -70,14 +66,14 @@ custom_constants/margin_bottom = 20
 margin_left = 20.0
 margin_top = 20.0
 margin_right = 320.0
-margin_bottom = 278.0
+margin_bottom = 320.0
 custom_constants/separation = 20
 
 [node name="Inputfile" parent="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer" instance=ExtResource( 3 )]
 anchor_right = 0.0
 anchor_bottom = 0.0
 margin_right = 300.0
-margin_bottom = 42.0
+margin_bottom = 54.0
 rect_min_size = Vector2( 300, 0 )
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -86,66 +82,67 @@ Filters = PoolStringArray( "*.vox ; MagicaVoxel file", "*.gox; Goxel", "*.kensha
 
 [node name="Caption" parent="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Inputfile" index="0"]
 margin_right = 300.0
-margin_bottom = 18.0
+margin_bottom = 24.0
 text = "Voxelfile"
 
 [node name="HBoxContainer" parent="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Inputfile" index="1"]
-margin_top = 22.0
+margin_top = 28.0
 margin_right = 300.0
+margin_bottom = 54.0
 
 [node name="Path" parent="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Inputfile/HBoxContainer" index="0"]
 margin_right = 279.0
-margin_bottom = 20.0
+margin_bottom = 26.0
 
 [node name="Button" parent="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Inputfile/HBoxContainer" index="1"]
 margin_left = 283.0
 margin_right = 300.0
-margin_bottom = 20.0
+margin_bottom = 26.0
 
 [node name="Outputfile" parent="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer" instance=ExtResource( 3 )]
 anchor_right = 0.0
 anchor_bottom = 0.0
-margin_top = 62.0
+margin_top = 74.0
 margin_right = 300.0
-margin_bottom = 104.0
+margin_bottom = 128.0
 rect_min_size = Vector2( 300, 0 )
 size_flags_horizontal = 3
 size_flags_vertical = 3
 Caption = "Outputfile"
-Filters = PoolStringArray( "*.obj ; Wavefront Obj file", "*.gltf, *.glb ; glTF Text", "*.png ; PNG Image", "*.escn; Godot Scene", "*.ply; Stanford" )
+Filters = PoolStringArray( "*.obj ; Wavefront Obj file", "*.gltf, *.glb ; glTF Text", "*.png ; PNG Image", "*.escn; Godot Scene", "*.ply; Stanford", "*.fbx; FBX" )
 SaveDialog = true
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
-margin_top = 124.0
+margin_top = 148.0
 margin_right = 300.0
-margin_bottom = 166.0
+margin_bottom = 202.0
 script = ExtResource( 6 )
 
 [node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer"]
 margin_right = 300.0
-margin_bottom = 18.0
+margin_bottom = 24.0
 text = "Meshing method"
 
 [node name="OptionButton" type="OptionButton" parent="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer"]
-margin_top = 22.0
+margin_top = 28.0
 margin_right = 300.0
-margin_bottom = 42.0
+margin_bottom = 54.0
 
 [node name="CheckButton" type="CheckButton" parent="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
-margin_top = 186.0
+margin_top = 222.0
 margin_right = 300.0
-margin_bottom = 218.0
+margin_bottom = 254.0
 pressed = true
 text = "Objects in worldspace"
 
 [node name="Button" type="Button" parent="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
-margin_top = 238.0
+margin_top = 274.0
 margin_right = 300.0
-margin_bottom = 258.0
+margin_bottom = 300.0
 text = "Save"
 
 [node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/VBoxContainer"]
-margin_top = 572.0
+margin_top = 566.0
 margin_right = 416.0
 margin_bottom = 600.0
 custom_constants/margin_left = 10
@@ -154,7 +151,7 @@ custom_constants/margin_bottom = 10
 [node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/MarginContainer"]
 margin_left = 10.0
 margin_right = 416.0
-margin_bottom = 18.0
+margin_bottom = 24.0
 text = "Version: 0.0.9-Alpha"
 script = ExtResource( 5 )
 
@@ -185,8 +182,6 @@ transform = Transform( 8.74228e-08, 0.5, 0.866025, -7.57103e-08, -0.866025, 0.5,
 [node name="WorldEnvironment" type="WorldEnvironment" parent="HBoxContainer/ViewportContainer/Viewport/Spatial"]
 environment = SubResource( 2 )
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="HBoxContainer/ViewportContainer/Viewport/Spatial"]
-
 [node name="Statistics" type="PanelContainer" parent="HBoxContainer/ViewportContainer"]
 visible = false
 self_modulate = Color( 1, 1, 1, 0.501961 )
@@ -203,7 +198,7 @@ custom_constants/margin_bottom = 20
 margin_left = 20.0
 margin_top = 20.0
 margin_right = 155.0
-margin_bottom = 80.0
+margin_bottom = 98.0
 
 [node name="StatisticsLabel" type="Label" parent="HBoxContainer/ViewportContainer/Statistics/MarginContainer/VBoxContainer"]
 margin_right = 135.0
@@ -237,14 +232,18 @@ margin_bottom = 595.0
 [node name="Wireframe" type="Button" parent="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer"]
 margin_right = 34.0
 margin_bottom = 34.0
+rect_min_size = Vector2( 34, 34 )
 hint_tooltip = "Toggle wireframe"
 toggle_mode = true
 icon = ExtResource( 8 )
+icon_align = 1
+expand_icon = true
 
 [node name="Button2" type="Button" parent="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer"]
 margin_top = 38.0
 margin_right = 34.0
 margin_bottom = 72.0
+rect_min_size = Vector2( 34, 34 )
 hint_tooltip = "Toggle statistics"
 toggle_mode = true
 icon = ExtResource( 9 )
@@ -252,13 +251,13 @@ icon = ExtResource( 9 )
 [node name="Control" type="Control" parent="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer"]
 margin_top = 76.0
 margin_right = 34.0
-margin_bottom = 476.0
+margin_bottom = 514.0
 size_flags_vertical = 3
 
 [node name="Github" type="Button" parent="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer"]
-margin_top = 480.0
+margin_top = 518.0
 margin_right = 34.0
-margin_bottom = 514.0
+margin_bottom = 552.0
 rect_min_size = Vector2( 34, 34 )
 hint_tooltip = "Contribute to V-Optimizer and VCore"
 icon = ExtResource( 13 )
@@ -269,23 +268,17 @@ __meta__ = {
 }
 
 [node name="Button" type="Button" parent="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer"]
-margin_top = 518.0
-margin_right = 34.0
-margin_bottom = 552.0
-hint_tooltip = "Follow me on Twitter @Vailor11"
-icon = ExtResource( 12 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Button3" type="Button" parent="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer"]
 margin_top = 556.0
 margin_right = 34.0
 margin_bottom = 590.0
-hint_tooltip = "About this tool"
-icon = ExtResource( 10 )
-
-[node name="AboutDialog" parent="." instance=ExtResource( 11 )]
+rect_min_size = Vector2( 34, 34 )
+hint_tooltip = "Follow me on Twitter @Vailor11"
+icon = ExtResource( 12 )
+icon_align = 1
+expand_icon = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [connection signal="load_file" from="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Inputfile" to="." method="_on_Fileselect_load_file"]
 [connection signal="item_selected" from="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/OptionButton" to="." method="_on_OptionButton_item_selected"]
@@ -296,6 +289,5 @@ icon = ExtResource( 10 )
 [connection signal="toggled" from="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/Button2" to="." method="_on_Button2_toggled"]
 [connection signal="pressed" from="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/Github" to="." method="_on_Github_pressed"]
 [connection signal="pressed" from="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/Button" to="." method="_on_twitter_pressed"]
-[connection signal="pressed" from="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/Button3" to="." method="_on_Button3_pressed"]
 
 [editable path="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Inputfile"]

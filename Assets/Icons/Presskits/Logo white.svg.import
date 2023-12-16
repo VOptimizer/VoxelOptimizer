@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/info.svg-1c517e60b0342592da4f9db250aba1f7.stex"
+path="res://.import/Logo white.svg-195f0ad9d37511524b04f625aded4a35.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Icons/info.svg"
-dest_files=[ "res://.import/info.svg-1c517e60b0342592da4f9db250aba1f7.stex" ]
+source_file="res://Assets/Icons/Presskits/Logo white.svg"
+dest_files=[ "res://.import/Logo white.svg-195f0ad9d37511524b04f625aded4a35.stex" ]
 
 [params]
 
@@ -22,13 +22,14 @@ compress/normal_map=0
 flags/repeat=0
 flags/filter=true
 flags/mipmaps=false
-flags/anisotropic=false
+flags/anisotropic=true
 flags/srgb=2
 process/fix_alpha_border=true
 process/premult_alpha=false
 process/HDR_as_SRGB=false
-process/invert_color=false
+process/invert_color=true
+process/normal_map_invert_y=false
 stream=false
 size_limit=0
-detect_3d=true
+detect_3d=false
 svg/scale=1.0

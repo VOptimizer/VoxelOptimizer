@@ -5,11 +5,9 @@ onready var _OutputFile : = $HBoxContainer/VBoxContainer/CenterContainer/PanelCo
 onready var _InputFile : = $HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Inputfile
 onready var _Statistics : = $HBoxContainer/ViewportContainer/Statistics
 onready var _StatisticsLabel : = $HBoxContainer/ViewportContainer/Statistics/MarginContainer/VBoxContainer/StatisticsLabel
-onready var _AboutDialog : = $AboutDialog
 onready var _Spatial : = $HBoxContainer/ViewportContainer/Viewport/Spatial
 onready var _WireframeButton : = $HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/Wireframe
 onready var _WorldspaceToggle : = $HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/CheckButton
-onready var _AnimationPlayer := $HBoxContainer/ViewportContainer/Viewport/Spatial/AnimationPlayer
 
 onready var _UnshadedMaterial = preload("res://Assets/Unshaded.material")
 onready var _FileDialogConfig : FileDialogConfig = FileDialogConfig.new()
@@ -33,43 +31,21 @@ func _generate_mesh():
 	for m in _Meshes:
 		if m is Node:
 			m.queue_free()
-		
-	for w in _Wireframes:
-		w.queue_free()
+
 	_Wireframes.clear()
 	
 	_Meshes = _VoxelOptimizer.get_meshes(_Selected)
 	_Transforms.clear()
-	for anim in _AnimationPlayer.get_animation_list():
-		_AnimationPlayer.remove_animation(anim)
 		
 	var animation_counter = 0
 	for m in _Meshes:
 		if m is MeshInstance:
 			_add_mesh(m)
-		else:
-			var firstOne = true
-			
-			var anim : Animation = Animation.new()
-			var length : float = 0
-			for dict in m:
-				dict["mesh"].visible = firstOne
-				
-				var track_id = anim.add_track(Animation.TYPE_VALUE)
-				anim.track_set_path(track_id, str(dict["mesh"].get_path()) + ":visible")
-				anim.track_insert_key(track_id, length / 1000.0, true)
-				anim.track_insert_key(track_id, (length + dict["frameTime"]) / 1000.0, false)
-				
-				length += dict["frameTime"]
-				
-				firstOne = false
-			anim.length = length / 1000.0
-			anim.loop = true
-			
-			_AnimationPlayer.add_animation("Anim" + str(animation_counter), anim)
-			_AnimationPlayer.play("Anim" + str(animation_counter))
-			
-			animation_counter += 1
+		elif m is Spatial:
+			_Spatial.add_child(m)
+			for c in m.get_children():
+				if c is MeshInstance:
+					_generate_wireframe(c)
 	
 	_on_worldspace_toggled(_WorldspaceToggle.pressed)
 	
@@ -77,10 +53,12 @@ func _generate_mesh():
 
 func _add_mesh(m : MeshInstance):
 	_Spatial.add_child(m)
+	_generate_wireframe(m)
 	
+func _generate_wireframe(m : MeshInstance):
 	# Generates the wireframe view.
 	var instance : = MeshInstance.new()
-	_Spatial.add_child(instance)
+	m.add_child(instance)
 	
 	var mesh : ArrayMesh = ArrayMesh.new()
 	var tmp = m.mesh.get_surface_count()
@@ -90,7 +68,7 @@ func _add_mesh(m : MeshInstance):
 		mesh.add_surface_from_arrays(Mesh.PRIMITIVE_LINES, m.mesh.surface_get_arrays(i))
 
 	instance.mesh = mesh
-	instance.transform = m.transform
+	#instance.transform = m.transform
 	_Transforms.append(m.transform)
 	instance.visible = _WireframeButton.pressed
 	instance.material_override = _UnshadedMaterial
@@ -122,21 +100,16 @@ func _on_Button2_toggled(button_pressed):
 	_set_statistics()
 	_Statistics.visible = button_pressed
 
-func _on_Button3_pressed():
-	_AboutDialog.popup()
-
 func _on_worldspace_toggled(button_pressed: bool) -> void:
 	if button_pressed:
 		for i in range(0, _Meshes.size()):
 			_Meshes[i].transform = _Transforms[i]
-			_Wireframes[i].transform = _Transforms[i]
 	else:
 		_Transforms.clear()
 		for i in range(0, _Meshes.size()):
 			_Transforms.append(_Meshes[i].transform)
 			
 			_Meshes[i].transform = Transform()
-			_Wireframes[i].transform = Transform()
 
 
 func _on_twitter_pressed() -> void:

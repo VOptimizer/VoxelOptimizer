@@ -1,6 +1,4 @@
-[gd_resource type="Theme" load_steps=19 format=2]
-
-[ext_resource path="res://Assets/kenney_future_narrow.tres" type="DynamicFont" id=1]
+[gd_resource type="Theme" load_steps=18 format=2]
 
 [sub_resource type="StyleBoxFlat" id=1]
 bg_color = Color( 0.0941176, 0.0901961, 0.121569, 1 )
@@ -121,13 +119,11 @@ shadow_size = 20
 shadow_offset = Vector2( 5, 5 )
 
 [resource]
-default_font = ExtResource( 1 )
 Button/colors/font_color = Color( 0.878431, 0.878431, 0.878431, 1 )
 Button/colors/font_color_disabled = Color( 0.9, 0.9, 0.9, 0.2 )
 Button/colors/font_color_hover = Color( 0.941176, 0.941176, 0.941176, 1 )
 Button/colors/font_color_pressed = Color( 1, 1, 1, 1 )
 Button/constants/hseparation = 2
-Button/fonts/font = ExtResource( 1 )
 Button/styles/disabled = SubResource( 1 )
 Button/styles/focus = SubResource( 2 )
 Button/styles/hover = SubResource( 3 )
@@ -144,7 +140,6 @@ ItemList/constants/hseparation = 4
 ItemList/constants/icon_margin = 4
 ItemList/constants/line_separation = 2
 ItemList/constants/vseparation = 2
-ItemList/fonts/font = ExtResource( 1 )
 ItemList/styles/bg = SubResource( 17 )
 ItemList/styles/bg_focus = null
 ItemList/styles/cursor = null
@@ -158,7 +153,6 @@ Label/constants/line_spacing = 3
 Label/constants/shadow_as_outline = 0
 Label/constants/shadow_offset_x = 1
 Label/constants/shadow_offset_y = 1
-Label/fonts/font = ExtResource( 1 )
 Label/styles/normal = null
 LineEdit/colors/clear_button_color = Color( 0.878431, 0.878431, 0.878431, 1 )
 LineEdit/colors/clear_button_color_pressed = Color( 1, 1, 1, 1 )
@@ -168,7 +162,6 @@ LineEdit/colors/font_color_selected = Color( 0.88, 0.88, 0.88, 1 )
 LineEdit/colors/font_color_uneditable = Color( 0.88, 0.88, 0.88, 0.5 )
 LineEdit/colors/selection_color = Color( 0.341176, 0.129412, 0.431373, 1 )
 LineEdit/constants/minimum_spaces = 12
-LineEdit/fonts/font = ExtResource( 1 )
 LineEdit/icons/clear = null
 LineEdit/styles/focus = SubResource( 6 )
 LineEdit/styles/normal = SubResource( 7 )
@@ -180,7 +173,6 @@ PopupMenu/colors/font_color_disabled = Color( 0.4, 0.4, 0.4, 0.8 )
 PopupMenu/colors/font_color_hover = Color( 0.88, 0.88, 0.88, 1 )
 PopupMenu/constants/hseparation = 4
 PopupMenu/constants/vseparation = 4
-PopupMenu/fonts/font = ExtResource( 1 )
 PopupMenu/icons/checked = null
 PopupMenu/icons/radio_checked = null
 PopupMenu/icons/radio_unchecked = null
@@ -207,8 +199,6 @@ Tree/constants/item_margin = 12
 Tree/constants/scroll_border = 4
 Tree/constants/scroll_speed = 12
 Tree/constants/vseparation = 4
-Tree/fonts/font = ExtResource( 1 )
-Tree/fonts/title_button_font = ExtResource( 1 )
 Tree/icons/arrow = null
 Tree/icons/arrow_collapsed = null
 Tree/icons/checked = null
@@ -242,7 +232,6 @@ WindowDialog/constants/close_h_ofs = 18
 WindowDialog/constants/close_v_ofs = 18
 WindowDialog/constants/scaleborder_size = 4
 WindowDialog/constants/title_height = 20
-WindowDialog/fonts/title_font = ExtResource( 1 )
 WindowDialog/icons/close = null
 WindowDialog/icons/close_highlight = null
 WindowDialog/styles/panel = SubResource( 16 )

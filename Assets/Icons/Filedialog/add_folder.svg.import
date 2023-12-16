@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/back_arrow.svg-cd1c65ff6567f25f782beebd818814a9.stex"
+path="res://.import/add_folder.svg-fb8717f536094dba8d702b2f7d84d16d.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/back_arrow.svg"
-dest_files=[ "res://.import/back_arrow.svg-cd1c65ff6567f25f782beebd818814a9.stex" ]
+source_file="res://Assets/Icons/Filedialog/add_folder.svg"
+dest_files=[ "res://.import/add_folder.svg-fb8717f536094dba8d702b2f7d84d16d.stex" ]
 
 [params]
 
