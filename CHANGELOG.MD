@@ -1,6 +1,10 @@
-# Version 0.1.0-Alpha (xx.12.2023)
+# Version 0.1.0-Alpha (27.01.2024)
 - Added fbx exporter
 - Added animation support
+- New font
+- New icons and logo
+- Bugfix: Out of bounce indices in OBJ
+- Bugfix: Out of bounce indices in PLY
 
 # Version 0.0.9-Alpha (27.11.2023)
 - Support for newer MagicaVoxel format

@@ -6,29 +6,26 @@
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource( 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="Caption" type="Label" parent="."]
 margin_right = 1024.0
-margin_bottom = 14.0
+margin_bottom = 24.0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
-margin_top = 18.0
+margin_top = 28.0
 margin_right = 1024.0
-margin_bottom = 42.0
+margin_bottom = 54.0
 
 [node name="Path" type="LineEdit" parent="HBoxContainer"]
 margin_right = 990.0
-margin_bottom = 24.0
+margin_bottom = 26.0
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 5.0
 
 [node name="Button" type="Button" parent="HBoxContainer"]
 margin_left = 994.0
 margin_right = 1024.0
-margin_bottom = 24.0
+margin_bottom = 26.0
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.15
 text = "..."
