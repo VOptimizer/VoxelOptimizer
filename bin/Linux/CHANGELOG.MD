@@ -1,3 +1,6 @@
+# Version 0.1.1-Alpha (29.01.2024)
+- Bugfix: Position of multiple meshes were completely messed up
+
 # Version 0.1.0-Alpha (27.01.2024)
 - Added fbx exporter
 - Added animation support

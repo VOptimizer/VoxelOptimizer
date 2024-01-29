@@ -82,22 +82,17 @@ Filters = PoolStringArray( "*.vox ; MagicaVoxel file", "*.gox; Goxel", "*.kensha
 
 [node name="Caption" parent="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Inputfile" index="0"]
 margin_right = 300.0
-margin_bottom = 24.0
 text = "Voxelfile"
 
 [node name="HBoxContainer" parent="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Inputfile" index="1"]
-margin_top = 28.0
 margin_right = 300.0
-margin_bottom = 54.0
 
 [node name="Path" parent="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Inputfile/HBoxContainer" index="0"]
 margin_right = 279.0
-margin_bottom = 26.0
 
 [node name="Button" parent="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Inputfile/HBoxContainer" index="1"]
 margin_left = 283.0
 margin_right = 300.0
-margin_bottom = 26.0
 
 [node name="Outputfile" parent="HBoxContainer/VBoxContainer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer" instance=ExtResource( 3 )]
 anchor_right = 0.0
@@ -177,7 +172,7 @@ render_target_update_mode = 3
 MaxZoom = 200
 
 [node name="DirectionalLight" type="DirectionalLight" parent="HBoxContainer/ViewportContainer/Viewport/Spatial"]
-transform = Transform( 8.74228e-08, 0.5, 0.866025, -7.57103e-08, -0.866025, 0.5, 1, -1.09278e-07, -3.78552e-08, 0, 8, 0 )
+transform = Transform( -0.389703, 0.460471, 0.797558, -7.57103e-08, -0.866025, 0.5, 0.920941, 0.194851, 0.337492, 0, 8, 0 )
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="HBoxContainer/ViewportContainer/Viewport/Spatial"]
 environment = SubResource( 2 )
