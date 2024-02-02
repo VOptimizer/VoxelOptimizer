@@ -147,7 +147,7 @@ custom_constants/margin_bottom = 10
 margin_left = 10.0
 margin_right = 416.0
 margin_bottom = 24.0
-text = "Version: 0.1.0-Alpha"
+text = "Version: 0.1.1-Alpha"
 script = ExtResource( 5 )
 
 [node name="ViewportContainer" type="ViewportContainer" parent="HBoxContainer"]

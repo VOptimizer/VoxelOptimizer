@@ -1,3 +1,7 @@
+# Version 0.1.2-Alpha (02.02.2024)
+- Bugfix: Crash on empty mesh
+- Added new greedy mesher, which reduces vertices more than the old one.
+
 # Version 0.1.1-Alpha (29.01.2024)
 - Bugfix: Position of multiple meshes were completely messed up
 
