@@ -1,3 +1,7 @@
+# Version 0.1.2-Alpha (11.02.2024)
+- Bugfix: Materials weren't correctly merged
+- Added new mesher (greedy textured), which creates a bigger texture but a smaller mesh.
+
 # Version 0.1.2-Alpha (02.02.2024)
 - Bugfix: Crash on empty mesh
 - Added new greedy mesher, which reduces vertices more than the old one.

@@ -49,7 +49,7 @@ run/main_scene="res://Scenes/Main.tscn"
 boot_splash/image="res://Assets/Icons/VOptimizer-Splash.png"
 config/icon="res://icon.png"
 config/windows_native_icon="res://icon.ico"
-config/version="0.1.2-Alpha"
+config/version="0.1.3-Alpha"
 
 [autoload]
 
